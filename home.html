@@ -152,7 +152,8 @@
       text-transform: uppercase;
     }
 
-    @media (max-width: 800px) { .draw-cards { grid-template-columns: 1fr; max-width: 320px; margin: 0 auto; } }
+    @media (max-width: 1000px) { .draw-cards { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 620px) { .draw-cards { grid-template-columns: 1fr; max-width: 320px; margin: 0 auto; } }
     @media (max-width: 620px) { .portal-wrap { padding: 24px 16px 48px; } }
   </style>
 </head>
@@ -191,19 +192,29 @@
     <!-- Draw cards -->
     <div class="draw-cards">
       <a class="draw-card" href="draw-select.html?type=customers">
-        <div class="icon-circle"><i data-lucide="users"></i></div>
-        <h3 class="dc-sub">Bi-Weekly Draw</h3>
-        <span class="dc-label">Customers Draw</span>
+        <div class="icon-circle"><i data-lucide="trophy"></i></div>
+        <h3 class="dc-sub">GRAND PRIZE<br>AD PRICE 1 MILLION ETB</h3>
+        <span class="dc-label">MERCHANT DRAW</span>
       </a>
       <a class="draw-card" href="draw-select.html?type=merchants">
-        <div class="icon-circle"><i data-lucide="store"></i></div>
-        <h3 class="dc-sub">Bi-Weekly Draw</h3>
-        <span class="dc-label">Merchants Draw</span>
+        <div class="icon-circle"><i data-lucide="award"></i></div>
+        <h3 class="dc-sub">MEGA PRIZE<br>500K ETB</h3>
+        <span class="dc-label">MERCHANT DRAW</span>
       </a>
       <a class="draw-card" href="draw-select.html?type=agents">
-        <div class="icon-circle"><i data-lucide="handshake"></i></div>
-        <h3 class="dc-sub">Bi-Weekly Draw</h3>
-        <span class="dc-label">Agents Draw</span>
+        <div class="icon-circle"><i data-lucide="gem"></i></div>
+        <h3 class="dc-sub">SUPPER PRIZE<br>100K ETB</h3>
+        <span class="dc-label">MERCHANT DRAW</span>
+      </a>
+      <a class="draw-card" href="draw-select.html?type=daily-float">
+        <div class="icon-circle"><i data-lucide="zap"></i></div>
+        <h3 class="dc-sub">DAILY FLOAT<br>50 UPTO 1,000 REWARD</h3>
+        <span class="dc-label">MERCHANT DRAW</span>
+      </a>
+      <a class="draw-card" href="draw-select.html?type=data-daily">
+        <div class="icon-circle"><i data-lucide="signal"></i></div>
+        <h3 class="dc-sub">DATA & DAILY<br>UPTO 2GB + 400 MIN</h3>
+        <span class="dc-label">MERCHANT DRAW</span>
       </a>
     </div>
 
