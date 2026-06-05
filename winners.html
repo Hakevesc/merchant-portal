@@ -12,8 +12,26 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body.portal-body { background: #f2f4f6; background-image: radial-gradient(#dce5e0 0.8px, transparent 0.8px); background-size: 22px 22px; font-family: 'Barlow', sans-serif; }
-    .portal-wrap { max-width: 1300px; }
+    .portal-wrap { max-width: 1300px; padding-bottom: 100px; }
     @media (max-width: 620px) { .portal-topbar { padding: 8px 20px; } }
+
+    /* ── Floating bottom bar ── */
+    .float-bar {
+      position: fixed;
+      bottom: 24px;
+      left: 50%; transform: translateX(-50%);
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 20px;
+      background: #fff;
+      border-radius: 60px;
+      padding: 10px 10px 10px 20px;
+      box-shadow: 0 8px 32px rgba(0,0,0,.14), 0 2px 8px rgba(35,145,80,.1);
+      border: 1px solid rgba(35,145,80,.12);
+      z-index: 50;
+      min-width: 420px;
+      max-width: calc(100vw - 48px);
+    }
+    .float-bar .pg-info { font-size: .8rem; color: #888; font-weight: 600; white-space: nowrap; }
   </style>
 </head>
 <body class="portal-body">
@@ -51,23 +69,23 @@
         </div>
       </div>
 
-      <!-- Top controls: pagination (left) + Confirm & Close (right) -->
-      <div class="w-footer" style="border-top:none; border-bottom:1px solid #e8ece9;">
-        <div class="w-pager">
-          <button class="pg-btn" onclick="prevPage()"><span>&larr;</span> PREVIOUS</button>
-          <span class="pg-info" id="pageInfo">Page 1 of 2</span>
-          <button class="pg-btn" onclick="nextPage()">NEXT <span>&rarr;</span></button>
-        </div>
-        <button class="confirm-close-btn" onclick="openModal()">
-          <span class="cc-check">&#10003;</span> CONFIRM & CLOSE
-        </button>
-      </div>
-
       <!-- Table column header + rows -->
       <div class="w-head" id="winnersHead"></div>
       <div class="w-list" id="winnersList"></div>
 
     </div>
+  </div>
+
+  <!-- Floating bottom bar -->
+  <div class="float-bar">
+    <div class="w-pager">
+      <button class="pg-btn" onclick="prevPage()"><span>&larr;</span> PREVIOUS</button>
+      <span class="pg-info" id="pageInfo">Page 1 of 2</span>
+      <button class="pg-btn" onclick="nextPage()">NEXT <span>&rarr;</span></button>
+    </div>
+    <button class="confirm-close-btn" onclick="openModal()">
+      <span class="cc-check">&#10003;</span> CONFIRM & CLOSE
+    </button>
   </div>
 
   <!-- Confirm & Close modal -->
