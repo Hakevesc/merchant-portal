@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Draw Selection — Terek Be M-PESA Promo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="portal.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body.portal-body { background: #f2f4f6; font-family: 'Barlow', sans-serif; }
+
+    /* ════════ REDESIGNED HEADER ════════ */
+    .portal-topbar {
+      background: linear-gradient(120deg, #1b7341 0%, #239150 48%, #2cb464 100%);
+      padding: 14px 40px;
+      display: flex; align-items: center; justify-content: space-between;
+      box-shadow: 0 6px 24px rgba(35, 145, 80, 0.28);
+      position: sticky; top: 0; z-index: 100; overflow: hidden;
+    }
+    .portal-topbar::after {
+      content: ""; position: absolute; top: -60%; right: 8%;
+      width: 220px; height: 220px;
+      background: radial-gradient(circle, rgba(255,255,255,0.18) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .portal-topbar .brand {
+      display: flex; align-items: center; gap: 16px; position: relative; z-index: 1;
+    }
+    .portal-topbar .brand .logo-wrapper {
+      display: flex; align-items: center; justify-content: center;
+      background: #ffffff; border-radius: 14px; padding: 9px 18px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.16);
+    }
+    .portal-topbar .brand .logo-wrapper img { height: 30px; object-fit: contain; display: block; }
+    .portal-topbar .brand-title {
+      font-family: 'Barlow', sans-serif !important;
+      font-weight: 800; font-size: 1.05rem; letter-spacing: 0.6px;
+      text-transform: uppercase; color: #ffffff !important;
+      padding-left: 16px; border-left: 2px solid rgba(255,255,255,0.28); line-height: 1.15;
+    }
+    .portal-topbar .topbar-right { position: relative; z-index: 1; }
+
+    @media (max-width: 620px) {
+      .portal-topbar .brand-title { font-size: 0.8rem; padding-left: 12px; }
+      .portal-topbar .logout-btn span.lbl { display: none; }
+    }
+
+    .portal-wrap { max-width: 1300px; margin: 0 auto; padding: 32px 32px 60px; }
+
+    /* --- banner --- */
+    .p-card { background: transparent; box-shadow: none; margin-bottom: 36px; }
+    .p-banner {
+      background: linear-gradient(125deg, #1e7b46 0%, #239150 40%, #2bb162 100%);
+      border-radius: 32px; padding: 32px 28px; text-align: center;
+      box-shadow: 0 15px 35px rgba(35, 145, 80, 0.25);
+      position: relative; overflow: hidden; transition: transform 0.2s ease;
+    }
+    .p-banner .banner-deco {
+      position: absolute; pointer-events: none; opacity: 0.08;
+    }
+    .p-banner .banner-deco.right {
+      bottom: -20px; right: -10px;
+    }
+    .p-banner .banner-deco.right i,
+    .p-banner .banner-deco.right [data-lucide] {
+      width: 120px; height: 120px; stroke-width: 1.2;
+    }
+    .p-banner .banner-deco.left {
+      top: -20px; left: -10px;
+    }
+    .p-banner .banner-deco.left i,
+    .p-banner .banner-deco.left [data-lucide] {
+      width: 90px; height: 90px; stroke-width: 1.2;
+    }
+    .prize-label {
+      font-size: 1.9rem; font-weight: 800; letter-spacing: -0.3px;
+      text-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      background: linear-gradient(135deg, #ffffff, #f9ffea);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    @media (max-width: 640px) {
+      .prize-label { font-size: 1.3rem; }
+      .p-banner { padding: 22px 18px; }
+    }
+
+    /* ════════ SECTION HEADING (Prize Categories) ════════ */
+    .section-wrap {
+      display: flex; align-items: center; justify-content: center;
+      gap: 18px; margin: 4px 0 30px;
+    }
+    .section-wrap .line {
+      display: block; height: 2px; width: 70px; max-width: 12vw;
+      background: linear-gradient(90deg, transparent, rgba(35,145,80,0.45)); border-radius: 2px;
+      flex-shrink: 0;
+    }
+    .section-wrap .line.right { background: linear-gradient(90deg, rgba(35,145,80,0.45), transparent); }
+    .section-heading {
+      display: inline-flex; align-items: center; gap: 9px;
+      font-size: 0.82rem; font-weight: 800; color: #239150;
+      text-transform: uppercase; letter-spacing: 3px;
+      background: #ffffff; padding: 11px 28px; border-radius: 60px;
+      border: 1.5px solid rgba(35,145,80,0.18);
+      box-shadow: 0 6px 18px rgba(35,145,80,0.12); white-space: nowrap;
+    }
+    .section-heading i,
+    .section-heading [data-lucide] { width: 17px; height: 17px; stroke-width: 2.4; color: #239150; }
+
+    /* ---- prize cards ---- */
+    .prize-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 28px; margin-top: 12px; }
+    .prize-card {
+      background: #ffffff; border-radius: 32px; padding: 36px 28px 28px;
+      display: flex; flex-direction: column; align-items: center; text-align: center;
+      border: 1px solid rgba(35, 145, 80, 0.15);
+      box-shadow: 0 12px 28px -12px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.02);
+      transition: all 0.35s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+      position: relative; overflow: hidden;
+    }
+    .prize-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 28px 38px -16px rgba(35, 145, 80, 0.28), 0 2px 5px rgba(0,0,0,0.02);
+      border-color: rgba(35, 145, 80, 0.4);
+    }
+    .prize-card:hover .icon-circle { transform: scale(1.1) translateY(-4px); }
+
+    .prize-card p {
+      font-size: 16px; color: #5f6c66; text-align: center;
+      padding: 0; margin: 6px 0 18px; font-weight: 500; line-height: 1.3;
+    }
+
+    /* badge — matches home .dc-sub exactly */
+    .dc-sub {
+      font-size: 0.75rem; font-weight: 700; color: #239150;
+      text-transform: uppercase; letter-spacing: 2px;
+      background: #eef6f1; padding: 10px 14px; border-radius: 40px;
+      margin-bottom: 12px; display: inline-flex; align-items: center; gap: 4px;
+    }
+    .dc-sub i, .dc-sub [data-lucide] { width: 14px; height: 14px; stroke-width: 2; }
+
+    /* h3 — matches home .dc-label (all caps, bold, dark) */
+    .prize-card h3 {
+      font-family: 'Barlow', sans-serif;
+      font-size: 1.15rem; font-weight: 800; color: #1a1a1a; letter-spacing: -0.1px;
+      text-transform: uppercase; text-align: center; margin: 0 0 6px;
+    }
+
+    /* RUN button -- higher specificity to override portal.css .prize-card .run-btn */
+    .prize-card .run-btn {
+      margin-top: auto; padding: 15px 28px; border: none; border-radius: 60px;
+      font-family: 'Barlow', sans-serif; font-weight: 800; font-size: 0.88rem;
+      letter-spacing: 1px; text-transform: uppercase; cursor: pointer;
+      text-align: center; text-decoration: none;
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      background: linear-gradient(105deg, #239150 0%, #2fc56d 100%);
+      color: #ffffff; box-shadow: 0 6px 14px rgba(35, 145, 80, 0.3);
+      transition: all 0.25s; width: 100%;
+    }
+    .prize-card .run-btn:hover {
+      transform: translateY(-2px); filter: brightness(1.05);
+      box-shadow: 0 12px 22px rgba(35, 145, 80, 0.35);
+    }
+    /* keep old color classes non-breaking but unify to green */
+    .run-green, .run-navy, .run-red, .run-purple { background: linear-gradient(105deg, #239150 0%, #2fc56d 100%); color: #ffffff; box-shadow: 0 6px 14px rgba(35, 145, 80, 0.3); }
+
+    @media (max-width: 1000px) { .prize-cards { grid-template-columns: repeat(2, 1fr); gap: 24px; } }
+    @media (max-width: 620px) {
+      .prize-cards { grid-template-columns: 1fr; max-width: 360px; margin-left: auto; margin-right: auto; }
+      .prize-card { padding: 24px 24px 0 24px; }
+      .portal-wrap { padding: 20px 16px 48px; }
+      .portal-topbar { padding: 8px 20px; }
+      .portal-nav { padding: 8px 20px; }
+    }
+
+    .portal-body { background-image: radial-gradient(#dce5e0 0.8px, transparent 0.8px); background-size: 22px 22px; }
+  </style>
+</head>
+<body class="portal-body">
+
+  <div class="portal-topbar">
+    <div class="brand">
+      <div class="logo-wrapper">
+        <img src="M-Pesa-Logo.png" alt="M-PESA">
+      </div>
+      <span class="brand-title">Terek Be M-PESA Promo</span>
+    </div>
+    <div class="topbar-right">
+      <a href="index.html" class="logout-btn"><i data-lucide="log-out" style="width:16px;height:16px;stroke-width:2.5;"></i> Logout</a>
+    </div>
+  </div>
+
+  <div class="portal-nav">
+    <a href="home.html"><i data-lucide="home" style="width:16px;height:16px;vertical-align:middle;margin-right:4px;"></i> Home</a>
+    &nbsp;›&nbsp; <span class="crumb-active" id="breadcrumb">Draw Selection</span>
+  </div>
+
+  <div class="portal-wrap">
+    <div class="p-card">
+      <div class="p-banner">
+        <div class="banner-deco right"><i data-lucide="dices"></i></div>
+        <div class="banner-deco left"><i data-lucide="sparkles"></i></div>
+        <div class="prize-label" id="drawBanner">Customer's Bi-Weekly Draw — 26th December 2023</div>
+        <div style="font-size: 0.85rem; margin-top: 14px; opacity: 0.85; font-weight: 500; letter-spacing: 0.5px;"><i data-lucide="sparkles" style="width:16px;height:16px;display:inline;vertical-align:middle;"></i> select a prize category to start the draw <i data-lucide="sparkles" style="width:16px;height:16px;display:inline;vertical-align:middle;"></i></div>
+      </div>
+    </div>
+
+    <div class="section-wrap">
+      <span class="line"></span>
+      <div class="section-heading"><i data-lucide="gift"></i> Prize Categories</div>
+      <span class="line right"></span>
+    </div>
+
+    <div class="prize-cards" id="prizeCards"></div>
+  </div>
+
+  <script>
+    (function() {
+      const params = new URLSearchParams(window.location.search);
+      const type = params.get('type') || 'customers';
+
+      const prizeLucideIcons = { airtime: 'signal', awaze: 'smartphone', nana: 'tablet', bajaj: 'truck' };
+
+      const configs = {
+        customers: {
+          label: "Customer's Bi-Weekly Draw",
+          prizes: [
+            { icon: 'airtime', title: 'Airtime — 250 Birr', desc: '200 winners across all 6 regions', prize: 'airtime', shortDesc: 'Instant airtime reward' },
+            { icon: 'awaze',   title: 'Awaze Phone',         desc: '6 lucky customers · nationwide', prize: 'awaze', shortDesc: 'Premium smartphone' },
+            { icon: 'nana',    title: 'Nana Teleone Phone',  desc: '6 winners · all regions', prize: 'nana', shortDesc: 'Next-gen device' },
+            { icon: 'bajaj',   title: 'Bajaj',               desc: '3 grand winners', prize: 'bajaj', shortDesc: '3-wheel motor vehicle' }
+          ]
+        },
+        merchants: {
+          label: "Merchant's Bi-Weekly Draw",
+          prizes: [
+            { icon: 'airtime', title: 'Airtime — 250 Birr', desc: '200 merchants across regions', prize: 'airtime', shortDesc: 'Business airtime' },
+            { icon: 'awaze',   title: 'Awaze Phone',         desc: '6 merchant champions', prize: 'awaze', shortDesc: 'Official device' },
+            { icon: 'nana',    title: 'Nana Teleone Phone',  desc: '6 merchants · national', prize: 'nana', shortDesc: 'Top-tier phone' },
+            { icon: 'bajaj',   title: 'Bajaj',               desc: '3 merchants · bonus mobility', prize: 'bajaj', shortDesc: 'Utility vehicle' }
+          ]
+        },
+        agents: {
+          label: "Agent's Bi-Weekly Draw",
+          prizes: [
+            { icon: 'airtime', title: 'Airtime — 250 Birr', desc: '200 agents across 6 regions', prize: 'airtime', shortDesc: 'Agent talk time' },
+            { icon: 'awaze',   title: 'Awaze Phone',         desc: '6 agents · special edition', prize: 'awaze', shortDesc: 'Agent pro device' },
+            { icon: 'nana',    title: 'Nana Teleone Phone',  desc: '6 agents · national reach', prize: 'nana', shortDesc: 'Connectivity+' },
+            { icon: 'bajaj',   title: 'Bajaj',               desc: '3 agents · mobility boost', prize: 'bajaj', shortDesc: 'Agent support asset' }
+          ]
+        }
+      };
+
+      const cfg = configs[type] || configs.customers;
+      const displayDate = "26th December 2023";
+      const labelIcons = { customers: 'users', merchants: 'store', agents: 'handshake' };
+      document.getElementById('drawBanner').innerHTML = `<i data-lucide="${labelIcons[type] || 'users'}" style="width:32px;height:32px;display:inline;vertical-align:middle;margin-right:6px;color:#fff;"></i> ${cfg.label} — ${displayDate}`;
+      document.getElementById('breadcrumb').innerHTML = cfg.label;
+
+      const prizeColorMap = {
+        airtime: { class: 'pc-green',  runClass: 'run-green',  borderHint: '#239150' },
+        awaze:   { class: 'pc-navy',   runClass: 'run-navy',   borderHint: '#43B7B0' },
+        nana:    { class: 'pc-red',    runClass: 'run-red',    borderHint: '#FE9500' },
+        bajaj:   { class: 'pc-purple', runClass: 'run-purple', borderHint: '#1074FF' }
+      };
+
+      const gridContainer = document.getElementById('prizeCards');
+      gridContainer.innerHTML = '';
+
+      cfg.prizes.forEach((p) => {
+        const prizeKey = p.prize;
+        const colorStyle = prizeColorMap[prizeKey] || prizeColorMap.airtime;
+        const lucideIcon = prizeLucideIcons[prizeKey] || 'gift';
+        const regionHint = "· all 6 regions ·";
+        const fullDesc = p.desc.includes('region') ? p.desc : `${p.desc} ${regionHint}`;
+        const iconHtml = `<i data-lucide="${lucideIcon}"></i>`;
+
+        const card = document.createElement('div');
+        card.className = 'prize-card';
+        card.style.setProperty('--accent', colorStyle.borderHint);
+        card.innerHTML = `
+          <div class="icon-circle">${iconHtml}</div>
+          <h3 class="${colorStyle.class}">${p.title}</h3>
+          <div style="display:flex; justify-content:center;">
+            <span class="dc-sub"><i data-lucide="award" style="width:14px;height:14px;stroke-width:2;"></i> ${p.shortDesc || 'Limited draw'}</span>
+          </div>
+          <p>${fullDesc}</p>
+          <a href="loading.html?type=${type}&prize=${prizeKey}&label=${encodeURIComponent(p.title)}"
+             class="run-btn ${colorStyle.runClass}">
+            <span>RUN DRAW</span>
+          </a>
+        `;
+        gridContainer.appendChild(card);
+      });
+
+      if (typeof lucide !== 'undefined' && lucide.createIcons) { lucide.createIcons(); }
+
+    })();
+  </script>
+  <noscript>Enable JavaScript to view draw categories</noscript>
+</body>
+</html>

@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Print Results — Terek Be M-PESA Promo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="portal.css" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body.portal-body {
+      background: #f0f4f2;
+      background-image: radial-gradient(#c9d9ce 0.8px, transparent 0.8px);
+      background-size: 22px 22px;
+      font-family: 'Barlow', sans-serif;
+    }
+    @media (max-width: 620px) { .portal-topbar { padding: 8px 16px; } }
+
+    /* ── Topbar action buttons ── */
+    .tb-action-btns {
+      display: flex; align-items: center; gap: 8px;
+      position: relative; z-index: 1;
+    }
+    .tb-home-btn {
+      font-family: 'Barlow', sans-serif;
+      display: inline-flex; align-items: center; gap: 7px;
+      color: #fff;
+      background: rgba(255,255,255,.12);
+      border: 1.5px solid rgba(255,255,255,.28);
+      border-radius: 40px;
+      padding: 9px 18px;
+      font-weight: 700; font-size: .82rem;
+      text-decoration: none;
+      transition: background .2s, transform .15s;
+    }
+    .tb-home-btn:hover { background: rgba(255,255,255,.26); color: #fff; transform: translateY(-1px); }
+
+    .tb-print-btn {
+      font-family: 'Barlow', sans-serif;
+      display: inline-flex; align-items: center; gap: 7px;
+      color: #239150;
+      background: #ffffff;
+      border: none;
+      border-radius: 40px;
+      padding: 9px 20px;
+      font-weight: 800; font-size: .82rem;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,.12);
+      transition: background .2s, transform .15s, box-shadow .2s;
+    }
+    .tb-print-btn:hover { background: #edfaf3; transform: translateY(-1px); box-shadow: 0 4px 14px rgba(0,0,0,.16); }
+
+    .tb-divider {
+      width: 1px; height: 28px;
+      background: rgba(255,255,255,.22);
+      margin: 0 4px;
+    }
+
+
+    /* ── Print card ── */
+    .print-wrap {
+      max-width: 940px;
+      margin: 36px auto;
+      background: #fff;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 10px 36px rgba(35,145,80,.14), 0 2px 8px rgba(0,0,0,.07);
+    }
+
+    /* ── Banner — two-column layout ── */
+    .print-banner {
+      background: linear-gradient(135deg, #1a7a40 0%, #239150 55%, #2cac62 100%);
+      padding: 28px 40px 24px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .banner-top-row {
+      display: flex;
+      align-items: center;
+      gap: 0;
+    }
+    .print-banner::before {
+      content: '';
+      position: absolute; top: -50px; right: -50px;
+      width: 200px; height: 200px;
+      background: rgba(255,255,255,.07); border-radius: 50%;
+    }
+    .print-banner::after {
+      content: '';
+      position: absolute; bottom: -40px; left: 40%;
+      width: 140px; height: 140px;
+      background: rgba(255,255,255,.04); border-radius: 50%;
+    }
+
+    /* Left badge */
+    .banner-badge {
+      position: relative; z-index: 1; flex-shrink: 0;
+      width: 77px; height: 77px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.14);
+      border: 2px solid rgba(255,255,255,.28);
+      display: flex; align-items: center; justify-content: center;
+      margin-right: 24px;
+    }
+    .banner-badge svg { width: 36px; height: 36px; stroke: #fff; stroke-width: 2; }
+
+    /* Vertical divider between badge and text */
+    .banner-vdivider {
+      position: relative; z-index: 1; flex-shrink: 0;
+      width: 1.5px; height: 58px;
+      background: rgba(255,255,255,.22);
+      border-radius: 2px;
+      margin-right: 20px;
+      margin-top: 6px;
+    }
+
+    /* Right text block */
+    .banner-text {
+      position: relative; z-index: 1;
+      display: flex; flex-direction: column; gap: 4px;
+      padding-top: 2px;
+    }
+    .banner-eyebrow {
+      font-size: .72rem; font-weight: 700; letter-spacing: 1.8px;
+      text-transform: uppercase; color: rgba(255,255,255,.6);
+    }
+    .banner-title {
+      font-size: 1.45rem; font-weight: 900; color: #fff;
+      letter-spacing: .2px; line-height: 1.2;
+    }
+    .banner-subtitle {
+      font-size: .88rem; font-weight: 600; color: rgba(255,255,255,.78);
+      margin-top: 2px;
+    }
+    .banner-prize {
+      display: inline-flex; align-items: center; gap: 6px;
+      margin-top: 10px;
+      background: rgba(255,255,255,.16);
+      border: 1.5px solid rgba(255,255,255,.32);
+      backdrop-filter: blur(6px);
+      color: #fff;
+      padding: 5px 16px; border-radius: 30px;
+      font-size: .78rem; font-weight: 700; letter-spacing: .5px;
+      width: fit-content;
+    }
+
+    /* ── Meta row ── */
+    .banner-meta {
+      position: relative; z-index: 1;
+      display: flex; align-items: center; gap: 0;
+      margin-top: 16px;
+      padding-left: 101px; /* badge 77 + margin-right 24 = indent under text */
+      flex-wrap: wrap;
+    }
+    .meta-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 0 40px 0 0;
+      margin-right: 40px;
+      border-right: 1px solid rgba(255,255,255,.18);
+    }
+    .meta-item:last-child { border-right: none; padding-right: 0; margin-right: 0; }
+    .meta-icon {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: rgba(255,255,255,.1);
+      border: 1px solid rgba(255,255,255,.18);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .meta-icon svg { width: 14px; height: 14px; stroke: rgba(255,255,255,.7); stroke-width: 2.2; }
+    .meta-text { display: flex; flex-direction: column; gap: 2px; }
+    .meta-lbl {
+      font-size: .64rem; font-weight: 700; letter-spacing: 1.3px;
+      text-transform: uppercase; color: rgba(255,255,255,.45);
+    }
+    .meta-val {
+      font-size: .84rem; font-weight: 700; color: #fff;
+    }
+
+    /* ── Confirmed strip ── */
+    .confirmed-strip {
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px 28px;
+      background: #edf8f2;
+      border-bottom: 1px solid #d4eedd;
+    }
+    .confirmed-strip .banner-prize {
+      background: linear-gradient(135deg, #2FC56D 0%, #239150 100%);
+      border: none;
+      color: #fff;
+      font-weight: 800;
+      font-size: 14px;
+      padding: 10px 16px;
+      backdrop-filter: none;
+      box-shadow: 0 4px 12px rgba(35,145,80,.28);
+    }
+    .cs-icon {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: #239150; color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; font-size: 1rem;
+    }
+    .cs-text { font-size: .86rem; font-weight: 700; color: #1b7341; }
+    .cs-sub  { font-size: .75rem; font-weight: 500; color: #5a9070; }
+
+    /* ── Table ── */
+    .pt-head {
+      display: grid; align-items: center; gap: 8px;
+      padding: 12px 28px;
+      background: #f0f5f2; color: #5b6e62;
+      font-family: 'Barlow', sans-serif;
+      font-weight: 700; font-size: .7rem;
+      text-transform: uppercase; letter-spacing: .5px;
+      border-bottom: 1px solid #dde8e2;
+    }
+    .pt-row {
+      display: grid; align-items: center; gap: 8px;
+      padding: 13px 28px;
+      background: #fff; color: #2a3530;
+      font-family: 'Barlow', sans-serif;
+      font-weight: 600; font-size: .86rem;
+      border-bottom: 1px solid #eef1ef;
+      transition: background .12s;
+    }
+    .pt-row:nth-child(even) { background: #f7faf8; }
+    .pt-row:hover { background: #ebf5ef; }
+    .pt-row .rn { font-weight: 800; color: #239150; }
+
+    .ptg-cust  { grid-template-columns: 36px 1.6fr 1.1fr 1fr 1fr .95fr 130px; }
+    .ptg-merch { grid-template-columns: 36px 1.4fr 1fr 65px 1fr .85fr .85fr 130px; }
+
+    .st-ok {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: #e7f4ec; color: #1b7341; border: 1.5px solid #b7ddc5;
+      padding: 4px 12px; border-radius: 50px;
+      font-size: .68rem; font-weight: 800;
+      white-space: nowrap; text-transform: uppercase; letter-spacing: .4px;
+    }
+    .st-nr {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: #fdeaea; color: #aa0000; border: 1.5px solid #f1c4c4;
+      padding: 4px 12px; border-radius: 50px;
+      font-size: .68rem; font-weight: 800;
+      white-space: nowrap; text-transform: uppercase; letter-spacing: .4px;
+    }
+    .st-pend {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: #f5f5f5; color: #888; border: 1.5px solid #ddd;
+      padding: 4px 12px; border-radius: 50px;
+      font-size: .68rem; font-weight: 800;
+      white-space: nowrap; text-transform: uppercase; letter-spacing: .4px;
+    }
+
+    /* ── Footer ── */
+    .print-footer {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 14px;
+      padding: 20px 28px;
+      border-top: 1px solid #e8ece9;
+      background: #fbfcfb;
+    }
+    .footer-note { font-size: .78rem; color: #999; font-weight: 500; }
+    .footer-btns { display: flex; gap: 10px; }
+
+    .btn-home-f {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: transparent; border: 2px solid #239150; color: #239150;
+      padding: 11px 26px; border-radius: 50px;
+      font-family: 'Barlow', sans-serif; font-size: .85rem; font-weight: 800;
+      text-transform: uppercase; letter-spacing: .5px;
+      text-decoration: none; cursor: pointer;
+      transition: background .2s, transform .15s;
+    }
+    .btn-home-f:hover { background: #edf7f2; transform: translateY(-1px); }
+
+    .btn-print-f {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: linear-gradient(135deg, #2FC56D 0%, #239150 100%);
+      color: #fff; border: none; cursor: pointer;
+      padding: 13px 30px; border-radius: 50px;
+      font-family: 'Barlow', sans-serif; font-size: .85rem; font-weight: 800;
+      text-transform: uppercase; letter-spacing: .5px;
+      box-shadow: 0 6px 18px rgba(35,145,80,.28);
+      transition: transform .15s, box-shadow .2s, filter .15s;
+    }
+    .btn-print-f:hover { transform: translateY(-2px); box-shadow: 0 10px 26px rgba(35,145,80,.38); filter: brightness(1.05); }
+
+    /* ── Print media ── */
+    @media print {
+      * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+      body { background: #fff !important; }
+      .portal-topbar, .portal-nav, .print-footer, .confirmed-strip { display: none !important; }
+      .print-wrap { box-shadow: none !important; border-radius: 0 !important; margin: 0 !important; }
+      .print-banner {
+        border-radius: 0 !important;
+        background: linear-gradient(135deg, #1a7a40 0%, #239150 55%, #2cac62 100%) !important;
+      }
+      .banner-badge { background: rgba(255,255,255,.2) !important; border-color: rgba(255,255,255,.4) !important; }
+      .pt-row:nth-child(even) { background: #f4f8f6 !important; }
+      .pt-row:hover { background: inherit !important; }
+      .st-ok  { background: #e7f4ec !important; }
+      .st-nr  { background: #fdeaea !important; }
+      .st-pend{ background: #f5f5f5 !important; }
+      @page { margin: 12mm 16mm; }
+    }
+
+    @media (max-width: 640px) {
+      .print-banner { flex-wrap: wrap; padding: 24px 20px; }
+      .banner-meta  { margin-left: 0; }
+      .meta-item    { padding-right: 16px; margin-right: 16px; }
+      .print-footer, .pt-head, .pt-row { padding: 14px 16px; }
+    }
+  </style>
+</head>
+<body class="portal-body">
+
+  <!-- Topbar with Home + Print + Logout -->
+  <div class="portal-topbar">
+    <div class="brand" style="display:flex;align-items:center;gap:16px;position:relative;z-index:1;">
+      <div class="logo-wrapper" style="display:flex;align-items:center;justify-content:center;background:#fff;border-radius:14px;padding:9px 18px;box-shadow:0 4px 14px rgba(0,0,0,0.16);">
+        <img src="M-Pesa-Logo.png" alt="M-PESA" style="height:30px;object-fit:contain;display:block;" />
+      </div>
+      <span class="brand-title" style="font-family:'Barlow',sans-serif;font-weight:800;font-size:1.05rem;letter-spacing:.6px;text-transform:uppercase;color:#fff;padding-left:16px;border-left:2px solid rgba(255,255,255,0.28);line-height:1.15;">Terek Be M-PESA Promo</span>
+    </div>
+
+    <div class="tb-action-btns">
+      <a href="home.html" class="tb-home-btn">
+        <i data-lucide="home" style="width:15px;height:15px;stroke-width:2.5;"></i>
+        Home
+      </a>
+      <button class="tb-print-btn" onclick="window.print()">
+        <i data-lucide="printer" style="width:15px;height:15px;stroke-width:2.5;color:#239150;"></i>
+        Print
+      </button>
+      <div class="tb-divider"></div>
+      <a href="index.html" class="logout-btn">
+        <i data-lucide="log-out" style="width:16px;height:16px;stroke-width:2.5;"></i>
+        Logout
+      </a>
+    </div>
+  </div>
+
+  <!-- Breadcrumb -->
+  <div class="portal-nav">
+    <a href="home.html"><i data-lucide="home" style="width:15px;height:15px;vertical-align:middle;margin-right:4px;"></i> Home</a>
+    &nbsp;›&nbsp;
+    <a href="javascript:history.go(-3)" id="drawCrumb">Draw Selection</a>
+    &nbsp;›&nbsp;
+    <a href="javascript:history.go(-1)" id="winnersCrumb">Winners</a>
+    &nbsp;›&nbsp;
+    <span class="crumb-active">Print Results</span>
+  </div>
+
+  <div class="portal-wrap" style="max-width:980px;">
+    <div class="print-wrap">
+
+      <!-- Banner -->
+      <div class="print-banner">
+
+        <!-- Top row: badge + divider + text -->
+        <div class="banner-top-row">
+          <div class="banner-badge">
+            <i data-lucide="trophy" style="width:36px;height:36px;stroke:#fff;stroke-width:1.8;fill:rgba(255,255,255,.12);"></i>
+          </div>
+          <div class="banner-vdivider"></div>
+          <div class="banner-text">
+            <div class="banner-eyebrow">Draw Results — Confirmed &amp; Closed</div>
+            <div class="banner-title" id="bannerTitle">Agent's Bi-Weekly Draw — 26th December 2023</div>
+          </div>
+        </div>
+
+        <!-- Meta row — sits naturally below, indented under text -->
+        <div class="banner-meta" id="metaRow">
+          <div class="meta-item">
+            <div class="meta-icon">
+              <i data-lucide="calendar" style="width:14px;height:14px;stroke:rgba(255,255,255,.75);stroke-width:2.2;"></i>
+            </div>
+            <div class="meta-text">
+              <span class="meta-lbl">Draw Date</span>
+              <span class="meta-val">26th December 2023</span>
+            </div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-icon">
+              <i data-lucide="users" style="width:14px;height:14px;stroke:rgba(255,255,255,.75);stroke-width:2.2;"></i>
+            </div>
+            <div class="meta-text">
+              <span class="meta-lbl">Total Winners</span>
+              <span class="meta-val" id="totalCount">—</span>
+            </div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-icon">
+              <i data-lucide="clock" style="width:14px;height:14px;stroke:rgba(255,255,255,.75);stroke-width:2.2;"></i>
+            </div>
+            <div class="meta-text">
+              <span class="meta-lbl">Printed</span>
+              <span class="meta-val" id="printDate">—</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Confirmed strip -->
+      <div class="confirmed-strip">
+        <div class="cs-icon">&#10003;</div>
+        <div>
+          <div class="cs-text">Draw Confirmed &amp; Closed</div>
+          <div class="cs-sub">All results have been finalised. This document is the official record.</div>
+        </div>
+        <div class="banner-prize" id="bannerPrize" style="margin-left:auto;">🎁 Prize</div>
+      </div>
+
+      <!-- Table -->
+      <div>
+        <div class="pt-head" id="tableHead"></div>
+        <div id="tableBody"></div>
+      </div>
+
+      <!-- Footer -->
+      <div class="print-footer">
+        <div class="footer-note" id="footerNote">Terek Be M-PESA Promo — Official Draw Record</div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const type   = params.get('type')  || 'customers';
+    const prize  = params.get('prize') || 'airtime';
+    const label  = decodeURIComponent(params.get('label') || 'Prize');
+
+    const typeLabels = { customers:"Customer's", merchants:"Merchant's", agents:"Agent's" };
+    const drawTitle  = (typeLabels[type] || "Customer's") + " Bi-Weekly Draw — 26th December 2023";
+
+    document.getElementById('bannerTitle').textContent = drawTitle;
+    document.getElementById('bannerPrize').innerHTML =
+      `<i data-lucide="gift" style="width:14px;height:14px;stroke-width:2.5;flex-shrink:0;"></i> ${label}`;
+    document.getElementById('drawCrumb').href = `draw-select.html?type=${type}`;
+    document.getElementById('winnersCrumb').href =
+      `winners.html?type=${type}&prize=${encodeURIComponent(prize)}&label=${encodeURIComponent(label)}`;
+
+    const now = new Date();
+    document.getElementById('printDate').textContent =
+      now.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' }) + ', ' +
+      now.toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' });
+
+    const CUST = [
+      { no:1,  name:'Selam Kebede',      phone:'251712700105', ticket:'W23EDS34E', region:'Addis Ababa', cluster:'Kality',       status:'confirmed' },
+      { no:2,  name:'Hiwi Kalab',        phone:'251710766766', ticket:'W23EDS34E', region:'Addis Ababa', cluster:'Kality',       status:'confirmed' },
+      { no:3,  name:'Fraol Solomon',     phone:'251712700001', ticket:'W23EDS34E', region:'Addis Ababa', cluster:'Bole',         status:'confirmed' },
+      { no:4,  name:'John Lema',         phone:'251712700002', ticket:'W23EDS34E', region:'Addis Ababa', cluster:'Bole',         status:'confirmed' },
+      { no:5,  name:'Dawit Solomon',     phone:'251712700003', ticket:'W23EDS34E', region:'Addis Ababa', cluster:'Kality',       status:'confirmed' },
+      { no:6,  name:'Selam Awiti',       phone:'251712700004', ticket:'W23EDS34E', region:'Addis Ababa', cluster:'Kality',       status:'confirmed' },
+      { no:7,  name:'Hiwi Tola',         phone:'251712700230', ticket:'W23EDS34E', region:'Dire Dawa',   cluster:'Sabian',       status:'confirmed' },
+      { no:8,  name:'Liya Haile',        phone:'251712700005', ticket:'W23EDS34E', region:'Hawassa',     cluster:'Tabor',        status:'confirmed' },
+      { no:9,  name:'Tigist Bekele',     phone:'251712700006', ticket:'W23EDS34E', region:'Bahir Dar',   cluster:'Belay Zeleke', status:'confirmed' },
+      { no:10, name:'Biruk Assefa',      phone:'251712700007', ticket:'W23EDS34E', region:'Addis Ababa', cluster:'Kality',       status:'unreachable' },
+      { no:11, name:'Meron Tesfaye',     phone:'251712700008', ticket:'W23EDS34E', region:'Dire Dawa',   cluster:'Sabian',       status:'confirmed' },
+      { no:12, name:'Abel Hailemariam',  phone:'251712700009', ticket:'W23EDS34E', region:'Hawassa',     cluster:'Tabor',        status:'confirmed' },
+    ];
+    const MERCH = [
+      { no:1, name:'Manna Hotel Ltd',   phone:'251712700105', till:'10070', ticket:'W23EDS34E', region:'Addis Ababa', cluster:'Kality',       status:'confirmed' },
+      { no:2, name:'Blessed Hotel Ltd', phone:'251712700106', till:'10071', ticket:'W23EDS34E', region:'Addis Ababa', cluster:'Kality',       status:'confirmed' },
+      { no:3, name:'Star Cafe',         phone:'251712700107', till:'10072', ticket:'W23EDS34E', region:'Addis Ababa', cluster:'Bole',         status:'confirmed' },
+      { no:4, name:'Golden Shop',       phone:'251712700108', till:'10073', ticket:'W23EDS34E', region:'Dire Dawa',   cluster:'Sabian',       status:'confirmed' },
+      { no:5, name:'Blue Nile Mart',    phone:'251712700109', till:'10074', ticket:'W23EDS34E', region:'Hawassa',     cluster:'Tabor',        status:'confirmed' },
+      { no:6, name:'Sunshine PLC',      phone:'251712700110', till:'10075', ticket:'W23EDS34E', region:'Bahir Dar',   cluster:'Belay Zeleke', status:'unreachable' },
+      { no:7, name:'Green Valley PLC',  phone:'251712700111', till:'10076', ticket:'W23EDS34E', region:'Addis Ababa', cluster:'Kality',       status:'confirmed' },
+      { no:8, name:'Royal Mart',        phone:'251712700112', till:'10077', ticket:'W23EDS34E', region:'Dire Dawa',   cluster:'Sabian',       status:'confirmed' },
+      { no:9, name:'Emperor Cafe',      phone:'251712700113', till:'10078', ticket:'W23EDS34E', region:'Hawassa',     cluster:'Tabor',        status:'confirmed' },
+    ];
+
+    const isMerch    = (type === 'merchants');
+    const hasActions = (prize !== 'airtime');
+    const winners    = isMerch ? MERCH : CUST;
+
+    document.getElementById('totalCount').textContent = winners.length + ' Winners';
+    document.getElementById('footerNote').textContent = drawTitle + ' — ' + label + ' — Official Record';
+
+    const gridClass = isMerch ? 'ptg-merch' : 'ptg-cust';
+
+    function headCols() {
+      const base = isMerch
+        ? ['#', 'Merchant', 'Phone', 'Till', 'Ticket', 'Region', 'Cluster']
+        : ['#', 'Name', 'Phone', 'Ticket', 'Region', 'Cluster'];
+      return hasActions ? [...base, 'Status'] : base;
+    }
+
+    function statusTag(s) {
+      if (s === 'confirmed')   return `<span class="st-ok"><i data-lucide="check-circle" style="width:13px;height:13px;stroke-width:2.5;"></i> Confirmed</span>`;
+      if (s === 'unreachable') return `<span class="st-nr"><i data-lucide="x-circle" style="width:13px;height:13px;stroke-width:2.5;"></i> Unreachable</span>`;
+      return `<span class="st-pend">Pending</span>`;
+    }
+
+    const head = document.getElementById('tableHead');
+    head.className = 'pt-head ' + gridClass;
+    head.innerHTML = headCols().map(c => `<span>${c}</span>`).join('');
+
+    const body = document.getElementById('tableBody');
+    winners.forEach(w => {
+      const row = document.createElement('div');
+      row.className = 'pt-row ' + gridClass;
+      if (isMerch) {
+        row.innerHTML = `
+          <span class="rn">${w.no}.</span>
+          <span>${w.name}</span><span>${w.phone}</span>
+          <span>${w.till}</span><span>${w.ticket}</span>
+          <span>${w.region}</span><span>${w.cluster}</span>
+          ${hasActions ? statusTag(w.status) : ''}`;
+      } else {
+        row.innerHTML = `
+          <span class="rn">${w.no}.</span>
+          <span>${w.name}</span><span>${w.phone}</span>
+          <span>${w.ticket}</span><span>${w.region}</span>
+          <span>${w.cluster}</span>
+          ${hasActions ? statusTag(w.status) : ''}`;
+      }
+      body.appendChild(row);
+    });
+
+    if (typeof lucide !== 'undefined' && lucide.createIcons) { lucide.createIcons(); }
+  </script>
+  <noscript>Enable JavaScript to view print results</noscript>
+</body>
+</html>

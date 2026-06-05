@@ -1,0 +1,226 @@
+/* ===== TEREK BE M-PESA PROMO — Merchant Portal ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --green:       #00b300;
+  --green-dark:  #008000;
+  --green-light: #33cc33;
+  --blue:        #0066cc;
+  --red:         #990000;
+  --navy:        #000066;
+  --purple:      #4b0082;
+  --white:       #ffffff;
+  --gray-light:  #f4f4f4;
+  --gray:        #cccccc;
+  --text:        #1a1a1a;
+  --radius:      10px;
+  --shadow:      0 4px 20px rgba(0,0,0,.12);
+}
+
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: #f0f0f0;
+  color: var(--text);
+  min-height: 100vh;
+}
+
+/* ── TOPBAR ─────────────────────────────────────────── */
+.topbar {
+  background: var(--white);
+  border-bottom: 2px solid var(--green);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 8px rgba(0,0,0,.08);
+}
+.topbar h1 {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--green);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  border: 2.5px solid var(--green);
+  padding: 6px 24px;
+  border-radius: 4px;
+}
+
+/* ── PAGE WRAPPER ───────────────────────────────────── */
+.page { max-width: 1200px; margin: 0 auto; padding: 40px 24px; }
+.page-full { width: 100%; padding: 0; }
+
+/* ── CARD ───────────────────────────────────────────── */
+.card {
+  background: var(--white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+/* ── BUTTONS ────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 28px;
+  border: none;
+  border-radius: 50px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  transition: opacity .2s, transform .1s;
+  white-space: nowrap;
+}
+.btn:hover  { opacity: .88; transform: translateY(-1px); }
+.btn:active { transform: translateY(0); }
+
+.btn-green  { background: var(--green);  color: var(--white); }
+.btn-navy   { background: var(--navy);   color: var(--white); }
+.btn-red    { background: var(--red);    color: var(--white); }
+.btn-purple { background: var(--purple); color: var(--white); }
+.btn-blue   { background: var(--blue);   color: var(--white); }
+.btn-outline-green {
+  background: transparent;
+  border: 2px solid var(--green);
+  color: var(--green);
+}
+
+.btn-sm { padding: 6px 14px; font-size: .75rem; border-radius: 6px; }
+.btn-xs { padding: 4px 10px; font-size: .7rem;  border-radius: 5px; font-weight: 700; }
+
+/* ── FORM INPUTS ────────────────────────────────────── */
+.form-group { margin-bottom: 18px; }
+.form-group label {
+  display: block;
+  font-size: .85rem;
+  color: #555;
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+.form-group input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid var(--green);
+  border-radius: var(--radius);
+  font-size: 1rem;
+  outline: none;
+  transition: border-color .2s, box-shadow .2s;
+}
+.form-group input:focus {
+  border-color: var(--green-dark);
+  box-shadow: 0 0 0 3px rgba(0,179,0,.15);
+}
+
+/* ── BANNER (green heading strip) ──────────────────── */
+.banner {
+  background: var(--green);
+  color: var(--white);
+  text-align: center;
+  padding: 28px 24px;
+  font-size: 1.3rem;
+  font-weight: 700;
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+.banner .subtitle {
+  font-size: 1.6rem;
+  font-weight: 800;
+  margin-top: 6px;
+}
+
+/* ── WINNERS TABLE ROWS ─────────────────────────────── */
+.winners-list { padding: 12px 0; }
+.winner-row {
+  display: grid;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 16px;
+  margin: 6px 12px;
+  background: var(--green);
+  border-radius: 8px;
+  color: var(--white);
+  font-weight: 600;
+  font-size: .9rem;
+}
+.winner-row .num { font-size: 1rem; font-weight: 800; min-width: 28px; }
+
+/* customer row: 6 cols */
+.winner-row.cust { grid-template-columns: 28px 1fr 1fr 1fr 1fr 1fr; }
+/* merchant row: 7 cols */
+.winner-row.merch { grid-template-columns: 28px 1fr 1fr 70px 1fr 80px 80px; }
+/* prize row (with confirm/unreachable): append action cols */
+.winner-row.action-row { grid-template-columns: 28px 1fr 1fr 1fr 1fr 1fr 70px 95px; }
+.winner-row.merch-action { grid-template-columns: 28px 1fr 1fr 60px 1fr 80px 80px 80px; }
+
+.action-btns { display: flex; gap: 4px; justify-content: flex-end; }
+.btn-confirm     { background: #005500; color:#fff; }
+.btn-unreachable { background: #cc0000; color:#fff; }
+.btn-confirmed-tag {
+  background: #006600;
+  color: #fff;
+  padding: 4px 10px;
+  border-radius: 5px;
+  font-size: .72rem;
+  font-weight: 700;
+}
+
+/* ── PAGINATION BAR ─────────────────────────────────── */
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-top: 1px solid #eee;
+}
+.confirm-close-btn {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+}
+
+/* ── LOADING ────────────────────────────────────────── */
+.loading-text {
+  font-size: 2rem;
+  color: #333;
+  text-align: center;
+  padding: 60px 0;
+  letter-spacing: 2px;
+}
+.loading-text span { display: inline-block; animation: blink 1.2s infinite; }
+.loading-text span:nth-child(2) { animation-delay: .2s; }
+.loading-text span:nth-child(3) { animation-delay: .4s; }
+.loading-text span:nth-child(4) { animation-delay: .6s; }
+.loading-text span:nth-child(5) { animation-delay: .8s; }
+@keyframes blink { 0%,80%,100%{opacity:1} 40%{opacity:.1} }
+
+/* ── PRINT REPORT ───────────────────────────────────── */
+.report-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .85rem;
+}
+.report-table th {
+  background: #f0f0f0;
+  border: 1px solid #ccc;
+  padding: 8px 12px;
+  text-align: left;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: .75rem;
+}
+.report-table td {
+  border: 1px solid #ccc;
+  padding: 8px 12px;
+}
+.report-table tr:nth-child(even) td { background: #fafafa; }
+.sig-line { border-bottom: 1.5px solid #000; display: inline-block; width: 200px; }
+
+/* ── RESPONSIVE ─────────────────────────────────────── */
+@media (max-width: 768px) {
+  .topbar h1 { font-size: 1.1rem; padding: 4px 14px; }
+  .winner-row { font-size: .72rem; gap: 4px; padding: 10px 8px; }
+  .page { padding: 20px 12px; }
+}
