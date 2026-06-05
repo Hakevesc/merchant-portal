@@ -496,16 +496,16 @@
 
 /* ── Icon circle — shared across all pages ── */
 .icon-circle {
-  width: 80px; height: 80px;
+  width: 60px; height: 60px;
   background: #E4F9ED;
   border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
-  margin-bottom: 18px;
+  margin-bottom: 14px;
   transition: transform 0.2s;
 }
 .icon-circle i,
 .icon-circle [data-lucide] {
-  width: 40px; height: 40px; stroke-width: 1.8;
+  width: 28px; height: 28px; stroke-width: 2;
   color: #239150;
 }
 
