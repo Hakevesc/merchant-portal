@@ -51,12 +51,8 @@
         </div>
       </div>
 
-      <!-- Table column header + rows -->
-      <div class="w-head" id="winnersHead"></div>
-      <div class="w-list" id="winnersList"></div>
-
-      <!-- Footer: pagination (left) + Confirm & Close (right) -->
-      <div class="w-footer">
+      <!-- Top controls: pagination (left) + Confirm & Close (right) -->
+      <div class="w-footer" style="border-top:none; border-bottom:1px solid #e8ece9;">
         <div class="w-pager">
           <button class="pg-btn" onclick="prevPage()"><span>&larr;</span> PREVIOUS</button>
           <span class="pg-info" id="pageInfo">Page 1 of 2</span>
@@ -66,6 +62,10 @@
           <span class="cc-check">&#10003;</span> CONFIRM & CLOSE
         </button>
       </div>
+
+      <!-- Table column header + rows -->
+      <div class="w-head" id="winnersHead"></div>
+      <div class="w-list" id="winnersList"></div>
 
     </div>
   </div>
@@ -125,7 +125,7 @@
     const hasActions = (prize !== 'airtime');
     const winners    = isMerch ? MERCH : CUST;
 
-    const PER_PAGE = 6;
+    const PER_PAGE = 15;
     let page = 1;
     const totalPages = Math.ceil(winners.length / PER_PAGE);
 
