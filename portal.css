@@ -146,7 +146,7 @@
   background-size: contain;
   background-repeat: no-repeat;
   background-position: bottom left;
-  opacity: 0.45;
+  opacity: 0.1;
   filter: invert(88%) sepia(18%) saturate(350%) hue-rotate(90deg) brightness(1.05);
   pointer-events: none;
   z-index: -1;
