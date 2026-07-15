@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Campaigns — M-PESA Campaign Manager</title>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="portal.css" />
+  <style>
+    .portal-topbar { position: sticky; top: 0; z-index: 100; }
+    .p-banner {
+      background: linear-gradient(125deg, #1e7b46 0%, #239150 40%, #2bb162 100%);
+      border-radius: 32px;
+      padding: 24px 32px;
+      text-align: center;
+      box-shadow: 0 15px 35px rgba(35, 145, 80, 0.25);
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 32px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .p-banner::before {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 55%;
+      height: 100%;
+      background-image: url('M-PESA Pattern.svg');
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: bottom left;
+      opacity: 0.08;
+      pointer-events: none;
+      transform: rotate(180deg);
+    }
+    .p-banner h2 {
+      font-family: 'Barlow', sans-serif;
+      font-size: 1.55rem;
+      font-weight: 900;
+      letter-spacing: -0.3px;
+      background: linear-gradient(135deg, #ffffff, #f9ffea);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      position: relative;
+      z-index: 1;
+      margin: 0;
+    }
+    .p-banner .banner-sub {
+      position: relative;
+      z-index: 1;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.18);
+      border: 1.5px solid rgba(255, 255, 255, 0.35);
+      padding: 5px 14px;
+      border-radius: 50px;
+      color: #fff;
+      font-family: 'Barlow', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .6px;
+      backdrop-filter: blur(4px);
+    }
+    .p-banner .banner-sub svg {
+      width: 16px;
+      height: 16px;
+      stroke-width: 2.5;
+    }
+    .section-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      margin: 4px 0 24px;
+    }
+    .section-wrap .line {
+      display: block;
+      height: 2px;
+      width: 70px;
+      max-width: 12vw;
+      background: linear-gradient(90deg, transparent, rgba(35, 145, 80, 0.45));
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+    .section-wrap .line.right {
+      background: linear-gradient(90deg, rgba(35, 145, 80, 0.45), transparent);
+    }
+    .section-heading {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      font-size: 0.82rem;
+      font-weight: 800;
+      color: #239150;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      background: #ffffff;
+      padding: 11px 28px;
+      border-radius: 60px;
+      border: 1.5px solid rgba(35, 145, 80, 0.18);
+      box-shadow: 0 6px 18px rgba(35, 145, 80, 0.12);
+      white-space: nowrap;
+    }
+    .section-heading svg {
+      width: 17px;
+      height: 17px;
+      stroke-width: 2.4;
+      color: #239150;
+    }
+    .cvm-search {
+      position: relative;
+      width: 340px;
+    }
+    .cvm-search input {
+      width: 100%;
+      padding: 14px 20px 14px 50px;
+      border: 2px solid #d4e9db;
+      border-radius: 14px;
+      font-family: 'Barlow', sans-serif;
+      font-size: 15px;
+      font-weight: 500;
+      color: #1a1a1a;
+      outline: none;
+      background: #fafafa;
+      transition: border-color 0.25s, box-shadow 0.2s, background 0.25s;
+    }
+    .cvm-search input:focus {
+      border-color: #239150;
+      background: #ffffff;
+      box-shadow: 0 0 0 4px rgba(35, 145, 80, 0.1);
+    }
+    .cvm-search-icon {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #239150;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .cvm-search-icon svg {
+      width: 20px;
+      height: 20px;
+      stroke-width: 2.2;
+    }
+    .p-table-wrap {
+      background: #fff;
+      border-radius: 0;
+      box-shadow: none;
+      overflow: hidden;
+      border: 1px solid rgba(35, 145, 80, 0.12);
+    }
+    .p-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: 'Barlow', sans-serif;
+    }
+    .p-table thead tr {
+      background: #eef2f0;
+      color: #5b6e62;
+      font-weight: 700;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+    }
+    .p-table thead th {
+      padding: 16px 20px;
+      text-align: left;
+      border-bottom: 1px solid #e2e8e4;
+    }
+    .p-table tbody td {
+      padding: 16px 20px;
+      border-bottom: 1px solid #f0f2f1;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: #2a3530;
+    }
+    .p-table tbody tr:nth-child(even) { background: #f6f8f7; }
+    .p-table tbody tr:hover { background: #ebf5ef; }
+    .p-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 50px;
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .4px;
+    }
+    .p-status-stopped {
+      background: #fdeaea;
+      color: #aa0000;
+      border: 1.5px solid #f1c4c4;
+    }
+    .p-status-running {
+      background: #e7f4ec;
+      color: #1b7341;
+      border: 1.5px solid #b7ddc5;
+    }
+    .p-status-paused {
+      background: #fff8e1;
+      color: #8a6d00;
+      border: 1.5px solid #f0d78c;
+    }
+    .p-view-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: 2px solid #239150;
+      background: transparent;
+      color: #239150;
+      padding: 8px 16px;
+      border-radius: 50px;
+      font-family: 'Barlow', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .4px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background .2s, color .2s;
+    }
+    .p-view-btn:hover {
+      background: #239150;
+      color: #fff;
+    }
+    .p-view-btn svg {
+      width: 15px;
+      height: 15px;
+      stroke-width: 2.5;
+    }
+    .p-pagination {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 18px;
+      border-top: 1px solid #e8ece9;
+      background: #fbfcfb;
+      font-family: 'Barlow', sans-serif;
+    }
+    .p-pager { display: flex; align-items: center; gap: 8px; }
+    .p-pg-btn {
+      width: 36px;
+      height: 36px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1.5px solid #d4e9db;
+      background: #fff;
+      border-radius: 10px;
+      font-family: 'Barlow', sans-serif;
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: #5b6e62;
+      cursor: pointer;
+      transition: background .15s, color .15s;
+    }
+    .p-pg-btn:hover {
+      background: #eef2f0;
+      color: #239150;
+    }
+    .p-pg-btn.active {
+      background: #239150;
+      color: #fff;
+      border-color: #239150;
+    }
+    .p-pg-info {
+      font-size: 0.82rem;
+      color: #888;
+      font-weight: 600;
+      font-family: 'Barlow', sans-serif;
+    }
+    .p-pg-btn svg {
+      width: 16px;
+      height: 16px;
+      stroke-width: 2.5;
+    }
+    .float-bar {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      background: #fff;
+      border-radius: 60px;
+      padding: 10px 10px 10px 20px;
+      box-shadow: 0 8px 32px rgba(0,0,0,.14), 0 2px 8px rgba(35,145,80,.1);
+      border: 1px solid rgba(35,145,80,.12);
+      z-index: 50;
+      min-width: 420px;
+      max-width: calc(100vw - 48px);
+    }
+    .float-bar .pg-info {
+      font-size: .8rem;
+      color: #888;
+      font-weight: 600;
+      white-space: nowrap;
+      font-family: 'Barlow', sans-serif;
+    }
+    .pg-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'Barlow', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      letter-spacing: .5px;
+      text-transform: uppercase;
+      text-decoration: none;
+      cursor: pointer;
+      color: #6c7a72;
+      background: transparent;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 40px;
+      transition: background .2s, color .2s;
+      white-space: nowrap;
+    }
+    .pg-btn:hover { background: #eef2f0; color: #239150; }
+    .pg-btn:active { transform: translateY(0); }
+    .pg-btn[disabled] { opacity: .35; pointer-events: none; }
+    @media (max-width: 860px) {
+      .cvm-search { width: 100%; }
+      .p-banner h2 { font-size: 1.4rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="portal-topbar">
+    <div class="topbar-brand">
+      <div class="topbar-brand-title" style="background:#ffffff;border-radius:14px;padding:9px 18px;box-shadow:0 4px 14px rgba(0,0,0,.16);display:inline-flex;align-items:center;justify-content:center;">
+        <img src="M-Pesa-Logo.png" alt="M-PESA" style="height:30px;object-fit:contain;display:block;" />
+      </div>
+      <span class="topbar-brand-title">M-PESA Campaign Manager</span>
+    </div>
+    <div class="topbar-right">
+      <a href="CVM-Login Page.html" class="logout-btn"><i data-lucide="log-out"></i> Logout</a>
+    </div>
+  </div>
+
+  <div class="portal-wrap">
+    <div class="p-banner">
+      <h2>All Campaigns</h2>
+      <div class="banner-sub"><i data-lucide="layout-list"></i> Manage customer bases and rewards</div>
+    </div>
+
+    <div class="section-wrap">
+      <span class="line"></span>
+      <div class="section-heading"><i data-lucide="list-filter"></i> Campaign List</div>
+      <span class="line right"></span>
+    </div>
+
+    <div style="margin-bottom:18px;">
+      <div class="cvm-search">
+        <span class="cvm-search-icon"><i data-lucide="search"></i></span>
+        <input type="text" placeholder="Search campaigns by name..." />
+      </div>
+    </div>
+
+    <div class="p-table-wrap">
+      <table class="p-table">
+        <thead>
+          <tr>
+            <th>Campaign</th>
+            <th>Created</th>
+            <th>Updated</th>
+            <th>Target Base</th>
+            <th>Converted</th>
+            <th>Conv. Rate</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>APP_DOWNLOAD</td>
+            <td>4/28/2026</td>
+            <td>6/2/2026</td>
+            <td>497</td>
+            <td>317</td>
+            <td>63.8%</td>
+            <td><span class="p-status p-status-stopped"><i data-lucide="circle" style="width:8px;height:8px;stroke-width:3;"></i> Stopped</span></td>
+            <td><a href="CVM-Detail Page.html" class="p-view-btn"><i data-lucide="eye"></i> View</a></td>
+          </tr>
+          <tr>
+            <td>AUTO_PIN_RESET</td>
+            <td>4/28/2026</td>
+            <td>5/27/2026</td>
+            <td>575</td>
+            <td>181</td>
+            <td>31.5%</td>
+            <td><span class="p-status p-status-stopped"><i data-lucide="circle" style="width:8px;height:8px;stroke-width:3;"></i> Stopped</span></td>
+            <td><a href="CVM-Detail Page.html" class="p-view-btn"><i data-lucide="eye"></i> View</a></td>
+          </tr>
+          <tr>
+            <td>BANK_TOPUP_USER</td>
+            <td>4/28/2026</td>
+            <td>5/27/2026</td>
+            <td>505</td>
+            <td>215</td>
+            <td>42.6%</td>
+            <td><span class="p-status p-status-stopped"><i data-lucide="circle" style="width:8px;height:8px;stroke-width:3;"></i> Stopped</span></td>
+            <td><a href="CVM-Detail Page.html" class="p-view-btn"><i data-lucide="eye"></i> View</a></td>
+          </tr>
+          <tr>
+            <td>CBE2MPESA</td>
+            <td>4/28/2026</td>
+            <td>5/27/2026</td>
+            <td>649</td>
+            <td>221</td>
+            <td>34.1%</td>
+            <td><span class="p-status p-status-stopped"><i data-lucide="circle" style="width:8px;height:8px;stroke-width:3;"></i> Stopped</span></td>
+            <td><a href="CVM-Detail Page.html" class="p-view-btn"><i data-lucide="eye"></i> View</a></td>
+          </tr>
+          <tr>
+            <td>CHURN_WIN_BACK_CHECK_BALANCE</td>
+            <td>4/28/2026</td>
+            <td>5/27/2026</td>
+            <td>536</td>
+            <td>172</td>
+            <td>32.1%</td>
+            <td><span class="p-status p-status-stopped"><i data-lucide="circle" style="width:8px;height:8px;stroke-width:3;"></i> Stopped</span></td>
+            <td><a href="CVM-Detail Page.html" class="p-view-btn"><i data-lucide="eye"></i> View</a></td>
+          </tr>
+          <tr>
+            <td>CHURN_WINBACK_TRANSACTION</td>
+            <td>4/28/2026</td>
+            <td>5/27/2026</td>
+            <td>338</td>
+            <td>181</td>
+            <td>53.6%</td>
+            <td><span class="p-status p-status-stopped"><i data-lucide="circle" style="width:8px;height:8px;stroke-width:3;"></i> Stopped</span></td>
+            <td><a href="CVM-Detail Page.html" class="p-view-btn"><i data-lucide="eye"></i> View</a></td>
+          </tr>
+          <tr>
+            <td>FOLLOW_UP</td>
+            <td>4/28/2026</td>
+            <td>5/27/2026</td>
+            <td>567</td>
+            <td>241</td>
+            <td>42.5%</td>
+            <td><span class="p-status p-status-stopped"><i data-lucide="circle" style="width:8px;height:8px;stroke-width:3;"></i> Stopped</span></td>
+            <td><a href="CVM-Detail Page.html" class="p-view-btn"><i data-lucide="eye"></i> View</a></td>
+          </tr>
+          <tr>
+            <td>MANUAL_PIN_RESET</td>
+            <td>4/28/2026</td>
+            <td>5/27/2026</td>
+            <td>623</td>
+            <td>331</td>
+            <td>53.1%</td>
+            <td><span class="p-status p-status-stopped"><i data-lucide="circle" style="width:8px;height:8px;stroke-width:3;"></i> Stopped</span></td>
+            <td><a href="CVM-Detail Page.html" class="p-view-btn"><i data-lucide="eye"></i> View</a></td>
+          </tr>
+          <tr>
+            <td>NI_PUSH_PIN_RESET</td>
+            <td>4/28/2026</td>
+            <td>5/27/2026</td>
+            <td>569</td>
+            <td>302</td>
+            <td>53.1%</td>
+            <td><span class="p-status p-status-stopped"><i data-lucide="circle" style="width:8px;height:8px;stroke-width:3;"></i> Stopped</span></td>
+            <td><a href="CVM-Detail Page.html" class="p-view-btn"><i data-lucide="eye"></i> View</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Floating bottom bar -->
+  <div class="float-bar">
+    <div style="display:flex;align-items:center;gap:14px;">
+      <button class="pg-btn" id="cvmPrevBtn"><span>&larr;</span> PREVIOUS</button>
+      <span class="pg-info" id="cvmPageInfo">Page 1 of 1</span>
+      <button class="pg-btn" id="cvmNextBtn">NEXT <span>&rarr;</span></button>
+    </div>
+  </div>
+
+  <script>
+    if (typeof lucide !== 'undefined' && lucide.createIcons) { lucide.createIcons(); }
+
+    const cvmPerPage = 5;
+    let cvmPage = 1;
+    const cvmRows = document.querySelectorAll('.p-table tbody tr');
+    const cvmTotal = cvmRows.length;
+    const cvmTotalPages = Math.max(1, Math.ceil(cvmTotal / cvmPerPage));
+
+    function cvmRender() {
+      cvmRows.forEach((row, idx) => {
+        row.style.display = (idx >= (cvmPage - 1) * cvmPerPage && idx < cvmPage * cvmPerPage) ? '' : 'none';
+      });
+      document.getElementById('cvmPageInfo').textContent = `Page ${cvmPage} of ${cvmTotalPages}`;
+      document.getElementById('cvmPrevBtn').disabled = cvmPage <= 1;
+      document.getElementById('cvmNextBtn').disabled = cvmPage >= cvmTotalPages;
+    }
+    document.getElementById('cvmPrevBtn').addEventListener('click', () => { if (cvmPage > 1) { cvmPage--; cvmRender(); } });
+    document.getElementById('cvmNextBtn').addEventListener('click', () => { if (cvmPage < cvmTotalPages) { cvmPage++; cvmRender(); } });
+    cvmRender();
+  </script>
+</body>
+</html>
