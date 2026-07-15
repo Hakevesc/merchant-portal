@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BlackList — Terek Be M-PESA Promo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="portal.css" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body.portal-body { background: #f2f4f6; background-image: radial-gradient(#dce5e0 0.8px, transparent 0.8px); background-size: 22px 22px; font-family: 'Barlow', sans-serif; }
+    .portal-wrap { max-width: 1300px; padding-bottom: 100px; }
+    @media (max-width: 620px) { .portal-topbar { padding: 8px 20px; } }
+
+    /* ── BlackList Hero Banner ── */
+    .bl-hero {
+      background: linear-gradient(125deg, #1e7b46 0%, #239150 40%, #2bb162 100%);
+      border-radius: 32px; padding: 36px 32px; text-align: center;
+      box-shadow: 0 15px 35px rgba(35, 145, 80, 0.25);
+      position: relative; overflow: hidden; margin-bottom: 36px;
+    }
+    .bl-hero .bl-deco {
+      position: absolute; pointer-events: none; opacity: 0.08;
+    }
+    .bl-hero .bl-deco.right { bottom: -20px; right: -10px; }
+    .bl-hero .bl-deco.right i,
+    .bl-hero .bl-deco.right [data-lucide] { width: 130px; height: 130px; stroke-width: 1.2; }
+    .bl-hero .bl-deco.left { top: -20px; left: -10px; }
+    .bl-hero .bl-deco.left i,
+    .bl-hero .bl-deco.left [data-lucide] { width: 90px; height: 90px; stroke-width: 1.2; }
+    .bl-hero h2 {
+      font-family: 'Barlow', sans-serif;
+      font-size: 2rem; font-weight: 900; letter-spacing: -0.3px;
+      background: linear-gradient(135deg, #ffffff, #f9ffea);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+      margin-bottom: 8px;
+    }
+    .bl-hero p {
+      font-size: 0.95rem; color: rgba(255,255,255,0.82); font-weight: 500;
+    }
+    .bl-hero .bl-count {
+      display: inline-flex; align-items: center; gap: 8px;
+      margin-top: 16px;
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(4px);
+      border: 1.5px solid rgba(255,255,255,0.25);
+      padding: 8px 22px; border-radius: 50px;
+      font-size: 0.85rem; font-weight: 700; color: #fff;
+    }
+    .bl-hero .bl-count i,
+    .bl-hero .bl-count [data-lucide] { width: 16px; height: 16px; stroke-width: 2.5; }
+    @media (max-width: 620px) {
+      .bl-hero h2 { font-size: 1.35rem; }
+      .bl-hero { padding: 24px 18px; }
+    }
+
+    /* ── Section heading ── */
+    .section-wrap {
+      display: flex; align-items: center; justify-content: center;
+      gap: 18px; margin: 4px 0 30px;
+    }
+    .section-wrap .line {
+      display: block; height: 2px; width: 70px; max-width: 12vw;
+      background: linear-gradient(90deg, transparent, rgba(35,145,80,0.45)); border-radius: 2px;
+      flex-shrink: 0;
+    }
+    .section-wrap .line.right { background: linear-gradient(90deg, rgba(35,145,80,0.45), transparent); }
+    .section-heading {
+      display: inline-flex; align-items: center; gap: 9px;
+      font-size: 0.82rem; font-weight: 800; color: #239150;
+      text-transform: uppercase; letter-spacing: 3px;
+      background: #ffffff; padding: 11px 28px; border-radius: 60px;
+      border: 1.5px solid rgba(35,145,80,0.18);
+      box-shadow: 0 6px 18px rgba(35,145,80,0.12); white-space: nowrap;
+    }
+    .section-heading i,
+    .section-heading [data-lucide] { width: 17px; height: 17px; stroke-width: 2.4; color: #239150; }
+
+    /* ── Search / Filter Bar ── */
+    .bl-toolbar {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 16px; flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+    .bl-search {
+      display: flex; align-items: center; gap: 8px;
+      background: #fff; border: 1.5px solid rgba(35,145,80,0.18);
+      border-radius: 50px; padding: 8px 18px;
+      flex: 1; max-width: 380px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .bl-search:focus-within {
+      border-color: #239150;
+      box-shadow: 0 0 0 3px rgba(35,145,80,0.12);
+    }
+    .bl-search i,
+    .bl-search [data-lucide] { width: 18px; height: 18px; color: #8a9b91; flex-shrink: 0; }
+    .bl-search input {
+      border: none; outline: none; background: transparent;
+      font-family: 'Barlow', sans-serif; font-size: 0.88rem; font-weight: 500;
+      color: #333; width: 100%;
+    }
+    .bl-search input::placeholder { color: #aab7af; }
+    .bl-filter-group {
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    }
+    .bl-filter-select {
+      font-family: 'Barlow', sans-serif; font-size: 0.82rem; font-weight: 600;
+      color: #5b6e62; background: #fff;
+      border: 1.5px solid rgba(35,145,80,0.18); border-radius: 50px;
+      padding: 8px 18px; cursor: pointer; outline: none;
+      transition: border-color 0.2s;
+    }
+    .bl-filter-select:focus { border-color: #239150; }
+    .bl-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-family: 'Barlow', sans-serif; font-size: 0.78rem; font-weight: 800;
+      text-transform: uppercase; letter-spacing: 0.4px;
+      border: none; border-radius: 50px; padding: 9px 20px;
+      cursor: pointer; color: #fff;
+      transition: transform 0.15s, box-shadow 0.2s, filter 0.15s;
+    }
+    .bl-btn:hover { transform: translateY(-1px); filter: brightness(1.08); }
+    .bl-btn:active { transform: translateY(0); }
+    .bl-btn-green {
+      background: linear-gradient(135deg, #2FC56D 0%, #239150 100%);
+      box-shadow: 0 4px 14px rgba(35,145,80,0.25);
+    }
+    .bl-btn-red {
+      background: linear-gradient(135deg, #e84040 0%, #b30000 100%);
+      box-shadow: 0 4px 14px rgba(180,0,0,0.22);
+    }
+    .bl-btn-outline {
+      background: transparent; color: #239150;
+      border: 2px solid #239150; box-shadow: none;
+    }
+    .bl-btn-outline:hover { background: rgba(35,145,80,0.06); filter: none; }
+
+    /* ── BlackList Table ── */
+    .bl-table-wrap {
+      background: #fff; border-radius: 20px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+      overflow: hidden;
+    }
+    .bl-head {
+      display: grid;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 20px;
+      background: #eef2f0;
+      color: #5b6e62;
+      font-family: 'Barlow', sans-serif;
+      font-weight: 700;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid #e2e8e4;
+    }
+    .bl-head-grid { grid-template-columns: 40px 1.3fr 1.1fr 1fr 1.2fr 1.1fr 1fr; }
+    .bl-row {
+      display: grid;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      background: #ffffff;
+      color: #2a3530;
+      font-family: 'Barlow', sans-serif;
+      font-weight: 600;
+      font-size: 0.87rem;
+      border-bottom: 1px solid #eef1ef;
+      transition: background 0.15s;
+    }
+    .bl-row:nth-child(even) { background: #f6f8f7; }
+    .bl-row:hover { background: #ebf5ef; }
+    .bl-row .bl-num { font-size: 0.9rem; font-weight: 800; color: #239150; }
+    .bl-row .bl-phone { font-family: monospace; font-size: 0.85rem; color: #4a5a50; }
+    .bl-row .bl-reason {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: 0.8rem; font-weight: 600;
+    }
+    .bl-row .bl-reason i,
+    .bl-row .bl-reason [data-lucide] { width: 13px; height: 13px; stroke-width: 2.5; }
+    .bl-row .bl-date { font-size: 0.82rem; color: #6c7a72; }
+    .bl-tag {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 5px 14px; border-radius: 50px;
+      font-size: 0.7rem; font-weight: 800;
+      text-transform: uppercase; letter-spacing: 0.4px;
+      white-space: nowrap;
+    }
+    .bl-tag-blocked {
+      background: #fdeaea; color: #aa0000;
+      border: 1.5px solid #f1c4c4;
+    }
+    .bl-tag-blocked i,
+    .bl-tag-blocked [data-lucide] { width: 13px; height: 13px; color: #aa0000; stroke-width: 2.5; }
+    .bl-tag-flagged {
+      background: #fff3e0; color: #b85c00;
+      border: 1.5px solid #ffd699;
+    }
+    .bl-tag-flagged i,
+    .bl-tag-flagged [data-lucide] { width: 13px; height: 13px; color: #b85c00; stroke-width: 2.5; }
+    .bl-action-btns {
+      display: flex; gap: 6px; align-items: center; flex-wrap: nowrap;
+    }
+    .bl-action-btns .bl-btn { padding: 6px 14px; font-size: 0.68rem; }
+
+    /* ── Empty state ── */
+    .bl-empty {
+      text-align: center; padding: 60px 20px;
+      color: #8a9b91; font-family: 'Barlow', sans-serif;
+    }
+    .bl-empty i,
+    .bl-empty [data-lucide] { width: 48px; height: 48px; stroke-width: 1.2; color: #c4d0c8; margin-bottom: 16px; }
+    .bl-empty h3 { font-size: 1.1rem; font-weight: 700; color: #5b6e62; margin-bottom: 6px; }
+    .bl-empty p { font-size: 0.88rem; }
+
+    /* ── Floating bottom bar ── */
+    .float-bar {
+      position: fixed;
+      bottom: 24px;
+      left: 50%; transform: translateX(-50%);
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 20px;
+      background: #fff;
+      border-radius: 60px;
+      padding: 10px 10px 10px 20px;
+      box-shadow: 0 8px 32px rgba(0,0,0,.14), 0 2px 8px rgba(35,145,80,.1);
+      border: 1px solid rgba(35,145,80,.12);
+      z-index: 50;
+      min-width: 420px;
+      max-width: calc(100vw - 48px);
+    }
+    .float-bar .pg-info { font-size: .8rem; color: #888; font-weight: 600; white-space: nowrap; }
+    .float-bar .bl-bulk-info {
+      font-size: 0.78rem; color: #6c7a72; font-weight: 600;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .float-bar .bl-bulk-info i,
+    .float-bar .bl-bulk-info [data-lucide] { width: 14px; height: 14px; color: #239150; }
+
+    /* ── Modal ── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.52); z-index: 200;
+      align-items: center; justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+    .p-modal {
+      background: #fff; border-radius: 16px;
+      padding: 40px 36px; max-width: 440px; width: 90%;
+      text-align: center; box-shadow: 0 16px 56px rgba(0,0,0,.2);
+      font-family: 'Barlow', sans-serif;
+    }
+    .p-modal h3 { font-size: 1.25rem; color: #239150; margin-bottom: 10px; font-weight: 800; }
+    .p-modal p  { color: #666; margin-bottom: 28px; font-size: .95rem; line-height: 1.6; }
+    .modal-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+    @media (max-width: 860px) {
+      .bl-head-grid { grid-template-columns: 36px 1.2fr 1fr 0.8fr 1fr 0.9fr 0.9fr; }
+      .bl-toolbar { flex-direction: column; align-items: stretch; }
+      .bl-search { max-width: 100%; }
+      .bl-filter-group { justify-content: stretch; }
+      .bl-filter-group select { flex: 1; }
+    }
+    @media (max-width: 620px) {
+      .bl-head-grid { grid-template-columns: 30px 1fr 1fr; }
+      .bl-head .bl-hide-mobile,
+      .bl-row .bl-hide-mobile { display: none; }
+      .float-bar { min-width: unset; width: calc(100vw - 32px); padding: 10px 14px; flex-wrap: wrap; justify-content: center; }
+    }
+  </style>
+</head>
+<body class="portal-body">
+
+  <!-- Topbar -->
+  <div class="portal-topbar">
+    <div class="brand" style="display:flex;align-items:center;gap:16px;position:relative;z-index:1;">
+      <div class="logo-wrapper" style="display:flex;align-items:center;justify-content:center;background:#fff;border-radius:14px;padding:9px 18px;box-shadow:0 4px 14px rgba(0,0,0,0.16);">
+        <img src="M-Pesa-Logo.png" alt="M-PESA" style="height:30px;object-fit:contain;display:block;" />
+      </div>
+      <span class="brand-title" style="font-family:'Barlow',sans-serif;font-weight:800;font-size:1.05rem;letter-spacing:.6px;text-transform:uppercase;color:#fff;padding-left:16px;border-left:2px solid rgba(255,255,255,0.28);line-height:1.15;">Terek Be M-PESA Promo</span>
+    </div>
+    <div class="topbar-right" style="position:relative;z-index:1;">
+      <a href="index.html" class="logout-btn"><i data-lucide="log-out" style="width:16px;height:16px;stroke-width:2.5;"></i> Logout</a>
+    </div>
+  </div>
+
+  <!-- Breadcrumb -->
+  <div class="portal-nav">
+    <a href="home.html"><i data-lucide="home" style="width:16px;height:16px;vertical-align:middle;margin-right:4px;"></i> Home</a>
+    &nbsp;›&nbsp;
+    <span class="crumb-active">BlackList</span>
+  </div>
+
+  <div class="portal-wrap">
+
+    <!-- Hero Banner -->
+    <div class="bl-hero">
+      <div class="bl-deco right"><i data-lucide="user-x"></i></div>
+      <div class="bl-deco left"><i data-lucide="shield-off"></i></div>
+      <h2>BlackList Management</h2>
+      <p>View and manage blocked customers, merchants, and agents</p>
+      <div class="bl-count">
+        <i data-lucide="users"></i>
+        <span id="totalBlockedCount">0 Blocked</span>
+      </div>
+    </div>
+
+    <!-- Section heading -->
+    <div class="section-wrap">
+      <span class="line"></span>
+      <div class="section-heading"><i data-lucide="user-x"></i> Blocked List</div>
+      <span class="line right"></span>
+    </div>
+
+    <!-- Toolbar: Search + Filter -->
+    <div class="bl-toolbar">
+      <div class="bl-search">
+        <i data-lucide="search"></i>
+        <input type="text" id="blSearchInput" placeholder="Search by name, phone or reason..." oninput="filterList()" />
+      </div>
+      <div class="bl-filter-group">
+        <select class="bl-filter-select" id="blTypeFilter" onchange="filterList()" title="Filter by type">
+          <option value="all">All Types</option>
+          <option value="customer">Customers</option>
+          <option value="merchant">Merchants</option>
+          <option value="agent">Agents</option>
+        </select>
+        <select class="bl-filter-select" id="blStatusFilter" onchange="filterList()" title="Filter by status">
+          <option value="all">All Status</option>
+          <option value="blocked">Blocked</option>
+          <option value="flagged">Flagged</option>
+        </select>
+        <button class="bl-btn bl-btn-outline" onclick="resetFilters()">
+          <i data-lucide="rotate-ccw" style="width:14px;height:14px;"></i> Reset
+        </button>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="bl-table-wrap">
+      <div class="bl-head bl-head-grid">
+        <span>#</span>
+        <span>Name</span>
+        <span>Phone</span>
+        <span class="bl-hide-mobile">Type</span>
+        <span>Reason</span>
+        <span class="bl-hide-mobile">Date Blocked</span>
+        <span>Status</span>
+      </div>
+      <div id="blList"></div>
+    </div>
+
+  </div>
+
+  <!-- Floating bottom bar -->
+  <div class="float-bar">
+    <div class="w-pager">
+      <button class="pg-btn" onclick="prevPage()"><span>&larr;</span> PREVIOUS</button>
+      <span class="pg-info" id="pageInfo">Page 1 of 1</span>
+      <button class="pg-btn" onclick="nextPage()">NEXT <span>&rarr;</span></button>
+    </div>
+    <div class="bl-bulk-info">
+      <i data-lucide="filter"></i>
+      <span id="filteredCount">Showing 0 of 0</span>
+    </div>
+  </div>
+
+  <!-- Unblock Confirmation Modal -->
+  <div class="modal-overlay" id="unblockModal">
+    <div class="p-modal">
+      <h3>Unblock User</h3>
+      <p id="unblockModalText">Are you sure you want to unblock this user?<br>They will be able to participate in draws again.</p>
+      <div class="modal-btns">
+        <button class="pb pb-green" id="confirmUnblockBtn">Yes, Unblock</button>
+        <button class="pb pb-outline" onclick="closeUnblockModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ── Mock BlackList Data ── */
+    const BLACKLIST_DATA = [
+      { id: 1,  name: 'Abebe Kebede',      phone: '251911100101', type: 'customer', reason: 'Fraudulent activity',        date: '2025-12-15', status: 'blocked' },
+      { id: 2,  name: 'Meron Tesfaye',     phone: '251911100102', type: 'customer', reason: 'Multiple account abuse',     date: '2025-12-20', status: 'blocked' },
+      { id: 3,  name: 'Blessed Hotel Ltd', phone: '251911100103', type: 'merchant', reason: 'Chargeback violation',       date: '2026-01-05', status: 'blocked' },
+      { id: 4,  name: 'Tigist Bekele',     phone: '251911100104', type: 'customer', reason: 'Suspicious transaction',     date: '2026-01-10', status: 'flagged' },
+      { id: 5,  name: 'Golden Shop',       phone: '251911100105', type: 'merchant', reason: 'Fake ticket submission',     date: '2026-01-12', status: 'blocked' },
+      { id: 6,  name: 'Dawit Solomon',     phone: '251911100106', type: 'customer', reason: 'Identity theft',             date: '2026-01-18', status: 'blocked' },
+      { id: 7,  name: 'Star Cafe',         phone: '251911100107', type: 'merchant', reason: 'Terms of service violation', date: '2026-01-22', status: 'flagged' },
+      { id: 8,  name: 'Hiwi Tola',         phone: '251911100108', type: 'customer', reason: 'Fraudulent activity',        date: '2026-01-25', status: 'blocked' },
+      { id: 9,  name: 'Manna Hotel Ltd',   phone: '251911100109', type: 'merchant', reason: 'Chargeback violation',       date: '2026-02-01', status: 'blocked' },
+      { id: 10, name: 'Liya Haile',        phone: '251911100110', type: 'customer', reason: 'Suspicious transaction',     date: '2026-02-03', status: 'blocked' },
+      { id: 11, name: 'Blue Nile Mart',    phone: '251911100111', type: 'merchant', reason: 'Fake ticket submission',     date: '2026-02-05', status: 'blocked' },
+      { id: 12, name: 'Biruk Assefa',      phone: '251911100112', type: 'customer', reason: 'Multiple account abuse',     date: '2026-02-08', status: 'flagged' },
+      { id: 13, name: 'Sunshine PLC',      phone: '251911100113', type: 'merchant', reason: 'Fraudulent activity',        date: '2026-02-10', status: 'blocked' },
+      { id: 14, name: 'Selam Awiti',       phone: '251911100114', type: 'customer', reason: 'Identity theft',             date: '2026-02-12', status: 'blocked' },
+      { id: 15, name: 'Royal Mart',        phone: '251911100115', type: 'merchant', reason: 'Terms of service violation', date: '2026-02-15', status: 'blocked' },
+      { id: 16, name: 'Fraol Solomon',     phone: '251911100116', type: 'customer', reason: 'Suspicious transaction',     date: '2026-02-18', status: 'flagged' },
+      { id: 17, name: 'Emperor Cafe',      phone: '251911100117', type: 'merchant', reason: 'Chargeback violation',       date: '2026-02-20', status: 'blocked' },
+      { id: 18, name: 'John Lema',         phone: '251911100118', type: 'customer', reason: 'Fraudulent activity',        date: '2026-02-22', status: 'blocked' },
+      { id: 19, name: 'Green Valley PLC',  phone: '251911100119', type: 'merchant', reason: 'Fake ticket submission',     date: '2026-02-25', status: 'blocked' },
+      { id: 20, name: 'Hiwi Kalab',        phone: '251911100120', type: 'customer', reason: 'Multiple account abuse',     date: '2026-02-28', status: 'blocked' },
+    ];
+
+    const PER_PAGE = 10;
+    let currentPage = 1;
+    let filteredData = [...BLACKLIST_DATA];
+    let pendingUnblockId = null;
+
+    function getFilteredData() {
+      const searchTerm = document.getElementById('blSearchInput').value.toLowerCase().trim();
+      const typeFilter = document.getElementById('blTypeFilter').value;
+      const statusFilter = document.getElementById('blStatusFilter').value;
+
+      return BLACKLIST_DATA.filter(item => {
+        // Search filter
+        if (searchTerm) {
+          const matchName = item.name.toLowerCase().includes(searchTerm);
+          const matchPhone = item.phone.includes(searchTerm);
+          const matchReason = item.reason.toLowerCase().includes(searchTerm);
+          if (!matchName && !matchPhone && !matchReason) return false;
+        }
+        // Type filter
+        if (typeFilter !== 'all' && item.type !== typeFilter) return false;
+        // Status filter
+        if (statusFilter !== 'all' && item.status !== statusFilter) return false;
+        return true;
+      });
+    }
+
+    function renderList() {
+      filteredData = getFilteredData();
+      const totalFiltered = filteredData.length;
+      const totalPages = Math.ceil(totalFiltered / PER_PAGE) || 1;
+
+      // Clamp page
+      if (currentPage > totalPages) currentPage = totalPages;
+      if (currentPage < 1) currentPage = 1;
+
+      const start = (currentPage - 1) * PER_PAGE;
+      const slice = filteredData.slice(start, start + PER_PAGE);
+      const listEl = document.getElementById('blList');
+      listEl.innerHTML = '';
+
+      if (slice.length === 0) {
+        listEl.innerHTML = `
+          <div class="bl-empty">
+            <i data-lucide="search-x"></i>
+            <h3>No results found</h3>
+            <p>Try adjusting your search or filter criteria</p>
+          </div>`;
+      } else {
+        slice.forEach((item, idx) => {
+          const row = document.createElement('div');
+          row.className = 'bl-row bl-head-grid';
+
+          const isBlocked = item.status === 'blocked';
+          const statusTag = isBlocked
+            ? `<span class="bl-tag bl-tag-blocked"><i data-lucide="ban"></i> BLOCKED</span>`
+            : `<span class="bl-tag bl-tag-flagged"><i data-lucide="alert-triangle"></i> FLAGGED</span>`;
+
+          const typeLabel = item.type.charAt(0).toUpperCase() + item.type.slice(1);
+
+          row.innerHTML = `
+            <span class="bl-num">${start + idx + 1}.</span>
+            <span><strong>${item.name}</strong></span>
+            <span class="bl-phone">${item.phone}</span>
+            <span class="bl-hide-mobile">${typeLabel}</span>
+            <span class="bl-reason"><i data-lucide="info"></i> ${item.reason}</span>
+            <span class="bl-date bl-hide-mobile">${item.date}</span>
+            <span>${statusTag}</span>
+          `;
+          listEl.appendChild(row);
+        });
+      }
+
+      // Update counts
+      document.getElementById('totalBlockedCount').textContent =
+        BLACKLIST_DATA.filter(d => d.status === 'blocked').length + ' Blocked';
+      document.getElementById('filteredCount').textContent =
+        `Showing ${slice.length} of ${totalFiltered}`;
+      document.getElementById('pageInfo').textContent =
+        `Page ${currentPage} of ${totalPages}`;
+
+      // Pagination button states
+      const prevBtn = document.querySelector('.pg-btn[onclick="prevPage()"]');
+      const nextBtn = document.querySelector('.pg-btn[onclick="nextPage()"]');
+      if (prevBtn) prevBtn.style.opacity = (currentPage <= 1) ? '0.35' : '1';
+      if (nextBtn) nextBtn.style.opacity = (currentPage >= totalPages) ? '0.35' : '1';
+
+      reLucide();
+    }
+
+    function filterList() {
+      currentPage = 1;
+      renderList();
+    }
+
+    function resetFilters() {
+      document.getElementById('blSearchInput').value = '';
+      document.getElementById('blTypeFilter').value = 'all';
+      document.getElementById('blStatusFilter').value = 'all';
+      currentPage = 1;
+      renderList();
+    }
+
+    function prevPage() {
+      const totalPages = Math.ceil(filteredData.length / PER_PAGE) || 1;
+      if (currentPage > 1) { currentPage--; renderList(); }
+    }
+
+    function nextPage() {
+      const totalPages = Math.ceil(filteredData.length / PER_PAGE) || 1;
+      if (currentPage < totalPages) { currentPage++; renderList(); }
+    }
+
+    function openUnblockModal(id) {
+      pendingUnblockId = id;
+      const item = BLACKLIST_DATA.find(d => d.id === id);
+      if (item) {
+        document.getElementById('unblockModalText').innerHTML =
+          `Are you sure you want to unblock <strong>${item.name}</strong>?<br>They will be able to participate in draws again.`;
+      }
+      document.getElementById('unblockModal').classList.add('open');
+    }
+
+    function closeUnblockModal() {
+      document.getElementById('unblockModal').classList.remove('open');
+      pendingUnblockId = null;
+    }
+
+    function confirmUnblock() {
+      if (pendingUnblockId !== null) {
+        const idx = BLACKLIST_DATA.findIndex(d => d.id === pendingUnblockId);
+        if (idx !== -1) {
+          BLACKLIST_DATA.splice(idx, 1);
+        }
+        pendingUnblockId = null;
+        closeUnblockModal();
+        renderList();
+      }
+    }
+
+    function reLucide() {
+      if (typeof lucide !== 'undefined' && lucide.createIcons) { lucide.createIcons(); }
+    }
+
+    // Wire up confirm unblock
+    document.getElementById('confirmUnblockBtn').addEventListener('click', confirmUnblock);
+
+    // Initial render
+    renderList();
+
+    if (typeof lucide !== 'undefined' && lucide.createIcons) { lucide.createIcons(); }
+  </script>
+  <noscript>Enable JavaScript to view the BlackList</noscript>
+  <script src="sidebar.js"></script>
+</body>
+</html>

@@ -38,7 +38,7 @@
             </a>
           </li>
           <li class="sb-item">
-            <a class="sb-link sb-sub-link" href="#" data-page="blacklist">
+            <a class="sb-link sb-sub-link" href="blacklist.html" data-page="blacklist">
               <span class="sb-link-icon"><i data-lucide="user-x"></i></span>
               <span class="sb-link-text">BlackList</span>
             </a>
@@ -161,6 +161,7 @@
     'draw-select.html': 'home',
     'loading.html':     'home',
     'winners.html':     'home',
+    'blacklist.html':   'blacklist',
   };
   const activePage = matchMap[page] || page;
 
