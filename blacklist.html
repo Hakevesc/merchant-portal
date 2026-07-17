@@ -11,266 +11,497 @@
   <link rel="stylesheet" href="portal.css" />
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body.portal-body { background: #f2f4f6; background-image: radial-gradient(#dce5e0 0.8px, transparent 0.8px); background-size: 22px 22px; font-family: 'Barlow', sans-serif; }
-    .portal-wrap { max-width: 1300px; padding-bottom: 100px; }
-    @media (max-width: 620px) { .portal-topbar { padding: 8px 20px; } }
-
-    /* ── BlackList Hero Banner ── */
-    .bl-hero {
-      background: linear-gradient(125deg, #1e7b46 0%, #239150 40%, #2bb162 100%);
-      border-radius: 32px; padding: 36px 32px; text-align: center;
-      box-shadow: 0 15px 35px rgba(35, 145, 80, 0.25);
-      position: relative; overflow: hidden; margin-bottom: 36px;
-    }
-    .bl-hero .bl-deco {
-      position: absolute; pointer-events: none; opacity: 0.08;
-    }
-    .bl-hero .bl-deco.right { bottom: -20px; right: -10px; }
-    .bl-hero .bl-deco.right i,
-    .bl-hero .bl-deco.right [data-lucide] { width: 130px; height: 130px; stroke-width: 1.2; }
-    .bl-hero .bl-deco.left { top: -20px; left: -10px; }
-    .bl-hero .bl-deco.left i,
-    .bl-hero .bl-deco.left [data-lucide] { width: 90px; height: 90px; stroke-width: 1.2; }
-    .bl-hero h2 {
+    
+    body.portal-body {
+      background: #f8fafc;
+      background-image: radial-gradient(#e2e8f0 0.8px, transparent 0.8px);
+      background-size: 20px 20px;
       font-family: 'Barlow', sans-serif;
-      font-size: 2rem; font-weight: 900; letter-spacing: -0.3px;
-      background: linear-gradient(135deg, #ffffff, #f9ffea);
-      -webkit-background-clip: text; background-clip: text; color: transparent;
-      margin-bottom: 8px;
     }
-    .bl-hero p {
-      font-size: 0.95rem; color: rgba(255,255,255,0.82); font-weight: 500;
+    
+    .portal-wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px 32px 100px;
     }
-    .bl-hero .bl-count {
-      display: inline-flex; align-items: center; gap: 8px;
+
+    /* Layout grid */
+    .bl-layout {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 32px;
       margin-top: 16px;
-      background: rgba(255,255,255,0.15);
-      backdrop-filter: blur(4px);
-      border: 1.5px solid rgba(255,255,255,0.25);
-      padding: 8px 22px; border-radius: 50px;
-      font-size: 0.85rem; font-weight: 700; color: #fff;
     }
-    .bl-hero .bl-count i,
-    .bl-hero .bl-count [data-lucide] { width: 16px; height: 16px; stroke-width: 2.5; }
-    @media (max-width: 620px) {
-      .bl-hero h2 { font-size: 1.35rem; }
-      .bl-hero { padding: 24px 18px; }
+    @media (min-width: 1024px) {
+      .bl-layout {
+        grid-template-columns: 400px 1fr;
+        align-items: start;
+      }
     }
 
-    /* ── Section heading ── */
-    .section-wrap {
-      display: flex; align-items: center; justify-content: center;
-      gap: 18px; margin: 4px 0 30px;
+    /* Premium card container */
+    .bl-card {
+      background: #ffffff;
+      border-radius: 24px;
+      padding: 32px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.01);
+      border: 1px solid rgba(226, 232, 240, 0.8);
+      transition: box-shadow 0.3s ease, transform 0.2s ease;
     }
-    .section-wrap .line {
-      display: block; height: 2px; width: 70px; max-width: 12vw;
-      background: linear-gradient(90deg, transparent, rgba(35,145,80,0.45)); border-radius: 2px;
-      flex-shrink: 0;
+    .bl-card:hover {
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05), 0 2px 8px rgba(0, 0, 0, 0.02);
     }
-    .section-wrap .line.right { background: linear-gradient(90deg, rgba(35,145,80,0.45), transparent); }
-    .section-heading {
-      display: inline-flex; align-items: center; gap: 9px;
-      font-size: 0.82rem; font-weight: 800; color: #239150;
-      text-transform: uppercase; letter-spacing: 3px;
-      background: #ffffff; padding: 11px 28px; border-radius: 60px;
-      border: 1.5px solid rgba(35,145,80,0.18);
-      box-shadow: 0 6px 18px rgba(35,145,80,0.12); white-space: nowrap;
+    
+    /* Header inside cards */
+    .bl-card-header {
+      margin-bottom: 28px;
+      text-align: center;
     }
-    .section-heading i,
-    .section-heading [data-lucide] { width: 17px; height: 17px; stroke-width: 2.4; color: #239150; }
+    .icon-wrap-green {
+      width: 52px;
+      height: 52px;
+      background: #eaf5ee;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+      color: #239150;
+      box-shadow: 0 4px 10px rgba(35, 145, 80, 0.1);
+    }
+    .icon-wrap-green svg {
+      width: 24px;
+      height: 24px;
+      stroke-width: 2.2;
+    }
+    .card-title {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: #0f172a;
+      margin-bottom: 6px;
+      letter-spacing: -0.2px;
+    }
+    .card-subtitle {
+      font-size: 0.88rem;
+      color: #64748b;
+      font-weight: 500;
+      line-height: 1.4;
+    }
 
-    /* ── Search / Filter Bar ── */
-    .bl-toolbar {
-      display: flex; align-items: center; justify-content: space-between;
-      gap: 16px; flex-wrap: wrap;
+    /* Form groups */
+    .form-group {
+      margin-bottom: 22px;
+    }
+    .form-label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #475569;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+    }
+    .input-icon-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .input-icon {
+      position: absolute;
+      left: 16px;
+      width: 18px;
+      height: 18px;
+      color: #94a3b8;
+      pointer-events: none;
+      transition: color 0.2s ease;
+    }
+    .input-icon-wrapper input {
+      width: 100%;
+      padding: 14px 16px 14px 48px;
+      border-radius: 14px;
+      border: 1.5px solid #e2e8f0;
+      font-family: 'Barlow', sans-serif;
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: #1e293b;
+      outline: none;
+      background: #f8fafc;
+      transition: all 0.2s ease;
+    }
+    .input-icon-wrapper input:focus {
+      background: #ffffff;
+      border-color: #239150;
+      box-shadow: 0 0 0 4px rgba(35, 145, 80, 0.12);
+    }
+    .input-icon-wrapper input:focus + .input-icon {
+      color: #239150;
+    }
+    .input-icon-wrapper input::placeholder {
+      color: #94a3b8;
+      font-weight: 500;
+    }
+
+    /* Submit Button */
+    .submit-btn {
+      width: 100%;
+      padding: 14px 20px;
+      border-radius: 14px;
+      border: none;
+      background: linear-gradient(135deg, #2FC56D 0%, #239150 100%);
+      color: #ffffff;
+      font-family: 'Barlow', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 14px rgba(35, 145, 80, 0.22);
+      transition: all 0.2s ease;
+    }
+    .submit-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(35, 145, 80, 0.32);
+      filter: brightness(1.04);
+    }
+    .submit-btn:active {
+      transform: translateY(0);
+    }
+    .submit-btn svg {
+      width: 18px;
+      height: 18px;
+      stroke-width: 2.2;
+    }
+
+    /* Table side design */
+    .bl-table-card {
+      display: flex;
+      flex-direction: column;
+    }
+    .bl-table-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .records-badge {
+      background: #eaf5ee;
+      color: #239150;
+      padding: 6px 14px;
+      border-radius: 50px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      border: 1px solid rgba(35, 145, 80, 0.15);
+      letter-spacing: 0.2px;
+    }
+
+    /* Table search */
+    .table-search-bar {
       margin-bottom: 20px;
     }
-    .bl-search {
-      display: flex; align-items: center; gap: 8px;
-      background: #fff; border: 1.5px solid rgba(35,145,80,0.18);
-      border-radius: 50px; padding: 8px 18px;
-      flex: 1; max-width: 380px;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-    .bl-search:focus-within {
-      border-color: #239150;
-      box-shadow: 0 0 0 3px rgba(35,145,80,0.12);
-    }
-    .bl-search i,
-    .bl-search [data-lucide] { width: 18px; height: 18px; color: #8a9b91; flex-shrink: 0; }
-    .bl-search input {
-      border: none; outline: none; background: transparent;
-      font-family: 'Barlow', sans-serif; font-size: 0.88rem; font-weight: 500;
-      color: #333; width: 100%;
-    }
-    .bl-search input::placeholder { color: #aab7af; }
-    .bl-filter-group {
-      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
-    }
-    .bl-filter-select {
-      font-family: 'Barlow', sans-serif; font-size: 0.82rem; font-weight: 600;
-      color: #5b6e62; background: #fff;
-      border: 1.5px solid rgba(35,145,80,0.18); border-radius: 50px;
-      padding: 8px 18px; cursor: pointer; outline: none;
-      transition: border-color 0.2s;
-    }
-    .bl-filter-select:focus { border-color: #239150; }
-    .bl-btn {
-      display: inline-flex; align-items: center; gap: 6px;
-      font-family: 'Barlow', sans-serif; font-size: 0.78rem; font-weight: 800;
-      text-transform: uppercase; letter-spacing: 0.4px;
-      border: none; border-radius: 50px; padding: 9px 20px;
-      cursor: pointer; color: #fff;
-      transition: transform 0.15s, box-shadow 0.2s, filter 0.15s;
-    }
-    .bl-btn:hover { transform: translateY(-1px); filter: brightness(1.08); }
-    .bl-btn:active { transform: translateY(0); }
-    .bl-btn-green {
-      background: linear-gradient(135deg, #2FC56D 0%, #239150 100%);
-      box-shadow: 0 4px 14px rgba(35,145,80,0.25);
-    }
-    .bl-btn-red {
-      background: linear-gradient(135deg, #e84040 0%, #b30000 100%);
-      box-shadow: 0 4px 14px rgba(180,0,0,0.22);
-    }
-    .bl-btn-outline {
-      background: transparent; color: #239150;
-      border: 2px solid #239150; box-shadow: none;
-    }
-    .bl-btn-outline:hover { background: rgba(35,145,80,0.06); filter: none; }
-
-    /* ── BlackList Table ── */
-    .bl-table-wrap {
-      background: #fff; border-radius: 20px;
-      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
-      overflow: hidden;
-    }
-    .bl-head {
-      display: grid;
+    .search-input-wrapper {
+      position: relative;
+      display: flex;
       align-items: center;
-      gap: 8px;
-      padding: 14px 20px;
-      background: #eef2f0;
-      color: #5b6e62;
+    }
+    .search-icon {
+      position: absolute;
+      left: 16px;
+      width: 18px;
+      height: 18px;
+      color: #94a3b8;
+      pointer-events: none;
+    }
+    .search-input-wrapper input {
+      width: 100%;
+      padding: 12px 16px 12px 48px;
+      border-radius: 12px;
+      border: 1.5px solid #e2e8f0;
       font-family: 'Barlow', sans-serif;
-      font-weight: 700;
-      font-size: 0.72rem;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      border-bottom: 1px solid #e2e8e4;
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: #1e293b;
+      outline: none;
+      background: #f8fafc;
+      transition: all 0.2s ease;
     }
-    .bl-head-grid { grid-template-columns: 40px 1.3fr 1.1fr 1fr 1.2fr 1.1fr 1fr; }
-    .bl-row {
-      display: grid;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 20px;
+    .search-input-wrapper input:focus {
       background: #ffffff;
-      color: #2a3530;
+      border-color: #239150;
+      box-shadow: 0 0 0 4px rgba(35, 145, 80, 0.1);
+    }
+    .search-input-wrapper input::placeholder {
+      color: #94a3b8;
+    }
+
+    /* Table styles */
+    .table-responsive {
+      overflow-x: auto;
+      border-radius: 16px;
+      border: 1px solid #edf2f7;
+    }
+    .premium-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
       font-family: 'Barlow', sans-serif;
+    }
+    .premium-table th {
+      background: #f8fafc;
+      padding: 16px 20px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #64748b;
+      border-bottom: 1px solid #edf2f7;
+    }
+    .premium-table td {
+      padding: 16px 20px;
+      font-size: 0.9rem;
       font-weight: 600;
-      font-size: 0.87rem;
-      border-bottom: 1px solid #eef1ef;
-      transition: background 0.15s;
+      color: #334155;
+      border-bottom: 1px solid #edf2f7;
+      transition: background-color 0.15s ease;
     }
-    .bl-row:nth-child(even) { background: #f6f8f7; }
-    .bl-row:hover { background: #ebf5ef; }
-    .bl-row .bl-num { font-size: 0.9rem; font-weight: 800; color: #239150; }
-    .bl-row .bl-phone { font-family: monospace; font-size: 0.85rem; color: #4a5a50; }
-    .bl-row .bl-reason {
-      display: inline-flex; align-items: center; gap: 5px;
-      font-size: 0.8rem; font-weight: 600;
+    .premium-table tbody tr:last-child td {
+      border-bottom: none;
     }
-    .bl-row .bl-reason i,
-    .bl-row .bl-reason [data-lucide] { width: 13px; height: 13px; stroke-width: 2.5; }
-    .bl-row .bl-date { font-size: 0.82rem; color: #6c7a72; }
-    .bl-tag {
-      display: inline-flex; align-items: center; gap: 5px;
-      padding: 5px 14px; border-radius: 50px;
-      font-size: 0.7rem; font-weight: 800;
-      text-transform: uppercase; letter-spacing: 0.4px;
-      white-space: nowrap;
+    .premium-table tbody tr:hover td {
+      background-color: #f8fafc;
     }
-    .bl-tag-blocked {
-      background: #fdeaea; color: #aa0000;
-      border: 1.5px solid #f1c4c4;
+    .premium-table td strong {
+      font-weight: 700;
+      color: #0f172a;
     }
-    .bl-tag-blocked i,
-    .bl-tag-blocked [data-lucide] { width: 13px; height: 13px; color: #aa0000; stroke-width: 2.5; }
-    .bl-tag-flagged {
-      background: #fff3e0; color: #b85c00;
-      border: 1.5px solid #ffd699;
+    .text-right {
+      text-align: right;
     }
-    .bl-tag-flagged i,
-    .bl-tag-flagged [data-lucide] { width: 13px; height: 13px; color: #b85c00; stroke-width: 2.5; }
-    .bl-action-btns {
-      display: flex; gap: 6px; align-items: center; flex-wrap: nowrap;
-    }
-    .bl-action-btns .bl-btn { padding: 6px 14px; font-size: 0.68rem; }
 
-    /* ── Empty state ── */
-    .bl-empty {
-      text-align: center; padding: 60px 20px;
-      color: #8a9b91; font-family: 'Barlow', sans-serif;
+    /* Action Remove Button */
+    .remove-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: 50px;
+      border: 1px solid #fecdd3;
+      background: #fff5f5;
+      color: #e11d48;
+      font-family: 'Barlow', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
     }
-    .bl-empty i,
-    .bl-empty [data-lucide] { width: 48px; height: 48px; stroke-width: 1.2; color: #c4d0c8; margin-bottom: 16px; }
-    .bl-empty h3 { font-size: 1.1rem; font-weight: 700; color: #5b6e62; margin-bottom: 6px; }
-    .bl-empty p { font-size: 0.88rem; }
+    .remove-btn:hover {
+      background: #ffe4e6;
+      border-color: #fda4af;
+      transform: translateY(-1px);
+    }
+    .remove-btn:active {
+      transform: translateY(0);
+    }
+    .remove-btn svg {
+      width: 13px;
+      height: 13px;
+      stroke-width: 2.2;
+    }
 
-    /* ── Floating bottom bar ── */
-    .float-bar {
+    /* Empty state styling */
+    .empty-state {
+      text-align: center;
+      padding: 48px 24px;
+      color: #64748b;
+    }
+    .empty-icon {
+      width: 48px;
+      height: 48px;
+      color: #cbd5e1;
+      margin-bottom: 16px;
+    }
+    .empty-state h3 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #334155;
+      margin-bottom: 6px;
+    }
+    .empty-state p {
+      font-size: 0.88rem;
+    }
+
+    /* Toast Notification styles */
+    .toast-container {
       position: fixed;
       bottom: 24px;
-      left: 50%; transform: translateX(-50%);
-      display: flex; align-items: center; justify-content: space-between;
-      gap: 20px;
-      background: #fff;
-      border-radius: 60px;
-      padding: 10px 10px 10px 20px;
-      box-shadow: 0 8px 32px rgba(0,0,0,.14), 0 2px 8px rgba(35,145,80,.1);
-      border: 1px solid rgba(35,145,80,.12);
-      z-index: 50;
-      min-width: 420px;
-      max-width: calc(100vw - 48px);
+      right: 24px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      pointer-events: none;
     }
-    .float-bar .pg-info { font-size: .8rem; color: #888; font-weight: 600; white-space: nowrap; }
-    .float-bar .bl-bulk-info {
-      font-size: 0.78rem; color: #6c7a72; font-weight: 600;
-      display: flex; align-items: center; gap: 6px;
+    .toast {
+      pointer-events: auto;
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 16px 20px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 320px;
+      max-width: 420px;
+      border-left: 4px solid #239150;
+      transform: translateX(120%);
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
+      opacity: 0;
     }
-    .float-bar .bl-bulk-info i,
-    .float-bar .bl-bulk-info [data-lucide] { width: 14px; height: 14px; color: #239150; }
-
-    /* ── Modal ── */
+    .toast.show {
+      transform: translateX(0);
+      opacity: 1;
+    }
+    .toast-icon {
+      width: 20px;
+      height: 20px;
+      color: #239150;
+      flex-shrink: 0;
+    }
+    .toast-content {
+      flex: 1;
+    }
+    .toast-title {
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: #0f172a;
+      margin-bottom: 2px;
+    }
+    .toast-message {
+      font-size: 0.78rem;
+      color: #64748b;
+      font-weight: 500;
+    }
+    .toast-close {
+      background: none;
+      border: none;
+      color: #94a3b8;
+      cursor: pointer;
+      padding: 0;
+      display: flex;
+    }
+    .toast-close:hover {
+      color: #64748b;
+    }
+    .toast-close svg {
+      width: 16px;
+      height: 16px;
+    }
+    
+    /* Modal styles override */
     .modal-overlay {
-      display: none; position: fixed; inset: 0;
-      background: rgba(0,0,0,.52); z-index: 200;
-      align-items: center; justify-content: center;
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.4);
+      backdrop-filter: blur(4px);
+      z-index: 10000;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.2s ease;
     }
-    .modal-overlay.open { display: flex; }
+    .modal-overlay.open {
+      display: flex;
+      opacity: 1;
+    }
     .p-modal {
-      background: #fff; border-radius: 16px;
-      padding: 40px 36px; max-width: 440px; width: 90%;
-      text-align: center; box-shadow: 0 16px 56px rgba(0,0,0,.2);
+      background: #ffffff;
+      border-radius: 24px;
+      padding: 36px;
+      max-width: 420px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      border: 1px solid rgba(226, 232, 240, 0.8);
+      transform: scale(0.95);
+      transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+    }
+    .modal-overlay.open .p-modal {
+      transform: scale(1);
+    }
+    .modal-icon-wrap {
+      width: 56px;
+      height: 56px;
+      background: #ffe4e6;
+      color: #e11d48;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+    }
+    .modal-icon-wrap svg {
+      width: 28px;
+      height: 28px;
+      stroke-width: 2;
+    }
+    .p-modal h3 {
+      font-size: 1.2rem;
+      color: #0f172a;
+      margin-bottom: 10px;
+      font-weight: 800;
+    }
+    .p-modal p {
+      color: #64748b;
+      margin-bottom: 28px;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      font-weight: 500;
+    }
+    .modal-btns {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+    }
+    .modal-btns button {
+      flex: 1;
+      padding: 12px;
+      border-radius: 12px;
       font-family: 'Barlow', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
     }
-    .p-modal h3 { font-size: 1.25rem; color: #239150; margin-bottom: 10px; font-weight: 800; }
-    .p-modal p  { color: #666; margin-bottom: 28px; font-size: .95rem; line-height: 1.6; }
-    .modal-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .btn-confirm-delete {
+      background: #e11d48;
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(225, 29, 72, 0.2);
+    }
+    .btn-confirm-delete:hover {
+      background: #be123c;
+      box-shadow: 0 6px 16px rgba(225, 29, 72, 0.3);
+    }
+    .btn-cancel {
+      background: #f1f5f9;
+      color: #475569;
+      border: 1px solid #e2e8f0;
+    }
+    .btn-cancel:hover {
+      background: #e2e8f0;
+    }
 
-    @media (max-width: 860px) {
-      .bl-head-grid { grid-template-columns: 36px 1.2fr 1fr 0.8fr 1fr 0.9fr 0.9fr; }
-      .bl-toolbar { flex-direction: column; align-items: stretch; }
-      .bl-search { max-width: 100%; }
-      .bl-filter-group { justify-content: stretch; }
-      .bl-filter-group select { flex: 1; }
+    /* Animation helper for table row fade-in */
+    @keyframes fadeInRow {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
-    @media (max-width: 620px) {
-      .bl-head-grid { grid-template-columns: 30px 1fr 1fr; }
-      .bl-head .bl-hide-mobile,
-      .bl-row .bl-hide-mobile { display: none; }
-      .float-bar { min-width: unset; width: calc(100vw - 32px); padding: 10px 14px; flex-wrap: wrap; justify-content: center; }
+    .fade-in-row {
+      animation: fadeInRow 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
   </style>
 </head>
@@ -290,273 +521,301 @@
   </div>
 
   <!-- Breadcrumb -->
-  <div class="portal-nav">
-    <a href="home.html"><i data-lucide="home" style="width:16px;height:16px;vertical-align:middle;margin-right:4px;"></i> Home</a>
-    &nbsp;›&nbsp;
-    <span class="crumb-active">BlackList</span>
+  <div class="portal-nav" style="background: transparent; padding: 24px 32px 12px;">
+    <a href="home.html" style="color: #239150; text-decoration: none; font-weight: 600;"><i data-lucide="home" style="width:16px;height:16px;vertical-align:middle;margin-right:4px;color: #239150;"></i> Home</a>
+    <span style="color: #94a3b8; margin: 0 8px;">/</span>
+    <a href="#" style="color: #239150; text-decoration: none; font-weight: 600;">DrawPortal</a>
+    <span style="color: #94a3b8; margin: 0 8px;">/</span>
+    <span class="crumb-active" style="background: #eaf5ee; color: #239150; padding: 4px 12px; border-radius: 40px; font-weight: 700; font-size: 0.8rem;">Blacklist</span>
   </div>
 
   <div class="portal-wrap">
-
-    <!-- Hero Banner -->
-    <div class="bl-hero">
-      <div class="bl-deco right"><i data-lucide="user-x"></i></div>
-      <div class="bl-deco left"><i data-lucide="shield-off"></i></div>
-      <h2>BlackList Management</h2>
-      <p>View and manage blocked customers, merchants, and agents</p>
-      <div class="bl-count">
-        <i data-lucide="users"></i>
-        <span id="totalBlockedCount">0 Blocked</span>
+    
+    <!-- Main layout -->
+    <div class="bl-layout">
+      
+      <!-- Left Card: Form -->
+      <div class="bl-card">
+        <div class="bl-card-header">
+          <div class="icon-wrap-green">
+            <i data-lucide="shield-alert"></i>
+          </div>
+          <h2 class="card-title">BlackList Merchant</h2>
+          <p class="card-subtitle">Enter the short code and blacklist reason</p>
+        </div>
+        
+        <form id="blacklistForm" onsubmit="handleBlacklistSubmit(event)">
+          <div class="form-group">
+            <label for="shortCode" class="form-label">Short Code</label>
+            <div class="input-icon-wrapper">
+              <i data-lucide="hash" class="input-icon"></i>
+              <input type="text" id="shortCode" placeholder="Enter short code" required autocomplete="off" />
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="blacklistReason" class="form-label">Blacklist Reason</label>
+            <div class="input-icon-wrapper">
+              <i data-lucide="file-text" class="input-icon"></i>
+              <input type="text" id="blacklistReason" placeholder="Enter reason (e.g. fraudulent activity)" required autocomplete="off" />
+            </div>
+          </div>
+          
+          <button type="submit" class="submit-btn">
+            <i data-lucide="ban"></i>
+            <span>BlackList</span>
+          </button>
+        </form>
       </div>
-    </div>
 
-    <!-- Section heading -->
-    <div class="section-wrap">
-      <span class="line"></span>
-      <div class="section-heading"><i data-lucide="user-x"></i> Blocked List</div>
-      <span class="line right"></span>
-    </div>
+      <!-- Right Card: Table -->
+      <div class="bl-card bl-table-card">
+        <div class="bl-table-header">
+          <div>
+            <h2 class="card-title">Blacklisted Users</h2>
+            <p class="card-subtitle">List of merchants blocked from draws and campaigns</p>
+          </div>
+          <span class="records-badge" id="recordsCount">0 records</span>
+        </div>
 
-    <!-- Toolbar: Search + Filter -->
-    <div class="bl-toolbar">
-      <div class="bl-search">
-        <i data-lucide="search"></i>
-        <input type="text" id="blSearchInput" placeholder="Search by name, phone or reason..." oninput="filterList()" />
+        <!-- Search query filter -->
+        <div class="table-search-bar">
+          <div class="search-input-wrapper">
+            <i data-lucide="search" class="search-icon"></i>
+            <input type="text" id="searchQuery" placeholder="Search by short code or reason..." oninput="handleSearch()" />
+          </div>
+        </div>
+
+        <!-- Table responsive -->
+        <div class="table-responsive">
+          <table class="premium-table">
+            <thead>
+              <tr>
+                <th>Short Code</th>
+                <th>Reason</th>
+                <th>Blacklisted By</th>
+                <th class="text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody id="blacklistTableBody">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Empty state layout -->
+        <div id="emptyState" class="empty-state" style="display: none;">
+          <i data-lucide="shield-check" class="empty-icon"></i>
+          <h3>No Blacklisted Merchants</h3>
+          <p>All merchants are currently active and allowed to participate.</p>
+        </div>
+
       </div>
-      <div class="bl-filter-group">
-        <select class="bl-filter-select" id="blTypeFilter" onchange="filterList()" title="Filter by type">
-          <option value="all">All Types</option>
-          <option value="customer">Customers</option>
-          <option value="merchant">Merchants</option>
-          <option value="agent">Agents</option>
-        </select>
-        <select class="bl-filter-select" id="blStatusFilter" onchange="filterList()" title="Filter by status">
-          <option value="all">All Status</option>
-          <option value="blocked">Blocked</option>
-          <option value="flagged">Flagged</option>
-        </select>
-        <button class="bl-btn bl-btn-outline" onclick="resetFilters()">
-          <i data-lucide="rotate-ccw" style="width:14px;height:14px;"></i> Reset
-        </button>
-      </div>
+
     </div>
 
-    <!-- Table -->
-    <div class="bl-table-wrap">
-      <div class="bl-head bl-head-grid">
-        <span>#</span>
-        <span>Name</span>
-        <span>Phone</span>
-        <span class="bl-hide-mobile">Type</span>
-        <span>Reason</span>
-        <span class="bl-hide-mobile">Date Blocked</span>
-        <span>Status</span>
-      </div>
-      <div id="blList"></div>
-    </div>
-
-  </div>
-
-  <!-- Floating bottom bar -->
-  <div class="float-bar">
-    <div class="w-pager">
-      <button class="pg-btn" onclick="prevPage()"><span>&larr;</span> PREVIOUS</button>
-      <span class="pg-info" id="pageInfo">Page 1 of 1</span>
-      <button class="pg-btn" onclick="nextPage()">NEXT <span>&rarr;</span></button>
-    </div>
-    <div class="bl-bulk-info">
-      <i data-lucide="filter"></i>
-      <span id="filteredCount">Showing 0 of 0</span>
-    </div>
   </div>
 
   <!-- Unblock Confirmation Modal -->
   <div class="modal-overlay" id="unblockModal">
     <div class="p-modal">
-      <h3>Unblock User</h3>
-      <p id="unblockModalText">Are you sure you want to unblock this user?<br>They will be able to participate in draws again.</p>
+      <div class="modal-icon-wrap">
+        <i data-lucide="trash-2"></i>
+      </div>
+      <h3>Remove from Blacklist</h3>
+      <p id="unblockModalText">Are you sure you want to remove this merchant from the blacklist?<br>They will be active again.</p>
       <div class="modal-btns">
-        <button class="pb pb-green" id="confirmUnblockBtn">Yes, Unblock</button>
-        <button class="pb pb-outline" onclick="closeUnblockModal()">Cancel</button>
+        <button class="btn-confirm-delete" id="confirmUnblockBtn">Yes, Remove</button>
+        <button class="btn-cancel" onclick="closeUnblockModal()">Cancel</button>
       </div>
     </div>
   </div>
 
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
   <script>
-    /* ── Mock BlackList Data ── */
+    // Live mock database initialized with the user's screenshot data
     const BLACKLIST_DATA = [
-      { id: 1,  name: 'Abebe Kebede',      phone: '251911100101', type: 'customer', reason: 'Fraudulent activity',        date: '2025-12-15', status: 'blocked' },
-      { id: 2,  name: 'Meron Tesfaye',     phone: '251911100102', type: 'customer', reason: 'Multiple account abuse',     date: '2025-12-20', status: 'blocked' },
-      { id: 3,  name: 'Blessed Hotel Ltd', phone: '251911100103', type: 'merchant', reason: 'Chargeback violation',       date: '2026-01-05', status: 'blocked' },
-      { id: 4,  name: 'Tigist Bekele',     phone: '251911100104', type: 'customer', reason: 'Suspicious transaction',     date: '2026-01-10', status: 'flagged' },
-      { id: 5,  name: 'Golden Shop',       phone: '251911100105', type: 'merchant', reason: 'Fake ticket submission',     date: '2026-01-12', status: 'blocked' },
-      { id: 6,  name: 'Dawit Solomon',     phone: '251911100106', type: 'customer', reason: 'Identity theft',             date: '2026-01-18', status: 'blocked' },
-      { id: 7,  name: 'Star Cafe',         phone: '251911100107', type: 'merchant', reason: 'Terms of service violation', date: '2026-01-22', status: 'flagged' },
-      { id: 8,  name: 'Hiwi Tola',         phone: '251911100108', type: 'customer', reason: 'Fraudulent activity',        date: '2026-01-25', status: 'blocked' },
-      { id: 9,  name: 'Manna Hotel Ltd',   phone: '251911100109', type: 'merchant', reason: 'Chargeback violation',       date: '2026-02-01', status: 'blocked' },
-      { id: 10, name: 'Liya Haile',        phone: '251911100110', type: 'customer', reason: 'Suspicious transaction',     date: '2026-02-03', status: 'blocked' },
-      { id: 11, name: 'Blue Nile Mart',    phone: '251911100111', type: 'merchant', reason: 'Fake ticket submission',     date: '2026-02-05', status: 'blocked' },
-      { id: 12, name: 'Biruk Assefa',      phone: '251911100112', type: 'customer', reason: 'Multiple account abuse',     date: '2026-02-08', status: 'flagged' },
-      { id: 13, name: 'Sunshine PLC',      phone: '251911100113', type: 'merchant', reason: 'Fraudulent activity',        date: '2026-02-10', status: 'blocked' },
-      { id: 14, name: 'Selam Awiti',       phone: '251911100114', type: 'customer', reason: 'Identity theft',             date: '2026-02-12', status: 'blocked' },
-      { id: 15, name: 'Royal Mart',        phone: '251911100115', type: 'merchant', reason: 'Terms of service violation', date: '2026-02-15', status: 'blocked' },
-      { id: 16, name: 'Fraol Solomon',     phone: '251911100116', type: 'customer', reason: 'Suspicious transaction',     date: '2026-02-18', status: 'flagged' },
-      { id: 17, name: 'Emperor Cafe',      phone: '251911100117', type: 'merchant', reason: 'Chargeback violation',       date: '2026-02-20', status: 'blocked' },
-      { id: 18, name: 'John Lema',         phone: '251911100118', type: 'customer', reason: 'Fraudulent activity',        date: '2026-02-22', status: 'blocked' },
-      { id: 19, name: 'Green Valley PLC',  phone: '251911100119', type: 'merchant', reason: 'Fake ticket submission',     date: '2026-02-25', status: 'blocked' },
-      { id: 20, name: 'Hiwi Kalab',        phone: '251911100120', type: 'customer', reason: 'Multiple account abuse',     date: '2026-02-28', status: 'blocked' },
+      { shortCode: '832797', reason: 'fraudulent activity', blacklistedBy: 'aklilu.tamirat@partner.safaricom.et' }
     ];
 
-    const PER_PAGE = 10;
-    let currentPage = 1;
-    let filteredData = [...BLACKLIST_DATA];
-    let pendingUnblockId = null;
+    let pendingRemoveShortCode = null;
 
-    function getFilteredData() {
-      const searchTerm = document.getElementById('blSearchInput').value.toLowerCase().trim();
-      const typeFilter = document.getElementById('blTypeFilter').value;
-      const statusFilter = document.getElementById('blStatusFilter').value;
+    // Toast logic
+    function showToast(title, message, type = 'success') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      if (type === 'error') {
+        toast.style.borderLeftColor = '#e11d48';
+      }
+      
+      const iconName = type === 'success' ? 'check-circle' : 'alert-triangle';
+      const iconColor = type === 'success' ? '#239150' : '#e11d48';
 
-      return BLACKLIST_DATA.filter(item => {
-        // Search filter
-        if (searchTerm) {
-          const matchName = item.name.toLowerCase().includes(searchTerm);
-          const matchPhone = item.phone.includes(searchTerm);
-          const matchReason = item.reason.toLowerCase().includes(searchTerm);
-          if (!matchName && !matchPhone && !matchReason) return false;
+      toast.innerHTML = `
+        <i data-lucide="${iconName}" class="toast-icon" style="color: ${iconColor};"></i>
+        <div class="toast-content">
+          <div class="toast-title">${title}</div>
+          <div class="toast-message">${message}</div>
+        </div>
+        <button class="toast-close" onclick="closeToast(this)">
+          <i data-lucide="x"></i>
+        </button>
+      `;
+      container.appendChild(toast);
+      
+      if (typeof lucide !== 'undefined' && lucide.createIcons) {
+        lucide.createIcons();
+      }
+
+      // Force a reflow
+      toast.offsetHeight;
+      toast.classList.add('show');
+
+      // Auto dismiss after 3.5s
+      setTimeout(() => {
+        if (toast.parentNode) {
+          toast.classList.remove('show');
+          setTimeout(() => toast.remove(), 300);
         }
-        // Type filter
-        if (typeFilter !== 'all' && item.type !== typeFilter) return false;
-        // Status filter
-        if (statusFilter !== 'all' && item.status !== statusFilter) return false;
-        return true;
-      });
+      }, 3500);
     }
 
-    function renderList() {
-      filteredData = getFilteredData();
-      const totalFiltered = filteredData.length;
-      const totalPages = Math.ceil(totalFiltered / PER_PAGE) || 1;
+    function closeToast(btn) {
+      const toast = btn.closest('.toast');
+      toast.classList.remove('show');
+      setTimeout(() => toast.remove(), 300);
+    }
 
-      // Clamp page
-      if (currentPage > totalPages) currentPage = totalPages;
-      if (currentPage < 1) currentPage = 1;
+    // Render local data
+    function renderTable() {
+      const tbody = document.getElementById('blacklistTableBody');
+      const emptyState = document.getElementById('emptyState');
+      const recordsCount = document.getElementById('recordsCount');
+      const query = document.getElementById('searchQuery').value.toLowerCase().trim();
 
-      const start = (currentPage - 1) * PER_PAGE;
-      const slice = filteredData.slice(start, start + PER_PAGE);
-      const listEl = document.getElementById('blList');
-      listEl.innerHTML = '';
+      const filtered = BLACKLIST_DATA.filter(item => {
+        return item.shortCode.toLowerCase().includes(query) || 
+               item.reason.toLowerCase().includes(query) ||
+               item.blacklistedBy.toLowerCase().includes(query);
+      });
 
-      if (slice.length === 0) {
-        listEl.innerHTML = `
-          <div class="bl-empty">
-            <i data-lucide="search-x"></i>
-            <h3>No results found</h3>
-            <p>Try adjusting your search or filter criteria</p>
-          </div>`;
+      tbody.innerHTML = '';
+      recordsCount.textContent = `${filtered.length} records`;
+
+      if (filtered.length === 0) {
+        emptyState.style.display = 'block';
+        tbody.parentElement.style.display = 'none';
       } else {
-        slice.forEach((item, idx) => {
-          const row = document.createElement('div');
-          row.className = 'bl-row bl-head-grid';
+        emptyState.style.display = 'none';
+        tbody.parentElement.style.display = 'table';
 
-          const isBlocked = item.status === 'blocked';
-          const statusTag = isBlocked
-            ? `<span class="bl-tag bl-tag-blocked"><i data-lucide="ban"></i> BLOCKED</span>`
-            : `<span class="bl-tag bl-tag-flagged"><i data-lucide="alert-triangle"></i> FLAGGED</span>`;
-
-          const typeLabel = item.type.charAt(0).toUpperCase() + item.type.slice(1);
-
-          row.innerHTML = `
-            <span class="bl-num">${start + idx + 1}.</span>
-            <span><strong>${item.name}</strong></span>
-            <span class="bl-phone">${item.phone}</span>
-            <span class="bl-hide-mobile">${typeLabel}</span>
-            <span class="bl-reason"><i data-lucide="info"></i> ${item.reason}</span>
-            <span class="bl-date bl-hide-mobile">${item.date}</span>
-            <span>${statusTag}</span>
+        filtered.forEach(item => {
+          const tr = document.createElement('tr');
+          tr.className = 'fade-in-row';
+          tr.innerHTML = `
+            <td><strong>${item.shortCode}</strong></td>
+            <td>${item.reason}</td>
+            <td><span style="color: #64748b; font-size: 0.85rem;">${item.blacklistedBy}</span></td>
+            <td class="text-right">
+              <button class="remove-btn" onclick="openUnblockModal('${item.shortCode}')">
+                <i data-lucide="user-check"></i> Remove
+              </button>
+            </td>
           `;
-          listEl.appendChild(row);
+          tbody.appendChild(tr);
         });
       }
 
-      // Update counts
-      document.getElementById('totalBlockedCount').textContent =
-        BLACKLIST_DATA.filter(d => d.status === 'blocked').length + ' Blocked';
-      document.getElementById('filteredCount').textContent =
-        `Showing ${slice.length} of ${totalFiltered}`;
-      document.getElementById('pageInfo').textContent =
-        `Page ${currentPage} of ${totalPages}`;
-
-      // Pagination button states
-      const prevBtn = document.querySelector('.pg-btn[onclick="prevPage()"]');
-      const nextBtn = document.querySelector('.pg-btn[onclick="nextPage()"]');
-      if (prevBtn) prevBtn.style.opacity = (currentPage <= 1) ? '0.35' : '1';
-      if (nextBtn) nextBtn.style.opacity = (currentPage >= totalPages) ? '0.35' : '1';
-
-      reLucide();
-    }
-
-    function filterList() {
-      currentPage = 1;
-      renderList();
-    }
-
-    function resetFilters() {
-      document.getElementById('blSearchInput').value = '';
-      document.getElementById('blTypeFilter').value = 'all';
-      document.getElementById('blStatusFilter').value = 'all';
-      currentPage = 1;
-      renderList();
-    }
-
-    function prevPage() {
-      const totalPages = Math.ceil(filteredData.length / PER_PAGE) || 1;
-      if (currentPage > 1) { currentPage--; renderList(); }
-    }
-
-    function nextPage() {
-      const totalPages = Math.ceil(filteredData.length / PER_PAGE) || 1;
-      if (currentPage < totalPages) { currentPage++; renderList(); }
-    }
-
-    function openUnblockModal(id) {
-      pendingUnblockId = id;
-      const item = BLACKLIST_DATA.find(d => d.id === id);
-      if (item) {
-        document.getElementById('unblockModalText').innerHTML =
-          `Are you sure you want to unblock <strong>${item.name}</strong>?<br>They will be able to participate in draws again.`;
+      if (typeof lucide !== 'undefined' && lucide.createIcons) {
+        lucide.createIcons();
       }
-      document.getElementById('unblockModal').classList.add('open');
+    }
+
+    // Form submit handler
+    function handleBlacklistSubmit(event) {
+      event.preventDefault();
+      const shortCodeInput = document.getElementById('shortCode');
+      const reasonInput = document.getElementById('blacklistReason');
+      
+      const shortCode = shortCodeInput.value.trim();
+      const reason = reasonInput.value.trim();
+
+      if (!shortCode || !reason) {
+        showToast('Error', 'Please fill in all fields.', 'error');
+        return;
+      }
+
+      // Check format
+      if (!/^\d+$/.test(shortCode)) {
+        showToast('Invalid Short Code', 'Short code must contain numbers only.', 'error');
+        return;
+      }
+
+      // Check duplicates
+      const exists = BLACKLIST_DATA.some(item => item.shortCode === shortCode);
+      if (exists) {
+        showToast('Duplicate Error', `Merchant ${shortCode} is already blacklisted.`, 'error');
+        return;
+      }
+
+      // Insert at index 0
+      BLACKLIST_DATA.unshift({
+        shortCode,
+        reason,
+        blacklistedBy: 'aklilu.tamirat@partner.safaricom.et'
+      });
+
+      // Clear inputs (prefill reason with 'fraudulent activity' just like the screenshot)
+      shortCodeInput.value = '';
+      reasonInput.value = 'fraudulent activity';
+
+      showToast('Merchant Blacklisted', `Short code ${shortCode} was added to the blacklist.`);
+      renderTable();
+    }
+
+    function handleSearch() {
+      renderTable();
+    }
+
+    // Modal behavior
+    function openUnblockModal(shortCode) {
+      pendingRemoveShortCode = shortCode;
+      const textEl = document.getElementById('unblockModalText');
+      textEl.innerHTML = `Are you sure you want to remove merchant <strong>${shortCode}</strong> from the blacklist?<br>They will be able to participate in draws again.`;
+      
+      const modal = document.getElementById('unblockModal');
+      modal.classList.add('open');
     }
 
     function closeUnblockModal() {
-      document.getElementById('unblockModal').classList.remove('open');
-      pendingUnblockId = null;
+      const modal = document.getElementById('unblockModal');
+      modal.classList.remove('open');
+      pendingRemoveShortCode = null;
     }
 
+    // Unblock verification click
     function confirmUnblock() {
-      if (pendingUnblockId !== null) {
-        const idx = BLACKLIST_DATA.findIndex(d => d.id === pendingUnblockId);
-        if (idx !== -1) {
-          BLACKLIST_DATA.splice(idx, 1);
+      if (pendingRemoveShortCode) {
+        const index = BLACKLIST_DATA.findIndex(item => item.shortCode === pendingRemoveShortCode);
+        if (index !== -1) {
+          BLACKLIST_DATA.splice(index, 1);
+          showToast('Merchant Removed', `Short code ${pendingRemoveShortCode} has been removed from the blacklist.`);
         }
-        pendingUnblockId = null;
         closeUnblockModal();
-        renderList();
+        renderTable();
       }
     }
 
-    function reLucide() {
-      if (typeof lucide !== 'undefined' && lucide.createIcons) { lucide.createIcons(); }
-    }
-
-    // Wire up confirm unblock
     document.getElementById('confirmUnblockBtn').addEventListener('click', confirmUnblock);
 
-    // Initial render
-    renderList();
-
-    if (typeof lucide !== 'undefined' && lucide.createIcons) { lucide.createIcons(); }
+    // Initial configuration on page load
+    window.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('blacklistReason').value = 'fraudulent activity';
+      renderTable();
+    });
   </script>
   <noscript>Enable JavaScript to view the BlackList</noscript>
   <script src="sidebar.js"></script>
