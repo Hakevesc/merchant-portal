@@ -642,29 +642,45 @@
       // Support multiple short codes separated by / or ,
       const codes = input.split(/[\/,]+/).map(c => c.trim()).filter(Boolean);
 
-      // Generate results for each code
+      // Build result cards for each code
       let resultsHtml = '';
-      codes.forEach((code, idx) => {
+      codes.forEach((code) => {
         const data = MOCK_MERCHANTS[code] || {
           name: `Merchant #${code}`, region:'Addis Ababa', cluster:'Central',
           entries: Math.floor(Math.random() * 120) + 10, eligible: true
         };
 
         const isEligible = data.eligible;
-        const eligibleText = isEligible ? 'Yes ✓' : 'No ✗';
-        const rowClass = isEligible ? 'el-result-row eligible' : 'el-result-row ineligible';
+        const statusColor = isEligible ? '#239150' : '#e11d48';
+        const statusBg = isEligible ? '#eef8f2' : '#fef2f2';
+        const statusBorder = isEligible ? '#239150' : '#ef4444';
+        const statusText = isEligible ? 'ELIGIBLE' : 'NOT ELIGIBLE';
         const iconName = isEligible ? 'check-circle-2' : 'x-circle';
 
         resultsHtml += `
-          <div class="${rowClass}">
-            <div class="el-result-left">
-              <i data-lucide="${iconName}" style="width:20px;height:20px;stroke-width:2.5;flex-shrink:0;"></i>
+          <div style="background:#fff;border-radius:16px;border:1.5px solid ${statusBorder};overflow:hidden;margin-bottom:16px;">
+            <div style="background:${statusBg};padding:14px 20px;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(0,0,0,0.04);">
+              <i data-lucide="${iconName}" style="width:22px;height:22px;stroke-width:2.5;color:${statusColor};flex-shrink:0;"></i>
               <div>
-                <div class="el-result-code"><strong>${code}</strong></div>
-                <div class="el-result-name">${data.name}</div>
+                <div style="font-family:'Barlow',sans-serif;font-size:1rem;font-weight:800;color:${statusColor};">Short Code: <strong>${code}</strong></div>
+                <div style="font-family:'Barlow',sans-serif;font-size:0.75rem;font-weight:600;color:${statusColor};opacity:0.8;">${data.name}</div>
+              </div>
+              <div style="margin-left:auto;background:${statusColor};color:#fff;padding:5px 16px;border-radius:50px;font-family:'Barlow',sans-serif;font-size:0.75rem;font-weight:800;white-space:nowrap;">${statusText}</div>
+            </div>
+            <div style="padding:16px 20px;display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+              <div>
+                <div style="font-family:'Barlow',sans-serif;font-size:0.68rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Merchant Short Code</div>
+                <div style="font-family:'Barlow',sans-serif;font-size:1rem;font-weight:800;color:#0f172a;">${code}</div>
+              </div>
+              <div>
+                <div style="font-family:'Barlow',sans-serif;font-size:0.68rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Is Eligible</div>
+                <div style="font-family:'Barlow',sans-serif;font-size:1rem;font-weight:800;color:${statusColor};">${isEligible ? 'Yes' : 'No'}</div>
+              </div>
+              <div>
+                <div style="font-family:'Barlow',sans-serif;font-size:0.68rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Prestigious Won</div>
+                <div style="font-family:'Barlow',sans-serif;font-size:1rem;font-weight:800;color:#0f172a;">${isEligible ? 'Yes' : 'No'}</div>
               </div>
             </div>
-            <div class="el-result-badge ${isEligible ? 'badge-ok' : 'badge-no'}">${eligibleText}</div>
           </div>
         `;
       });
@@ -672,7 +688,7 @@
       // Build the result content dynamically
       const activeResult = document.getElementById('elActiveResult');
       activeResult.innerHTML = `
-        <div style="margin-bottom:10px;font-size:0.82rem;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:0.5px;">Eligibility Results (${codes.length} merchants)</div>
+        <div style="margin-bottom:12px;font-size:0.82rem;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:0.5px;">Eligibility Results (${codes.length} merchants)</div>
         ${resultsHtml}
       `;
 
