@@ -11,10 +11,7 @@
   <link rel="stylesheet" href="portal.css">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-
     body.portal-body { background: #f2f4f6; font-family: 'Barlow', sans-serif; }
-
-    /* ════════ REDESIGNED HEADER ════════ */
     .portal-topbar {
       background: linear-gradient(120deg, #1b7341 0%, #239150 48%, #2cb464 100%);
       padding: 14px 40px;
@@ -28,9 +25,7 @@
       background: radial-gradient(circle, rgba(255,255,255,0.18) 0%, transparent 70%);
       pointer-events: none;
     }
-    .portal-topbar .brand {
-      display: flex; align-items: center; gap: 16px; position: relative; z-index: 1;
-    }
+    .portal-topbar .brand { display: flex; align-items: center; gap: 16px; position: relative; z-index: 1; }
     .portal-topbar .brand .logo-wrapper {
       display: flex; align-items: center; justify-content: center;
       background: #ffffff; border-radius: 14px; padding: 9px 18px;
@@ -44,15 +39,11 @@
       padding-left: 16px; border-left: 2px solid rgba(255,255,255,0.28); line-height: 1.15;
     }
     .portal-topbar .topbar-right { position: relative; z-index: 1; }
-
     @media (max-width: 620px) {
       .portal-topbar .brand-title { font-size: 0.8rem; padding-left: 12px; }
       .portal-topbar .logout-btn span.lbl { display: none; }
     }
-
     .portal-wrap { max-width: 1200px; margin: 0 auto; padding: 24px 32px 100px; }
-
-    /* --- banner --- */
     .p-card { background: transparent; box-shadow: none; margin-bottom: 36px; }
     .p-banner {
       background: linear-gradient(125deg, #1e7b46 0%, #239150 40%, #2bb162 100%);
@@ -60,43 +51,25 @@
       box-shadow: 0 15px 35px rgba(35, 145, 80, 0.25);
       position: relative; overflow: hidden; transition: transform 0.2s ease;
     }
-    .p-banner .banner-deco {
-      position: absolute; pointer-events: none; opacity: 0.08;
-    }
-    .p-banner .banner-deco.right {
-      bottom: -20px; right: -10px;
-    }
-    .p-banner .banner-deco.right i,
-    .p-banner .banner-deco.right [data-lucide] {
-      width: 120px; height: 120px; stroke-width: 1.2;
-    }
-    .p-banner .banner-deco.left {
-      top: -20px; left: -10px;
-    }
-    .p-banner .banner-deco.left i,
-    .p-banner .banner-deco.left [data-lucide] {
-      width: 90px; height: 90px; stroke-width: 1.2;
-    }
+    .p-banner .banner-deco { position: absolute; pointer-events: none; opacity: 0.08; }
+    .p-banner .banner-deco.right { bottom: -20px; right: -10px; }
+    .p-banner .banner-deco.right i, .p-banner .banner-deco.right [data-lucide] { width: 120px; height: 120px; stroke-width: 1.2; }
+    .p-banner .banner-deco.left { top: -20px; left: -10px; }
+    .p-banner .banner-deco.left i, .p-banner .banner-deco.left [data-lucide] { width: 90px; height: 90px; stroke-width: 1.2; }
     .prize-label {
       font-size: 1.9rem; font-weight: 800; letter-spacing: -0.3px;
       text-shadow: 0 2px 5px rgba(0,0,0,0.1);
       background: linear-gradient(135deg, #ffffff, #f9ffea);
       -webkit-background-clip: text; background-clip: text; color: transparent;
     }
-    @media (max-width: 640px) {
-      .prize-label { font-size: 1.3rem; }
-      .p-banner { padding: 22px 18px; }
-    }
-
-    /* ════════ SECTION HEADING (Prize Categories) ════════ */
+    @media (max-width: 640px) { .prize-label { font-size: 1.3rem; } .p-banner { padding: 22px 18px; } }
     .section-wrap {
       display: flex; align-items: center; justify-content: center;
       gap: 18px; margin: 4px 0 30px;
     }
     .section-wrap .line {
       display: block; height: 2px; width: 70px; max-width: 12vw;
-      background: linear-gradient(90deg, transparent, rgba(35,145,80,0.45)); border-radius: 2px;
-      flex-shrink: 0;
+      background: linear-gradient(90deg, transparent, rgba(35,145,80,0.45)); border-radius: 2px; flex-shrink: 0;
     }
     .section-wrap .line.right { background: linear-gradient(90deg, rgba(35,145,80,0.45), transparent); }
     .section-heading {
@@ -107,173 +80,112 @@
       border: 1.5px solid rgba(35,145,80,0.18);
       box-shadow: 0 6px 18px rgba(35,145,80,0.12); white-space: nowrap;
     }
-    .section-heading i,
-    .section-heading [data-lucide] { width: 17px; height: 17px; stroke-width: 2.4; color: #239150; }
+    .section-heading i, .section-heading [data-lucide] { width: 17px; height: 17px; stroke-width: 2.4; color: #239150; }
 
-    /* ---- Region horizontal radio list ---- */
+    /* ── No Schedule Display ── */
+    .no-schedule-card {
+      text-align: center;
+      padding: 60px 24px;
+      background: #ffffff;
+      border-radius: 24px;
+      border: 1px solid rgba(226,232,240,0.8);
+    }
+    .no-schedule-card .ns-icon {
+      width: 64px; height: 64px;
+      margin: 0 auto 16px;
+      background: #f8fafc;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      color: #94a3b8;
+    }
+    .no-schedule-card .ns-icon [data-lucide] { width: 32px; height: 32px; stroke-width: 1.5; }
+    .no-schedule-card h3 {
+      font-size: 1.3rem; font-weight: 800; color: #334155; margin-bottom: 6px;
+    }
+    .no-schedule-card p {
+      font-size: 0.92rem; color: #64748b; font-weight: 500; line-height: 1.5;
+    }
+    .no-schedule-card .ns-amount {
+      display: inline-flex; align-items: center; gap: 8px;
+      margin-top: 16px;
+      background: #eaf5ee;
+      border: 1.5px solid rgba(35,145,80,0.2);
+      border-radius: 50px;
+      padding: 10px 22px;
+      font-family: 'Barlow', sans-serif;
+      font-size: 0.95rem; font-weight: 800; color: #1b7341;
+    }
+    .no-schedule-card .ns-amount [data-lucide] { width: 18px; height: 18px; }
+
+    /* Region cards */
     .region-cards {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 16px;
       margin-top: 16px;
-      padding-bottom: 110px; /* space for floating bottom bar */
+      padding-bottom: 110px;
     }
     .region-card {
-      background: #ffffff;
-      border-radius: 20px;
-      padding: 18px 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      border: 2px solid #d4e9db;
-      cursor: pointer;
+      background: #ffffff; border-radius: 20px; padding: 18px 24px;
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+      border: 2px solid #d4e9db; cursor: pointer;
       transition: all 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1);
-      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
-      user-select: none;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04); user-select: none;
     }
-    .region-card:hover {
-      border-color: #239150;
-      background: #f4fbf6;
-      transform: translateY(-2px);
-      box-shadow: 0 8px 22px rgba(35, 145, 80, 0.12);
-    }
-    .region-card.selected {
-      border-color: #239150;
-      background: #eef8f2;
-      box-shadow: 0 8px 24px rgba(35, 145, 80, 0.2);
-    }
-    .region-card input[type="radio"] {
-      display: none;
-    }
-    .region-left {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
+    .region-card:hover { border-color: #239150; background: #f4fbf6; transform: translateY(-2px); box-shadow: 0 8px 22px rgba(35, 145, 80, 0.12); }
+    .region-card.selected { border-color: #239150; background: #eef8f2; box-shadow: 0 8px 24px rgba(35, 145, 80, 0.2); }
+    .region-card input[type="radio"] { display: none; }
+    .region-left { display: flex; align-items: center; gap: 16px; }
     .radio-indicator {
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      border: 2.5px solid #a8c8b4;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.25s;
-      flex-shrink: 0;
-      background: #ffffff;
+      width: 24px; height: 24px; border-radius: 50%;
+      border: 2.5px solid #a8c8b4; display: flex; align-items: center; justify-content: center;
+      transition: all 0.25s; flex-shrink: 0; background: #ffffff;
     }
-    .region-card.selected .radio-indicator {
-      border-color: #239150;
-      background: #239150;
-    }
+    .region-card.selected .radio-indicator { border-color: #239150; background: #239150; }
     .radio-indicator::after {
-      content: '';
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: #ffffff;
-      opacity: 0;
-      transform: scale(0.4);
-      transition: all 0.2s;
+      content: ''; width: 8px; height: 8px; border-radius: 50%;
+      background: #ffffff; opacity: 0; transform: scale(0.4); transition: all 0.2s;
     }
-    .region-card.selected .radio-indicator::after {
-      opacity: 1;
-      transform: scale(1);
-    }
+    .region-card.selected .radio-indicator::after { opacity: 1; transform: scale(1); }
     .region-icon {
-      width: 44px;
-      height: 44px;
-      border-radius: 14px;
-      background: #eef9f2;
-      color: #239150;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      transition: all 0.2s;
+      width: 44px; height: 44px; border-radius: 14px;
+      background: #eef9f2; color: #239150;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s;
     }
-    .region-card.selected .region-icon {
-      background: #239150;
-      color: #ffffff;
-    }
+    .region-card.selected .region-icon { background: #239150; color: #ffffff; }
     .region-card h3 {
-      font-family: 'Barlow', sans-serif;
-      font-size: 1.2rem;
-      font-weight: 800;
-      color: #1a1a1a;
-      letter-spacing: -0.2px;
-      text-transform: uppercase;
-      margin: 0;
+      font-family: 'Barlow', sans-serif; font-size: 1.2rem; font-weight: 800;
+      color: #1a1a1a; letter-spacing: -0.2px; text-transform: uppercase; margin: 0;
     }
     .region-badge {
-      font-size: 0.74rem;
-      font-weight: 800;
-      color: #239150;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      background: #eaf5ee;
-      padding: 6px 14px;
-      border-radius: 30px;
-      transition: all 0.2s;
+      font-size: 0.74rem; font-weight: 800; color: #239150;
+      text-transform: uppercase; letter-spacing: 1px;
+      background: #eaf5ee; padding: 6px 14px; border-radius: 30px; transition: all 0.2s;
     }
-    .region-card.selected .region-badge {
-      background: #239150;
-      color: #ffffff;
-    }
-
-    /* Floating bottom bar */
+    .region-card.selected .region-badge { background: #239150; color: #ffffff; }
     .float-bar {
-      position: fixed;
-      bottom: 24px;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 20px;
-      background: #ffffff;
-      border-radius: 60px;
-      padding: 10px 14px 10px 24px;
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+      display: flex; align-items: center; justify-content: space-between; gap: 20px;
+      background: #ffffff; border-radius: 60px; padding: 10px 14px 10px 24px;
       box-shadow: 0 10px 36px rgba(0,0,0,.16), 0 2px 10px rgba(35,145,80,.15);
-      border: 1.5px solid rgba(35,145,80,.2);
-      z-index: 100;
-      min-width: 480px;
-      max-width: calc(100vw - 48px);
+      border: 1.5px solid rgba(35,145,80,.2); z-index: 100;
+      min-width: 480px; max-width: calc(100vw - 48px);
     }
     .float-bar-btn {
-      padding: 14px 34px;
-      border: none;
-      border-radius: 60px;
-      font-family: 'Barlow', sans-serif;
-      font-weight: 900;
-      font-size: 0.95rem;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
+      padding: 14px 34px; border: none; border-radius: 60px;
+      font-family: 'Barlow', sans-serif; font-weight: 900; font-size: 0.95rem;
+      letter-spacing: 1px; text-transform: uppercase; cursor: pointer;
+      display: inline-flex; align-items: center; gap: 10px;
       background: linear-gradient(105deg, #239150 0%, #2fc56d 100%);
-      color: #ffffff;
-      box-shadow: 0 6px 18px rgba(35, 145, 80, 0.35);
-      transition: all 0.25s;
+      color: #ffffff; box-shadow: 0 6px 18px rgba(35, 145, 80, 0.35); transition: all 0.25s;
     }
-    .float-bar-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 24px rgba(35, 145, 80, 0.45);
-      filter: brightness(1.05);
-    }
-
-    @media (max-width: 1024px) {
-      .region-cards { grid-template-columns: repeat(2, 1fr); }
-    }
+    .float-bar-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(35, 145, 80, 0.45); filter: brightness(1.05); }
+    @media (max-width: 1024px) { .region-cards { grid-template-columns: repeat(2, 1fr); } }
     @media (max-width: 768px) {
       .region-cards { grid-template-columns: 1fr; }
       .float-bar { min-width: calc(100vw - 32px); padding: 10px 14px; }
       .float-bar-btn { padding: 12px 22px; font-size: 0.85rem; }
     }
-
     .portal-body { background-image: radial-gradient(#dce5e0 0.8px, transparent 0.8px); background-size: 22px 22px; }
   </style>
 </head>
@@ -302,32 +214,42 @@
         <div class="banner-deco right"><i data-lucide="dices"></i></div>
         <div class="banner-deco left"><i data-lucide="sparkles"></i></div>
         <div class="prize-label" id="drawBanner">Customer's Weekly Draw</div>
-        
         <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 18px;">
           <span style="background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(4px); padding: 7px 16px; border-radius: 50px; font-weight: 700; font-size: 0.82rem; color: #fff; border: 1px solid rgba(255,255,255,0.35); display: inline-flex; align-items: center; gap: 6px;">
-            <i data-lucide="calendar" style="width:14px;height:14px;"></i> Scheduled Today
+            <i data-lucide="calendar" style="width:14px;height:14px;"></i> <span id="scheduleLabel">Scheduled Today</span>
           </span>
           <span style="background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(4px); padding: 7px 16px; border-radius: 50px; font-weight: 700; font-size: 0.82rem; color: #fff; border: 1px solid rgba(255,255,255,0.35); display: inline-flex; align-items: center; gap: 6px;">
             <i data-lucide="award" style="width:14px;height:14px;"></i> Regional Prize
           </span>
           <span style="background: #ffffff; padding: 7px 18px; border-radius: 50px; font-weight: 900; font-size: 0.82rem; color: #1b7341; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 14px rgba(0,0,0,0.12);">
-            <i data-lucide="trophy" style="width:15px;height:15px;color:#1b7341;"></i> Total Winners: 10
+            <i data-lucide="trophy" style="width:15px;height:15px;color:#1b7341;"></i> <span id="winnersLabel">Total Winners: 10</span>
           </span>
         </div>
       </div>
     </div>
 
-    <div class="section-wrap">
-      <span class="line"></span>
-      <div class="section-heading"><i data-lucide="map-pin"></i> Select Region to Draw</div>
-      <span class="line right"></span>
+    <div id="mainContent">
+      <div class="section-wrap">
+        <span class="line"></span>
+        <div class="section-heading"><i data-lucide="map-pin"></i> Select Region to Draw</div>
+        <span class="line right"></span>
+      </div>
+      <div class="region-cards" id="prizeCards"></div>
     </div>
 
-    <div class="region-cards" id="prizeCards"></div>
+    <div id="noScheduleContent" style="display:none;">
+      <div class="no-schedule-card">
+        <div class="ns-icon"><i data-lucide="calendar"></i></div>
+        <h3>No Draw Scheduled for Today</h3>
+        <p>Regional Schedule Draw — July 14, 2026<br>No draw is scheduled for today.</p>
+        <p style="margin-top:10px;">Regional schedule across all regions — <strong>100,000 ETB</strong> per winner</p>
+        <div class="ns-amount"><i data-lucide="trophy"></i> 100,000 ETB per Regional Winner</div>
+      </div>
+    </div>
   </div>
 
   <!-- Floating bottom bar -->
-  <div class="float-bar">
+  <div class="float-bar" id="floatBar">
     <div style="display: flex; align-items: center; gap: 12px;">
       <div style="width: 40px; height: 40px; border-radius: 50%; background: #eef8f2; display: flex; align-items: center; justify-content: center; color: #239150; flex-shrink: 0;">
         <i data-lucide="map-pin" style="width: 20px; height: 20px;"></i>
@@ -346,6 +268,7 @@
     (function() {
       const params = new URLSearchParams(window.location.search);
       const type = params.get('type') || 'customers';
+      const prize = params.get('prize') || '';
 
       const typeLabels = {
         customers: "Customer's Weekly Draw",
@@ -353,6 +276,21 @@
         agents: "Agent's Weekly Draw"
       };
 
+      // Check if this is MEGA PRIZE (no schedule)
+      const isMegaPrize = prize === 'mega-prize' || type === 'mega';
+
+      if (isMegaPrize) {
+        document.getElementById('drawBanner').innerHTML = `<i data-lucide="calendar" style="width:32px;height:32px;display:inline;vertical-align:middle;margin-right:6px;color:#fff;"></i> MEGA PRIZE — 500K ETB`;
+        document.getElementById('breadcrumb').innerHTML = 'MEGA PRIZE';
+        document.getElementById('scheduleLabel').textContent = 'Regional Schedule - July 14, 2026';
+        document.getElementById('winnersLabel').textContent = '100,000 ETB per Winner';
+        document.getElementById('mainContent').style.display = 'none';
+        document.getElementById('noScheduleContent').style.display = 'block';
+        document.getElementById('floatBar').style.display = 'none';
+        return;
+      }
+
+      // Normal draw flow
       const titleText = typeLabels[type] || "Customer's Weekly Draw";
       document.getElementById('drawBanner').innerHTML = `<i data-lucide="users" style="width:32px;height:32px;display:inline;vertical-align:middle;margin-right:6px;color:#fff;"></i> ${titleText}`;
       document.getElementById('breadcrumb').innerHTML = titleText;
@@ -399,7 +337,6 @@
       });
 
       if (typeof lucide !== 'undefined' && lucide.createIcons) { lucide.createIcons(); }
-
     })();
   </script>
   <noscript>Enable JavaScript to view draw categories</noscript>

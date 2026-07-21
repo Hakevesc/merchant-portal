@@ -553,8 +553,8 @@
 
     function headCols() {
       const base = isMerch
-        ? ['#', 'Merchant', 'Phone', 'Till', 'Ticket', 'Region', 'Cluster']
-        : ['#', 'Name', 'Phone', 'Ticket', 'Region', 'Cluster'];
+        ? ['#', 'Merchant Name', 'Short Code', 'Ticket', 'Region', 'Cluster']
+        : ['#', 'Merchant Name', 'Short Code', 'Ticket', 'Region', 'Cluster'];
       return hasActions ? [...base, 'Status'] : base;
     }
 
