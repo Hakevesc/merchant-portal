@@ -189,44 +189,67 @@
 .winners-banner .wb-prize { font-size: 1.5rem; font-weight: 800; margin-top: 4px; }
 
 /* ── WINNERS TABLE: white + light-gray rows ── */
+.w-table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  background: #ffffff;
+  border-radius: 0 0 24px 24px;
+}
+
 .w-list { padding: 0; }
 
 .w-head {
   display: grid;
   align-items: center;
-  gap: 8px;
-  padding: 13px 20px;
-  background: #eef2f0;
-  color: #5b6e62;
+  gap: 12px;
+  padding: 14px 24px;
+  background: #eef3f0;
+  color: #4b5e52;
   font-family: 'Barlow', sans-serif;
-  font-weight: 700;
-  font-size: .72rem;
+  font-weight: 800;
+  font-size: .76rem;
   text-transform: uppercase;
-  letter-spacing: .5px;
-  border-bottom: 1px solid #e2e8e4;
+  letter-spacing: .8px;
+  border-bottom: 2px solid #d6e4dc;
+  min-width: 860px;
+}
+.w-head span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .w-row {
   display: grid;
   align-items: center;
-  gap: 8px;
-  padding: 9px 20px;
+  gap: 12px;
+  padding: 14px 24px;
+  min-height: 56px;
   background: #ffffff;
-  color: #2a3530;
+  color: #212d27;
   font-family: 'Barlow', sans-serif;
   font-weight: 600;
-  font-size: .87rem;
-  border-bottom: 1px solid #eef1ef;
-  transition: background .15s;
+  font-size: .9rem;
+  border-bottom: 1px solid #edf2ef;
+  transition: background .15s ease;
+  min-width: 860px;
 }
-.w-row:nth-child(even) { background: #f6f8f7; }
-.w-row:hover           { background: #ebf5ef; }
-.w-row .wn { font-size: .9rem; font-weight: 800; color: #239150; }
+.w-row:nth-child(even) { background: #f7faf8; }
+.w-row:hover           { background: #e8f5ed; }
+.w-row .wn { font-size: .92rem; font-weight: 800; color: #239150; }
 
-.wg-airtime  { grid-template-columns: 36px 1.5fr 1.1fr 1fr 1fr .9fr; }
-.wg-prize    { grid-template-columns: 36px 1.3fr 1fr 1fr 1fr .85fr 220px; }
-.wg-m-air    { grid-template-columns: 36px 1.3fr 1fr 60px 1fr .9fr .9fr; }
-.wg-m-prize  { grid-template-columns: 36px 1.1fr .9fr 55px .95fr .75fr .75fr 220px; }
+.w-row span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+}
+
+.wg-airtime  { grid-template-columns: 44px 1.5fr 1.2fr 1.1fr 1fr 1fr; }
+.wg-prize    { grid-template-columns: 44px 1.4fr 1.2fr 1.1fr 1fr 1fr 210px; }
+.wg-m-air    { grid-template-columns: 44px 1.4fr 1.2fr 75px 1.1fr 1fr 1fr; }
+.wg-m-prize  { grid-template-columns: 44px 1.2fr 1.1fr 75px 1fr 1fr 1fr 210px; }
 
 /* ── Action buttons — horizontal pill pair ── */
 .ab {
