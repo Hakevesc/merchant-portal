@@ -427,15 +427,8 @@
             </div>
             <div class="res-grid">
               <div class="res-item"><div class="res-item-lbl">Short Code</div><div class="res-item-val" id="elResCode">—</div></div>
-              <div class="res-item"><div class="res-item-lbl">Merchant Name</div><div class="res-item-val" id="elResName">—</div></div>
-              <div class="res-item"><div class="res-item-lbl">Region / Cluster</div><div class="res-item-val" id="elResRegion">—</div></div>
-              <div class="res-item"><div class="res-item-lbl">Eligible Entries</div><div class="res-item-val" id="elResEntries">—</div></div>
-            </div>
-            <div class="response-msg" id="elResMsg" style="display:none;padding:16px 20px;border-radius:12px;margin-bottom:20px;font-family:'Barlow',sans-serif;font-size:0.9rem;font-weight:600;line-height:1.5;">
-              <div style="display:flex;align-items:flex-start;gap:10px;">
-                <i data-lucide="info" id="resMsgIcon" style="width:20px;height:20px;stroke-width:2.2;flex-shrink:0;margin-top:2px;"></i>
-                <div id="resMsgText"></div>
-              </div>
+              <div class="res-item"><div class="res-item-lbl">Is Eligible</div><div class="res-item-val" id="elIsEligible">—</div></div>
+              <div class="res-item"><div class="res-item-lbl">Prestigious Won</div><div class="res-item-val" id="elPrestigious">—</div></div>
             </div>
           </div>
         </div>
@@ -464,19 +457,14 @@
             </div>
             <div class="form-group">
               <label for="blReason" class="form-label">Blacklist Reason</label>
-              <div class="reason-dropdown-wrap">
-                <div class="reason-select-wrapper">
-                  <select id="blReason" required>
-                    <option value="suspected fraud">Suspected Fraud</option>
-                    <option value="internal staff/partner">Internal Staff / Partner</option>
-                    <option value="merchant request">Merchant Request</option>
-                    <option value="customer complaint">Customer Complaint</option>
-                    <option value="business closed">Business Closed (Short Code Frozen)</option>
-                  </select>
-                </div>
-                <button type="button" class="add-reason-btn" onclick="openAddReasonModal()">
-                  <i data-lucide="plus"></i> Add Reason
-                </button>
+              <div class="reason-select-wrapper">
+                <select id="blReason" required>
+                  <option value="suspected fraud">Suspected Fraud</option>
+                  <option value="internal staff/partner">Internal Staff / Partner</option>
+                  <option value="merchant request">Merchant Request</option>
+                  <option value="customer complaint">Customer Complaint</option>
+                  <option value="business closed">Business Closed (Short Code Frozen)</option>
+                </select>
               </div>
             </div>
             <button type="submit" class="submit-btn">
@@ -596,9 +584,8 @@
       };
 
       document.getElementById('elResCode').textContent = code;
-      document.getElementById('elResName').textContent = data.name;
-      document.getElementById('elResRegion').textContent = `${data.region} (${data.cluster})`;
-      document.getElementById('elResEntries').textContent = `${data.entries} Entries`;
+      document.getElementById('elIsEligible').textContent = data.eligible ? 'Yes' : 'No';
+      document.getElementById('elPrestigious').textContent = data.eligible ? 'Yes' : 'No';
 
       const banner = document.getElementById('elStatusBanner');
       const title  = document.getElementById('elStatusTitle');
