@@ -203,7 +203,7 @@
       <div class="p-banner">
         <div class="banner-deco right"><i data-lucide="dices"></i></div>
         <div class="banner-deco left"><i data-lucide="sparkles"></i></div>
-        <div class="prize-label" id="drawBanner">Customer's Bi-Weekly Draw</div>
+        <div class="prize-label" id="drawBanner">Customer's Weekly Draw</div>
         
         <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 18px;">
           <span style="background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(4px); padding: 7px 16px; border-radius: 50px; font-weight: 700; font-size: 0.82rem; color: #fff; border: 1px solid rgba(255,255,255,0.35); display: inline-flex; align-items: center; gap: 6px;">
@@ -234,12 +234,12 @@
       const type = params.get('type') || 'customers';
 
       const typeLabels = {
-        customers: "Customer's Bi-Weekly Draw",
-        merchants: "Merchant's Bi-Weekly Draw",
-        agents: "Agent's Bi-Weekly Draw"
+        customers: "Customer's Weekly Draw",
+        merchants: "Merchant's Weekly Draw",
+        agents: "Agent's Weekly Draw"
       };
 
-      const titleText = typeLabels[type] || "Customer's Bi-Weekly Draw";
+      const titleText = typeLabels[type] || "Customer's Weekly Draw";
       document.getElementById('drawBanner').innerHTML = `<i data-lucide="users" style="width:32px;height:32px;display:inline;vertical-align:middle;margin-right:6px;color:#fff;"></i> ${titleText}`;
       document.getElementById('breadcrumb').innerHTML = titleText;
 

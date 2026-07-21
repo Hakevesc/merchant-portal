@@ -64,7 +64,7 @@
       <!-- Full-width banner -->
       <div class="winners-header">
         <div class="winners-banner">
-          <div class="wb-draw"  id="drawTitle">Customer's Bi-Weekly Draw — July 21, 2026</div>
+          <div class="wb-draw"  id="drawTitle">Customer's Weekly Draw — July 21, 2026</div>
           <div class="wb-prize" id="prizeTitle">250 Birr Airtime Winners</div>
         </div>
       </div>
@@ -107,7 +107,7 @@
     const label     = decodeURIComponent(params.get('label') || 'Airtime — 250 Birr');
 
     const typeLabels = { customers:"Customer's", merchants:"Merchant's", agents:"Agent's" };
-    document.getElementById('drawTitle').textContent  = (typeLabels[type]||"Customer's") + " Bi-Weekly Draw — July 21, 2026";
+    document.getElementById('drawTitle').textContent  = (typeLabels[type]||"Customer's") + " Weekly Draw — July 21, 2026";
     document.getElementById('prizeTitle').textContent = label + ' Winners';
     document.getElementById('prizeCrumb').textContent = label + ' Winners';
     document.getElementById('drawCrumb').href = `draw-select.html?type=${type}`;
