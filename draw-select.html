@@ -50,7 +50,7 @@
       .portal-topbar .logout-btn span.lbl { display: none; }
     }
 
-    .portal-wrap { max-width: 1300px; margin: 0 auto; padding: 32px 32px 60px; }
+    .portal-wrap { max-width: 1200px; margin: 0 auto; padding: 24px 32px 100px; }
 
     /* --- banner --- */
     .p-card { background: transparent; box-shadow: none; margin-bottom: 36px; }
@@ -113,7 +113,7 @@
     /* ---- Region horizontal radio list ---- */
     .region-cards {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(3, 1fr);
       gap: 16px;
       margin-top: 16px;
       padding-bottom: 110px; /* space for floating bottom bar */
@@ -265,6 +265,9 @@
       filter: brightness(1.05);
     }
 
+    @media (max-width: 1024px) {
+      .region-cards { grid-template-columns: repeat(2, 1fr); }
+    }
     @media (max-width: 768px) {
       .region-cards { grid-template-columns: 1fr; }
       .float-bar { min-width: calc(100vw - 32px); padding: 10px 14px; }

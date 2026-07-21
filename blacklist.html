@@ -400,6 +400,231 @@
       height: 16px;
     }
     
+    /* Reason dropdown custom styles */
+    .reason-dropdown-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .reason-select-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .reason-select-wrapper select {
+      width: 100%;
+      padding: 14px 16px 14px 48px;
+      border-radius: 14px;
+      border: 1.5px solid #e2e8f0;
+      font-family: 'Barlow', sans-serif;
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: #1e293b;
+      outline: none;
+      background: #f8fafc;
+      transition: all 0.2s ease;
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      background-size: 16px;
+    }
+    .reason-select-wrapper select:focus {
+      background-color: #ffffff;
+      border-color: #239150;
+      box-shadow: 0 0 0 4px rgba(35, 145, 80, 0.12);
+    }
+    .reason-select-wrapper select:focus + .input-icon {
+      color: #239150;
+    }
+    .add-reason-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: transparent;
+      border: 1.5px dashed #cbd5e1;
+      border-radius: 12px;
+      padding: 10px 16px;
+      font-family: 'Barlow', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #64748b;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      align-self: flex-start;
+    }
+    .add-reason-btn:hover {
+      border-color: #239150;
+      color: #239150;
+      background: #f0f9f3;
+    }
+    .add-reason-btn svg {
+      width: 16px;
+      height: 16px;
+      stroke-width: 2.2;
+    }
+
+    /* Add Reason Modal */
+    .add-reason-modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.4);
+      backdrop-filter: blur(4px);
+      z-index: 10001;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+    .add-reason-modal-overlay.open {
+      display: flex;
+      opacity: 1;
+    }
+    .add-reason-modal {
+      background: #ffffff;
+      border-radius: 24px;
+      padding: 32px;
+      max-width: 420px;
+      width: 90%;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      border: 1px solid rgba(226, 232, 240, 0.8);
+      transform: scale(0.95);
+      transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+    }
+    .add-reason-modal-overlay.open .add-reason-modal {
+      transform: scale(1);
+    }
+    .add-reason-modal .modal-icon-wrap {
+      width: 48px;
+      height: 48px;
+      background: #eaf5ee;
+      color: #239150;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+    }
+    .add-reason-modal .modal-icon-wrap svg {
+      width: 24px;
+      height: 24px;
+      stroke-width: 2;
+    }
+    .add-reason-modal h3 {
+      font-size: 1.15rem;
+      color: #0f172a;
+      margin-bottom: 8px;
+      font-weight: 800;
+      text-align: center;
+    }
+    .add-reason-modal p {
+      color: #64748b;
+      margin-bottom: 24px;
+      font-size: 0.88rem;
+      line-height: 1.5;
+      font-weight: 500;
+      text-align: center;
+    }
+    .add-reason-modal .input-icon-wrapper input {
+      width: 100%;
+      padding: 14px 16px;
+      border-radius: 14px;
+      border: 1.5px solid #e2e8f0;
+      font-family: 'Barlow', sans-serif;
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: #1e293b;
+      outline: none;
+      background: #f8fafc;
+      transition: all 0.2s ease;
+    }
+    .add-reason-modal .input-icon-wrapper input:focus {
+      background: #ffffff;
+      border-color: #239150;
+      box-shadow: 0 0 0 4px rgba(35, 145, 80, 0.12);
+    }
+    .add-reason-modal .modal-btns {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-top: 24px;
+    }
+    .add-reason-modal .modal-btns button {
+      flex: 1;
+      padding: 12px;
+      border-radius: 12px;
+      font-family: 'Barlow', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+    }
+    .btn-add-reason-confirm {
+      background: linear-gradient(135deg, #2FC56D 0%, #239150 100%);
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(35, 145, 80, 0.2);
+    }
+    .btn-add-reason-confirm:hover {
+      box-shadow: 0 6px 16px rgba(35, 145, 80, 0.3);
+      filter: brightness(1.04);
+    }
+    .btn-add-reason-cancel {
+      background: #f1f5f9;
+      color: #475569;
+      border: 1px solid #e2e8f0;
+    }
+    .btn-add-reason-cancel:hover {
+      background: #e2e8f0;
+    }
+
+    /* Custom reasons tag display */
+    .custom-reasons-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 4px;
+    }
+    .custom-reason-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: #eaf5ee;
+      border: 1px solid rgba(35, 145, 80, 0.2);
+      border-radius: 50px;
+      padding: 4px 10px 4px 12px;
+      font-family: 'Barlow', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #239150;
+    }
+    .custom-reason-tag .remove-tag {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      color: #239150;
+      padding: 0;
+      transition: background 0.15s;
+    }
+    .custom-reason-tag .remove-tag:hover {
+      background: rgba(35, 145, 80, 0.15);
+    }
+    .custom-reason-tag .remove-tag svg {
+      width: 12px;
+      height: 12px;
+      stroke-width: 2.5;
+    }
+
     /* Modal styles override */
     .modal-overlay {
       display: none;
@@ -555,9 +780,21 @@
           
           <div class="form-group">
             <label for="blacklistReason" class="form-label">Blacklist Reason</label>
-            <div class="input-icon-wrapper">
-              <i data-lucide="file-text" class="input-icon"></i>
-              <input type="text" id="blacklistReason" placeholder="Enter reason (e.g. fraudulent activity)" required autocomplete="off" />
+            <div class="reason-dropdown-wrap">
+              <div class="input-icon-wrapper reason-select-wrapper">
+                <i data-lucide="file-text" class="input-icon"></i>
+                <select id="blacklistReason" required>
+                  <option value="fraudulent activity">Fraudulent Activity</option>
+                  <option value="suspicious behaviour">Suspicious Behaviour</option>
+                  <option value="terms violation">Terms Violation</option>
+                  <option value="chargeback">Chargeback</option>
+                  <option value="duplicate account">Duplicate Account</option>
+                  <option value="inactive">Inactive</option>
+                </select>
+              </div>
+              <button type="button" class="add-reason-btn" id="addReasonBtn" onclick="openAddReasonModal()">
+                <i data-lucide="plus"></i> Add Reason
+              </button>
             </div>
           </div>
           
@@ -616,6 +853,24 @@
 
   </div>
 
+  <!-- Add Reason Modal -->
+  <div class="add-reason-modal-overlay" id="addReasonModal">
+    <div class="add-reason-modal">
+      <div class="modal-icon-wrap">
+        <i data-lucide="plus-circle"></i>
+      </div>
+      <h3>Add Custom Reason</h3>
+      <p>Type a new blacklist reason to add to the dropdown list.</p>
+      <div class="input-icon-wrapper">
+        <input type="text" id="newReasonInput" placeholder="Enter new reason..." maxlength="60" />
+      </div>
+      <div class="modal-btns">
+        <button class="btn-add-reason-confirm" id="confirmAddReasonBtn">Add Reason</button>
+        <button class="btn-add-reason-cancel" onclick="closeAddReasonModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Unblock Confirmation Modal -->
   <div class="modal-overlay" id="unblockModal">
     <div class="p-modal">
@@ -639,6 +894,9 @@
     const BLACKLIST_DATA = [
       { shortCode: '832797', reason: 'fraudulent activity', blacklistedBy: 'aklilu.tamirat@partner.safaricom.et' }
     ];
+
+    // Custom reasons added by the user
+    const CUSTOM_REASONS = [];
 
     let pendingRemoveShortCode = null;
 

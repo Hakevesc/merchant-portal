@@ -38,6 +38,12 @@
             </a>
           </li>
           <li class="sb-item">
+            <a class="sb-link sb-sub-link" href="eligibility.html" data-page="eligibility">
+              <span class="sb-link-icon"><i data-lucide="shield-check"></i></span>
+              <span class="sb-link-text">Check Eligibility</span>
+            </a>
+          </li>
+          <li class="sb-item">
             <a class="sb-link sb-sub-link" href="blacklist.html" data-page="blacklist">
               <span class="sb-link-icon"><i data-lucide="user-x"></i></span>
               <span class="sb-link-text">BlackList</span>
@@ -161,6 +167,7 @@
     'draw-select.html': 'home',
     'loading.html':     'home',
     'winners.html':     'home',
+    'eligibility.html': 'eligibility',
     'blacklist.html':   'blacklist',
   };
   const activePage = matchMap[page] || page;

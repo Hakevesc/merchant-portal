@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Check Eligibility — Terek Be M-PESA Promo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="portal.css" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body.portal-body {
+      background: #f8fafc;
+      background-image: radial-gradient(#e2e8f0 0.8px, transparent 0.8px);
+      background-size: 20px 20px;
+      font-family: 'Barlow', sans-serif;
+    }
+
+    .portal-wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px 32px 100px;
+    }
+
+    /* ════════ HERO BANNER ════════ */
+    .p-banner {
+      background: linear-gradient(125deg, #1e7b46 0%, #239150 40%, #2bb162 100%);
+      border-radius: 32px;
+      padding: 36px 32px;
+      text-align: center;
+      box-shadow: 0 15px 35px rgba(35, 145, 80, 0.25);
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 32px;
+    }
+    .p-banner .banner-deco {
+      position: absolute;
+      pointer-events: none;
+      opacity: 0.08;
+    }
+    .p-banner .banner-deco.right { bottom: -20px; right: -10px; }
+    .p-banner .banner-deco.right [data-lucide] { width: 140px; height: 140px; stroke-width: 1.2; }
+    .p-banner .banner-deco.left { top: -20px; left: -10px; }
+    .p-banner .banner-deco.left [data-lucide] { width: 100px; height: 100px; stroke-width: 1.2; }
+
+    .p-banner h2 {
+      font-family: 'Barlow', sans-serif;
+      font-size: 2.1rem;
+      font-weight: 900;
+      letter-spacing: -0.3px;
+      background: linear-gradient(135deg, #ffffff, #f9ffea);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 10px;
+    }
+    .p-banner p.banner-desc {
+      font-size: 1.05rem;
+      color: rgba(255, 255, 255, 0.92);
+      font-weight: 600;
+      max-width: 760px;
+      margin: 0 auto;
+      line-height: 1.45;
+    }
+    .p-banner p.banner-sub {
+      font-size: 0.88rem;
+      color: rgba(255, 255, 255, 0.78);
+      font-weight: 500;
+      margin-top: 6px;
+    }
+
+    /* ════════ LAYOUT GRID ════════ */
+    .el-layout {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 32px;
+      margin-top: 16px;
+    }
+    @media (min-width: 960px) {
+      .el-layout {
+        grid-template-columns: 420px 1fr;
+        align-items: start;
+      }
+    }
+
+    /* Premium card container */
+    .el-card {
+      background: #ffffff;
+      border-radius: 24px;
+      padding: 32px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.01);
+      border: 1px solid rgba(226, 232, 240, 0.8);
+      transition: box-shadow 0.3s ease;
+    }
+    .el-card:hover {
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05);
+    }
+
+    .el-card-header {
+      margin-bottom: 24px;
+      text-align: center;
+    }
+    .icon-wrap-green {
+      width: 54px;
+      height: 54px;
+      background: #eaf5ee;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+      color: #239150;
+      box-shadow: 0 4px 12px rgba(35, 145, 80, 0.12);
+    }
+    .icon-wrap-green [data-lucide] {
+      width: 26px;
+      height: 26px;
+      stroke-width: 2.2;
+    }
+    .card-title {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: #0f172a;
+      margin-bottom: 6px;
+      letter-spacing: -0.2px;
+    }
+    .card-subtitle {
+      font-size: 0.88rem;
+      color: #64748b;
+      font-weight: 500;
+      line-height: 1.4;
+    }
+
+    /* Form groups */
+    .form-group {
+      margin-bottom: 22px;
+    }
+    .form-label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #475569;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .input-icon {
+      position: absolute;
+      left: 16px;
+      color: #94a3b8;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+    }
+    .input-icon [data-lucide] {
+      width: 18px;
+      height: 18px;
+    }
+    .form-input {
+      width: 100%;
+      padding: 14px 16px 14px 44px;
+      background: #f8fafc;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 14px;
+      font-family: 'Barlow', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #0f172a;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+    .form-input:focus {
+      background: #ffffff;
+      border-color: #239150;
+      box-shadow: 0 0 0 4px rgba(35, 145, 80, 0.12);
+    }
+    .form-select {
+      width: 100%;
+      padding: 14px 16px 14px 44px;
+      background: #f8fafc;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 14px;
+      font-family: 'Barlow', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #0f172a;
+      outline: none;
+      appearance: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .form-select:focus {
+      background: #ffffff;
+      border-color: #239150;
+      box-shadow: 0 0 0 4px rgba(35, 145, 80, 0.12);
+    }
+
+    .btn-submit {
+      width: 100%;
+      padding: 15px 24px;
+      background: linear-gradient(105deg, #239150 0%, #2fc56d 100%);
+      color: #ffffff;
+      border: none;
+      border-radius: 50px;
+      font-family: 'Barlow', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      box-shadow: 0 6px 18px rgba(35, 145, 80, 0.3);
+      transition: all 0.25s ease;
+      margin-top: 10px;
+    }
+    .btn-submit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 24px rgba(35, 145, 80, 0.4);
+      filter: brightness(1.05);
+    }
+
+    /* Result Card Panel */
+    .result-empty {
+      text-align: center;
+      padding: 48px 24px;
+      color: #64748b;
+    }
+    .result-empty [data-lucide] {
+      width: 56px;
+      height: 56px;
+      color: #cbd5e1;
+      margin-bottom: 16px;
+      stroke-width: 1.5;
+    }
+
+    .result-box {
+      display: none;
+    }
+    .result-box.active {
+      display: block;
+    }
+
+    .res-status-banner {
+      border-radius: 18px;
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .res-status-banner.eligible {
+      background: #eef8f2;
+      border: 1.5px solid #239150;
+      color: #1b7341;
+    }
+    .res-status-banner.ineligible {
+      background: #fef2f2;
+      border: 1.5px solid #ef4444;
+      color: #991b1b;
+    }
+    .res-status-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .res-status-left [data-lucide] {
+      width: 28px;
+      height: 28px;
+      stroke-width: 2.5;
+    }
+    .res-status-title {
+      font-size: 1.15rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .res-status-sub {
+      font-size: 0.8rem;
+      font-weight: 600;
+      opacity: 0.85;
+    }
+
+    .res-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    @media (max-width: 600px) {
+      .res-grid { grid-template-columns: 1fr; }
+    }
+    .res-item {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 14px 18px;
+    }
+    .res-item-lbl {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+    .res-item-val {
+      font-size: 1rem;
+      font-weight: 800;
+      color: #0f172a;
+    }
+
+    .response-code-box {
+      background: #0f172a;
+      color: #38bdf8;
+      font-family: monospace;
+      font-size: 0.85rem;
+      padding: 16px 20px;
+      border-radius: 14px;
+      margin-bottom: 24px;
+      line-height: 1.5;
+      word-break: break-all;
+    }
+    .response-code-lbl {
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+      font-family: 'Barlow', sans-serif;
+    }
+
+    @media (max-width: 620px) {
+      .portal-wrap { padding: 16px 16px 80px; }
+      .p-banner { padding: 24px 20px; }
+      .p-banner h2 { font-size: 1.5rem; }
+    }
+  </style>
+</head>
+<body class="portal-body">
+
+  <!-- Topbar -->
+  <div class="portal-topbar">
+    <div class="brand" style="display:flex;align-items:center;gap:16px;position:relative;z-index:1;">
+      <div class="logo-wrapper" style="display:flex;align-items:center;justify-content:center;background:#fff;border-radius:14px;padding:9px 18px;box-shadow:0 4px 14px rgba(0,0,0,0.16);">
+        <img src="M-Pesa-Logo.png" alt="M-PESA" style="height:30px;object-fit:contain;display:block;" />
+      </div>
+      <span class="brand-title" style="font-family:'Barlow',sans-serif;font-weight:800;font-size:1.05rem;letter-spacing:.6px;text-transform:uppercase;color:#fff;padding-left:16px;border-left:2px solid rgba(255,255,255,0.28);line-height:1.15;">Terek Be M-PESA Promo</span>
+    </div>
+    <div class="topbar-right" style="position:relative;z-index:1;">
+      <a href="index.html" class="logout-btn"><i data-lucide="log-out" style="width:16px;height:16px;stroke-width:2.5;"></i> Logout</a>
+    </div>
+  </div>
+
+  <!-- Breadcrumb -->
+  <div class="portal-nav">
+    <a href="home.html"><i data-lucide="home" style="width:16px;height:16px;vertical-align:middle;margin-right:4px;"></i> Home</a>
+    &nbsp;›&nbsp;
+    <span>Merchant Promo</span>
+    &nbsp;›&nbsp;
+    <span class="crumb-active">Check Eligibility</span>
+  </div>
+
+  <div class="portal-wrap">
+
+    <!-- Hero Banner -->
+    <div class="p-banner">
+      <div class="banner-deco right"><i data-lucide="shield-check"></i></div>
+      <div class="banner-deco left"><i data-lucide="sparkles"></i></div>
+      <h2>Need to verify a merchant before running the draw?</h2>
+      <p class="banner-desc">Open the eligibility checker and confirm a short code against the promo service response.</p>
+    </div>
+
+    <!-- Main Grid -->
+    <div class="el-layout">
+
+      <!-- Form Card -->
+      <div class="el-card">
+        <div class="el-card-header">
+          <div class="icon-wrap-green">
+            <i data-lucide="search-code"></i>
+          </div>
+          <h3 class="card-title">Check Eligibility</h3>
+          <p class="card-subtitle">Verify merchant short code status against live promo service data</p>
+        </div>
+
+        <form id="eligibilityForm" onsubmit="handleCheck(event)">
+          <div class="form-group">
+            <label class="form-label" for="shortCodeInput">Merchant Short Code / Till Number</label>
+            <div class="input-wrapper">
+              <span class="input-icon"><i data-lucide="hash"></i></span>
+              <input type="text" id="shortCodeInput" class="form-input" placeholder="e.g. 10070, 10071, 10072" required />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="serviceSelect">Promo Service</label>
+            <div class="input-wrapper">
+              <span class="input-icon"><i data-lucide="layers"></i></span>
+              <select id="serviceSelect" class="form-select">
+                <option value="merchant-draw">Bi-Weekly Merchant Draw</option>
+                <option value="grand-prize">Grand Prize Draw (1M ETB)</option>
+                <option value="mega-prize">Mega Prize Draw (500K ETB)</option>
+                <option value="airtime-reward">Airtime Reward Promo</option>
+              </select>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-submit">
+            <i data-lucide="shield-check" style="width:18px;height:18px;"></i> Check Eligibility
+          </button>
+        </form>
+      </div>
+
+      <!-- Result Panel Card -->
+      <div class="el-card">
+        <div id="emptyResult" class="result-empty">
+          <i data-lucide="shield-alert"></i>
+          <h3 style="font-size: 1.2rem; font-weight: 800; color: #334155; margin-bottom: 6px;">No Verification Run Yet</h3>
+          <p style="font-size: 0.9rem; max-width: 360px; margin: 0 auto; line-height: 1.4;">Enter a merchant short code on the left and click <strong>Check Eligibility</strong> to confirm status against the promo service.</p>
+        </div>
+
+        <div id="activeResult" class="result-box">
+          <div class="res-status-banner eligible" id="statusBanner">
+            <div class="res-status-left">
+              <i data-lucide="check-circle-2" id="statusIcon"></i>
+              <div>
+                <div class="res-status-title" id="statusTitle">ELIGIBLE FOR DRAW</div>
+                <div class="res-status-sub" id="statusSub">Verified against M-PESA Promo Service</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="res-grid">
+            <div class="res-item">
+              <div class="res-item-lbl">Short Code / Till</div>
+              <div class="res-item-val" id="resCode">10070</div>
+            </div>
+            <div class="res-item">
+              <div class="res-item-lbl">Merchant Name</div>
+              <div class="res-item-val" id="resName">Manna Hotel Ltd</div>
+            </div>
+            <div class="res-item">
+              <div class="res-item-lbl">Region / Cluster</div>
+              <div class="res-item-val" id="resRegion">Addis Ababa (Kality)</div>
+            </div>
+            <div class="res-item">
+              <div class="res-item-lbl">Eligible Tickets</div>
+              <div class="res-item-val" id="resEntries">142 Entries</div>
+            </div>
+          </div>
+
+          <div class="response-code-lbl">Promo Service Response Data</div>
+          <div class="response-code-box" id="resPayload">
+            { "status": 200, "service": "PROMO_VERIFY", "short_code": "10070", "eligible": true, "blacklist": false }
+          </div>
+
+          <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+            <a href="home.html" class="btn-submit" style="text-decoration:none; margin-top:0; flex:1;">
+              <i data-lucide="play" style="width:16px;height:16px;fill:currentColor;"></i> Continue to Draw
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+    // Mock Database of Merchants for verification
+    const MOCK_DB = {
+      '10070': { name: 'Manna Hotel Ltd', region: 'Addis Ababa', cluster: 'Kality', phone: '251712700105', entries: 142, eligible: true, blacklist: false },
+      '10071': { name: 'Blessed Hotel Ltd', region: 'Addis Ababa', cluster: 'Kality', phone: '251712700106', entries: 98, eligible: true, blacklist: false },
+      '10072': { name: 'Star Cafe', region: 'Addis Ababa', cluster: 'Bole', phone: '251712700107', entries: 215, eligible: true, blacklist: false },
+      '10073': { name: 'Golden Shop', region: 'Dire Dawa', cluster: 'Sabian', phone: '251712700108', entries: 54, eligible: true, blacklist: false },
+      '10074': { name: 'Blue Nile Mart', region: 'Hawassa', cluster: 'Tabor', phone: '251712700109', entries: 0, eligible: false, reason: 'Insufficient transaction volume' },
+      '10075': { name: 'Blacklisted Merchant PLC', region: 'Bahir Dar', cluster: 'Belay Zeleke', phone: '251712700110', entries: 0, eligible: false, blacklist: true, reason: 'Merchant is on active BlackList' },
+    };
+
+    function handleCheck(e) {
+      e.preventDefault();
+      const input = document.getElementById('shortCodeInput').value.trim();
+      if (!input) return;
+
+      const empty = document.getElementById('emptyResult');
+      const result = document.getElementById('activeResult');
+      const banner = document.getElementById('statusBanner');
+      const title = document.getElementById('statusTitle');
+      const sub = document.getElementById('statusSub');
+      const icon = document.getElementById('statusIcon');
+
+      const data = MOCK_DB[input] || {
+        name: `Merchant #${input}`,
+        region: 'Addis Ababa',
+        cluster: 'Central',
+        phone: '251700000000',
+        entries: Math.floor(Math.random() * 120) + 10,
+        eligible: true,
+        blacklist: false
+      };
+
+      document.getElementById('resCode').textContent = input;
+      document.getElementById('resName').textContent = data.name;
+      document.getElementById('resRegion').textContent = `${data.region} (${data.cluster})`;
+      document.getElementById('resEntries').textContent = `${data.entries} Entries`;
+
+      if (data.eligible) {
+        banner.className = 'res-status-banner eligible';
+        title.textContent = 'ELIGIBLE FOR DRAW';
+        sub.textContent = 'Confirmed active & verified against Promo Service';
+        icon.setAttribute('data-lucide', 'check-circle-2');
+      } else {
+        banner.className = 'res-status-banner ineligible';
+        title.textContent = 'NOT ELIGIBLE';
+        sub.textContent = data.reason || 'Verification failed against Promo Service';
+        icon.setAttribute('data-lucide', 'x-circle');
+      }
+
+      document.getElementById('resPayload').textContent = JSON.stringify({
+        timestamp: new Date().toISOString(),
+        status: data.eligible ? 200 : 403,
+        short_code: input,
+        merchant_name: data.name,
+        eligible: data.eligible,
+        blacklisted: !!data.blacklist,
+        entries: data.entries,
+        service_response: data.eligible ? "VERIFIED_OK" : "INELIGIBLE_RESTRICTED"
+      }, null, 2);
+
+      empty.style.display = 'none';
+      result.classList.add('active');
+
+      if (typeof lucide !== 'undefined' && lucide.createIcons) {
+        lucide.createIcons();
+      }
+    }
+
+    if (typeof lucide !== 'undefined' && lucide.createIcons) {
+      lucide.createIcons();
+    }
+  </script>
+  <script src="sidebar.js"></script>
+</body>
+</html>
