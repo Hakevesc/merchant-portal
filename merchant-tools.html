@@ -591,40 +591,17 @@
       const title  = document.getElementById('elStatusTitle');
       const sub    = document.getElementById('elStatusSub');
       const icon   = document.getElementById('elStatusIcon');
-
+      
       if (data.eligible) {
         banner.className = 'res-status-banner eligible';
         title.textContent = 'ELIGIBLE FOR DRAW';
-        sub.textContent = 'Confirmed active & verified against Promo Service';
+        sub.textContent = `${data.name} — ${data.region} (${data.cluster})`;
         icon.setAttribute('data-lucide','check-circle-2');
       } else {
         banner.className = 'res-status-banner ineligible';
         title.textContent = 'NOT ELIGIBLE';
-        sub.textContent = data.reason || 'Verification failed';
+        sub.textContent = `${data.name} — ${data.reason || 'Verification failed'}`;
         icon.setAttribute('data-lucide','x-circle');
-      }
-
-      // Show a readable message instead of JSON code
-      const msgEl = document.getElementById('elResMsg');
-      const msgIcon = document.getElementById('resMsgIcon');
-      const msgText = document.getElementById('resMsgText');
-      
-      if (data.eligible) {
-        msgEl.style.display = 'block';
-        msgEl.style.background = '#eef8f2';
-        msgEl.style.border = '1.5px solid #239150';
-        msgEl.style.color = '#1b7341';
-        msgIcon.setAttribute('data-lucide', 'check-circle-2');
-        msgIcon.style.color = '#239150';
-        msgText.innerHTML = `✅ <strong>${data.name}</strong> (Short Code: ${code}) is <strong>ELIGIBLE</strong> for the draw.<br>This merchant has <strong>${data.entries}</strong> entries and is verified against the Promo Service.`;
-      } else {
-        msgEl.style.display = 'block';
-        msgEl.style.background = '#fef2f2';
-        msgEl.style.border = '1.5px solid #ef4444';
-        msgEl.style.color = '#991b1b';
-        msgIcon.setAttribute('data-lucide', 'x-circle');
-        msgIcon.style.color = '#e11d48';
-        msgText.innerHTML = `❌ <strong>${data.name}</strong> (Short Code: ${code}) is <strong>NOT ELIGIBLE</strong>.<br>Reason: ${data.reason || 'Verification failed against Promo Service.'}`;
       }
 
       document.getElementById('elEmptyResult').style.display = 'none';
