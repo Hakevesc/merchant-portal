@@ -544,7 +544,9 @@
 
     const isMerch    = (type === 'merchants');
     const hasActions = (prize !== 'airtime');
-    const winners    = isMerch ? MERCH : CUST;
+    const allWinners = isMerch ? MERCH : CUST;
+    // Only show confirmed merchants
+    const winners    = allWinners.filter(w => w.status === 'confirmed');
 
     document.getElementById('totalCount').textContent = winners.length + ' Winners';
     document.getElementById('footerNote').textContent = drawTitle + ' — ' + label + ' — Official Record';
