@@ -233,8 +233,8 @@
     .pt-row:hover { background: #ebf5ef; }
     .pt-row .rn { font-weight: 800; color: #239150; }
 
-    .ptg-cust  { grid-template-columns: 36px 1.6fr 1.1fr 1fr 1fr .95fr 130px; }
-    .ptg-merch { grid-template-columns: 36px 1.4fr 1fr 65px 1fr .85fr .85fr 130px; }
+    .ptg-cust  { grid-template-columns: 36px 1.6fr 1fr 1fr .95fr .85fr 130px; }
+    .ptg-merch { grid-template-columns: 36px 1.4fr 1fr 1fr .85fr .85fr 130px; }
 
     .st-ok {
       display: inline-flex; align-items: center; gap: 4px;
@@ -577,14 +577,14 @@
       if (isMerch) {
         row.innerHTML = `
           <span class="rn">${w.no}.</span>
-          <span>${w.name}</span><span>${w.phone}</span>
-          <span>${w.till}</span><span>${w.ticket}</span>
-          <span>${w.region}</span><span>${w.cluster}</span>
+          <span>${w.name}</span><span>${w.till}</span>
+          <span>${w.ticket}</span><span>${w.region}</span>
+          <span>${w.cluster}</span>
           ${hasActions ? statusTag(w.status) : ''}`;
       } else {
         row.innerHTML = `
           <span class="rn">${w.no}.</span>
-          <span>${w.name}</span><span>${w.phone}</span>
+          <span>${w.name}</span><span>${w.till || '—'}</span>
           <span>${w.ticket}</span><span>${w.region}</span>
           <span>${w.cluster}</span>
           ${hasActions ? statusTag(w.status) : ''}`;
