@@ -290,8 +290,9 @@
           if (p) { p.classList.remove('active'); p.classList.add('done'); }
         });
         setTimeout(() => {
+          const confirmed = params.get('confirmed') || '';
           window.location.href =
-            `winners.html?type=${type}&prize=${encodeURIComponent(prize)}&label=${encodeURIComponent(label)}`;
+            `winners.html?type=${type}&prize=${encodeURIComponent(prize)}&label=${encodeURIComponent(label)}${confirmed ? '&confirmed=' + confirmed : ''}`;
         }, 700);
         return;
       }

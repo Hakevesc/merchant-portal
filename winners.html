@@ -472,6 +472,16 @@
     let winnerStatuses = {};
     winners.forEach(w => { winnerStatuses[w.till] = null; });
 
+    // Restore confirmed statuses from URL param (passed back from redraw flow)
+    const preConfirmed = params.get('confirmed') || '';
+    if (preConfirmed) {
+      preConfirmed.split(',').forEach(till => {
+        if (winnerStatuses[till] !== undefined) {
+          winnerStatuses[till] = 'confirmed';
+        }
+      });
+    }
+
     function renderContent() {
       const container = document.getElementById('contentContainer');
       container.innerHTML = '';
@@ -602,9 +612,13 @@
     // Update setStatus to handle redraw directly
     function setStatus(till, status) {
       if (status === 'redraw') {
-        // Redraw clicked — re-run the draw for this region
+        // Redraw clicked — collect confirmed tills and pass them to loading
+        const confirmedTills = winners
+          .filter(w => winnerStatuses[w.till] === 'confirmed' && w.till !== till)
+          .map(w => w.till)
+          .join(',');
         window.location.href =
-          `loading.html?type=${type}&region=${regionCode}&label=${encodeURIComponent(label)}`;
+          `loading.html?type=${type}&region=${regionCode}&label=${encodeURIComponent(label)}&confirmed=${confirmedTills}`;
         return;
       }
       if (winnerStatuses[till] !== undefined) {
