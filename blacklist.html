@@ -1069,8 +1069,138 @@
 
     document.getElementById('confirmUnblockBtn').addEventListener('click', confirmUnblock);
 
+    // ── Custom Reason Management ──
+
+    function openAddReasonModal() {
+      document.getElementById('newReasonInput').value = '';
+      document.getElementById('addReasonModal').classList.add('open');
+      setTimeout(() => document.getElementById('newReasonInput').focus(), 100);
+    }
+
+    function closeAddReasonModal() {
+      document.getElementById('addReasonModal').classList.remove('open');
+    }
+
+    function addCustomReason() {
+      const input = document.getElementById('newReasonInput');
+      const reason = input.value.trim().toLowerCase();
+
+      if (!reason) {
+        showToast('Empty Reason', 'Please enter a reason.', 'error');
+        return;
+      }
+
+      // Check if already exists in default options
+      const defaultOptions = ['fraudulent activity', 'suspicious behaviour', 'terms violation', 'chargeback', 'duplicate account', 'inactive'];
+      if (defaultOptions.includes(reason)) {
+        showToast('Duplicate Reason', `"${reason}" is already a default option.`, 'error');
+        return;
+      }
+
+      // Check if already added as custom
+      if (CUSTOM_REASONS.includes(reason)) {
+        showToast('Duplicate Reason', `"${reason}" is already in the list.`, 'error');
+        return;
+      }
+
+      CUSTOM_REASONS.push(reason);
+      populateReasonDropdown();
+      closeAddReasonModal();
+      showToast('Reason Added', `"${reason}" has been added to the dropdown.`);
+
+      // Auto-select the newly added reason
+      document.getElementById('blacklistReason').value = reason;
+    }
+
+    function removeCustomReason(reason) {
+      const index = CUSTOM_REASONS.indexOf(reason);
+      if (index !== -1) {
+        CUSTOM_REASONS.splice(index, 1);
+        populateReasonDropdown();
+        showToast('Reason Removed', `"${reason}" has been removed from the dropdown.`);
+      }
+    }
+
+    function populateReasonDropdown() {
+      const select = document.getElementById('blacklistReason');
+      const currentValue = select.value;
+
+      // Keep default options, remove custom ones
+      const defaultOptions = [
+        { value: 'fraudulent activity', label: 'Fraudulent Activity' },
+        { value: 'suspicious behaviour', label: 'Suspicious Behaviour' },
+        { value: 'terms violation', label: 'Terms Violation' },
+        { value: 'chargeback', label: 'Chargeback' },
+        { value: 'duplicate account', label: 'Duplicate Account' },
+        { value: 'inactive', label: 'Inactive' }
+      ];
+
+      select.innerHTML = '';
+
+      // Add default options
+      defaultOptions.forEach(opt => {
+        const option = document.createElement('option');
+        option.value = opt.value;
+        option.textContent = opt.label;
+        select.appendChild(option);
+      });
+
+      // Add custom options with a divider visual (optgroup)
+      if (CUSTOM_REASONS.length > 0) {
+        const divider = document.createElement('option');
+        divider.disabled = true;
+        divider.textContent = '────────── Custom ──────────';
+        divider.style.fontWeight = '700';
+        divider.style.color = '#94a3b8';
+        divider.style.background = '#f8fafc';
+        select.appendChild(divider);
+
+        CUSTOM_REASONS.forEach(reason => {
+          const option = document.createElement('option');
+          option.value = reason;
+          // Capitalize first letter of each word
+          option.textContent = reason.replace(/\b\w/g, c => c.toUpperCase());
+          select.appendChild(option);
+        });
+      }
+
+      // Restore previous selection if still available
+      if ([...select.options].some(opt => opt.value === currentValue)) {
+        select.value = currentValue;
+      }
+    }
+
+    // Event listener for Add Reason confirm button
+    document.getElementById('confirmAddReasonBtn').addEventListener('click', addCustomReason);
+
+    // Close "Add Reason" modal on overlay click
+    document.getElementById('addReasonModal').addEventListener('click', function(e) {
+      if (e.target === this) closeAddReasonModal();
+    });
+
+    // Close on Escape key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        if (document.getElementById('addReasonModal').classList.contains('open')) {
+          closeAddReasonModal();
+        }
+        if (document.getElementById('unblockModal').classList.contains('open')) {
+          closeUnblockModal();
+        }
+      }
+    });
+
+    // Enter key in the reason input triggers add
+    document.getElementById('newReasonInput').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        addCustomReason();
+      }
+    });
+
     // Initial configuration on page load
     window.addEventListener('DOMContentLoaded', () => {
+      populateReasonDropdown();
       document.getElementById('blacklistReason').value = 'fraudulent activity';
       renderTable();
     });

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Winners — Terek Be M-PESA Promo</title>
+  <title>Winners — Merchant Promo</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -14,6 +14,274 @@
     body.portal-body { background: #f2f4f6; background-image: radial-gradient(#dce5e0 0.8px, transparent 0.8px); background-size: 22px 22px; font-family: 'Barlow', sans-serif; }
     .portal-wrap { max-width: 1200px; margin: 0 auto; padding: 24px 32px 100px; }
     @media (max-width: 620px) { .portal-topbar { padding: 8px 20px; } }
+
+    /* ── Winners Table ── */
+    .w-table-wrap {
+      overflow-x: auto;
+      border-radius: 16px;
+      border: 1px solid rgba(35,145,80,0.12);
+    }
+    .w-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: 'Barlow', sans-serif;
+      min-width: 700px;
+    }
+    .w-table thead tr {
+      background: #f0f5f2;
+    }
+    .w-table thead th {
+      padding: 14px 18px;
+      text-align: left;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #4a5d52;
+      border-bottom: 1px solid #dce6e0;
+    }
+    .w-table tbody td {
+      padding: 14px 18px;
+      border-bottom: 1px solid #f0f2f1;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: #2a3530;
+    }
+    .w-table tbody tr:nth-child(even) { background: #f6f8f7; }
+    .w-table tbody tr:hover { background: #ebf5ef; }
+    .w-table td strong { font-weight: 800; color: #0f172a; }
+    .w-table .cluster-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: #eaf5ee;
+      border: 1px solid rgba(35,145,80,0.15);
+      border-radius: 50px;
+      padding: 4px 12px;
+      font-weight: 700;
+      font-size: 0.75rem;
+      color: #1b7341;
+    }
+    .w-table .cluster-badge [data-lucide] { width: 12px; height: 12px; }
+
+    /* Action buttons */
+    .w-actions {
+      display: flex;
+      gap: 6px;
+    }
+    .w-action-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 7px 14px;
+      border-radius: 50px;
+      border: none;
+      font-family: 'Barlow', sans-serif;
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .w-action-btn:hover { transform: translateY(-1px); }
+    .w-action-btn [data-lucide] { width: 13px; height: 13px; }
+    .w-btn-confirm {
+      background: linear-gradient(135deg, #2FC56D 0%, #239150 100%);
+      color: #fff;
+      box-shadow: 0 3px 10px rgba(35,145,80,0.2);
+    }
+    .w-btn-confirm:hover { box-shadow: 0 5px 14px rgba(35,145,80,0.3); filter: brightness(1.05); }
+    .w-btn-redraw {
+      background: transparent;
+      color: #e11d48;
+      border: 1.5px solid #e11d48;
+    }
+    .w-btn-redraw:hover { background: #fff5f5; }
+
+    .tag-ok {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: #e7f4ec; color: #1b7341; border: 1.5px solid #b7ddc5;
+      padding: 6px 14px; border-radius: 50px; font-size: 0.7rem; font-weight: 800;
+      white-space: nowrap; text-transform: uppercase; letter-spacing: 0.4px;
+    }
+    .tag-nr {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: #fdeaea; color: #aa0000; border: 1.5px solid #f1c4c4;
+      padding: 6px 14px; border-radius: 50px; font-size: 0.7rem; font-weight: 800;
+      white-space: nowrap; text-transform: uppercase; letter-spacing: 0.4px;
+    }
+
+    /* ── Footer summary ── */
+    .w-footer-summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 18px;
+      border-top: 1px solid #e8ece9;
+      background: #fbfcfb;
+      font-family: 'Barlow', sans-serif;
+    }
+    .w-footer-summary .fs-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .w-footer-summary .fs-item {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #5b6e62;
+    }
+    .w-footer-summary .fs-item strong { color: #239150; }
+    .w-footer-summary .fs-confirm-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: linear-gradient(135deg, #2FC56D 0%, #239150 100%);
+      color: #fff; border: none; cursor: pointer;
+      padding: 12px 28px; border-radius: 50px;
+      font-family: 'Barlow', sans-serif; font-size: 0.85rem; font-weight: 800;
+      text-transform: uppercase; letter-spacing: 0.5px;
+      box-shadow: 0 6px 18px rgba(35,145,80,0.28);
+      transition: all 0.2s;
+    }
+    .w-footer-summary .fs-confirm-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 24px rgba(35,145,80,0.38);
+      filter: brightness(1.05);
+    }
+
+    /* ── No Winner Display ── */
+    .no-winner-display {
+      text-align: center;
+      padding: 60px 24px;
+      background: #fff;
+      border-radius: 16px;
+    }
+    .no-winner-display .nw-icon {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 16px;
+      background: #f8fafc;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #94a3b8;
+    }
+    .no-winner-display .nw-icon [data-lucide] {
+      width: 32px;
+      height: 32px;
+      stroke-width: 1.5;
+    }
+    .no-winner-display h3 {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: #334155;
+      margin-bottom: 6px;
+    }
+    .no-winner-display p {
+      font-size: 0.92rem;
+      color: #64748b;
+      font-weight: 500;
+    }
+
+    /* ── Single Winner Card ── */
+    .winner-card {
+      background: #fff;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+      border: 1px solid rgba(35,145,80,0.12);
+    }
+    .winner-card-header {
+      background: linear-gradient(135deg, #eef8f2 0%, #d4f0df 100%);
+      padding: 20px 28px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      border-bottom: 1px solid rgba(35,145,80,0.1);
+    }
+    .winner-card-header .wc-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #2FC56D 0%, #239150 100%);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .winner-card-header .wc-icon [data-lucide] {
+      width: 22px;
+      height: 22px;
+      stroke-width: 2.5;
+    }
+    .winner-card-header .wc-title {
+      font-family: 'Barlow', sans-serif;
+      font-size: 1rem;
+      font-weight: 800;
+      color: #1b7341;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .winner-card-header .wc-sub {
+      font-family: 'Barlow', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: #5a9070;
+      margin-top: 2px;
+    }
+
+    .winner-card-body {
+      padding: 28px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 540px) {
+      .winner-card-body { grid-template-columns: 1fr; }
+    }
+    .wc-field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .wc-field .wc-label {
+      font-family: 'Barlow', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+    }
+    .wc-field .wc-value {
+      font-family: 'Barlow', sans-serif;
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: #0f172a;
+    }
+    .wc-field .wc-value.highlight {
+      color: #239150;
+    }
+
+    .winner-cluster-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #eef8f2;
+      border: 1.5px solid rgba(35,145,80,0.2);
+      color: #1b7341;
+      padding: 8px 18px;
+      border-radius: 50px;
+      font-family: 'Barlow', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 800;
+    }
+    .winner-cluster-badge [data-lucide] {
+      width: 16px;
+      height: 16px;
+      stroke-width: 2.5;
+    }
 
     /* ── Floating bottom bar ── */
     .float-bar {
@@ -32,6 +300,51 @@
       max-width: calc(100vw - 48px);
     }
     .float-bar .pg-info { font-size: .8rem; color: #888; font-weight: 600; white-space: nowrap; }
+
+    /* Action buttons in winner card */
+    .wc-actions {
+      grid-column: 1 / -1;
+      display: flex;
+      gap: 12px;
+      margin-top: 8px;
+    }
+    .wc-actions button {
+      flex: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 13px 20px;
+      border-radius: 50px;
+      font-family: 'Barlow', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+    }
+    .wc-actions button:hover {
+      transform: translateY(-1px);
+    }
+    .wc-btn-confirm {
+      background: linear-gradient(135deg, #2FC56D 0%, #239150 100%);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(35,145,80,0.25);
+    }
+    .wc-btn-confirm:hover {
+      box-shadow: 0 6px 20px rgba(35,145,80,0.35);
+      filter: brightness(1.05);
+    }
+    .wc-btn-redraw {
+      background: transparent;
+      color: #e11d48;
+      border: 2px solid #e11d48 !important;
+    }
+    .wc-btn-redraw:hover {
+      background: #fff5f5;
+    }
   </style>
 </head>
 <body class="portal-body">
@@ -42,14 +355,14 @@
       <div class="logo-wrapper" style="display:flex;align-items:center;justify-content:center;background:#fff;border-radius:14px;padding:9px 18px;box-shadow:0 4px 14px rgba(0,0,0,0.16);">
         <img src="M-Pesa-Logo.png" alt="M-PESA" style="height:30px;object-fit:contain;display:block;" />
       </div>
-      <span class="brand-title" style="font-family:'Barlow',sans-serif;font-weight:800;font-size:1.05rem;letter-spacing:.6px;text-transform:uppercase;color:#fff;padding-left:16px;border-left:2px solid rgba(255,255,255,0.28);line-height:1.15;">Terek Be M-PESA Promo</span>
+      <span class="brand-title" style="font-family:'Barlow',sans-serif;font-weight:800;font-size:1.05rem;letter-spacing:.6px;text-transform:uppercase;color:#fff;padding-left:16px;border-left:2px solid rgba(255,255,255,0.28);line-height:1.15;">Merchant Promo</span>
     </div>
     <div class="topbar-right" style="position:relative;z-index:1;">
       <a href="index.html" class="logout-btn"><i data-lucide="log-out" style="width:16px;height:16px;stroke-width:2.5;"></i> Logout</a>
     </div>
   </div>
 
-  <!-- Breadcrumb (glassy from portal.css) -->
+  <!-- Breadcrumb -->
   <div class="portal-nav">
     <a href="home.html"><i data-lucide="home" style="width:16px;height:16px;vertical-align:middle;margin-right:4px;"></i> Home</a>
     &nbsp;›&nbsp;
@@ -64,37 +377,22 @@
       <!-- Full-width banner -->
       <div class="winners-header">
         <div class="winners-banner">
-          <div class="wb-draw"  id="drawTitle">Customer's Weekly Draw — July 21, 2026</div>
-          <div class="wb-prize" id="prizeTitle">250 Birr Airtime Winners</div>
+          <div class="wb-draw"  id="drawTitle">Draw — July 21, 2026</div>
+          <div class="wb-prize" id="prizeTitle">R - 1 Regional Prize</div>
         </div>
       </div>
 
-      <!-- Table column header + rows -->
-      <div class="w-table-wrap">
-        <div class="w-head" id="winnersHead"></div>
-        <div class="w-list" id="winnersList"></div>
-      </div>
+      <!-- Content Container -->
+      <div id="contentContainer"></div>
 
     </div>
   </div>
 
-  <!-- Floating bottom bar -->
-  <div class="float-bar">
-    <div class="w-pager">
-      <button class="pg-btn" onclick="prevPage()"><span>&larr;</span> PREVIOUS</button>
-      <span class="pg-info" id="pageInfo">Page 1 of 2</span>
-      <button class="pg-btn" onclick="nextPage()">NEXT <span>&rarr;</span></button>
-    </div>
-    <button class="confirm-close-btn" onclick="openModal()">
-      <span class="cc-check">&#10003;</span> CONFIRM & CLOSE
-    </button>
-  </div>
-
-  <!-- Confirm & Close modal -->
+  <!-- Confirm Modal -->
   <div class="modal-overlay" id="confirmModal">
     <div class="p-modal">
-      <h3>Confirm & Close Draw</h3>
-      <p>Are you sure you want to confirm all results and close this draw?<br>This action cannot be undone.</p>
+      <h3>Confirm & Finalize Draw</h3>
+      <p>Are you sure you want to confirm this winner and finalize the draw?<br>This will generate the official draw record.</p>
       <div class="modal-btns">
         <button class="pb pb-green" onclick="finalConfirm()">Yes, Confirm</button>
         <button class="pb pb-outline" onclick="closeModal()">Cancel</button>
@@ -106,142 +404,251 @@
     const params    = new URLSearchParams(window.location.search);
     const type      = params.get('type')  || 'customers';
     const prize     = params.get('prize') || 'airtime';
-    const label     = decodeURIComponent(params.get('label') || 'Airtime — 250 Birr');
+    const label     = decodeURIComponent(params.get('label') || 'R - 1 Regional Prize');
 
     const typeLabels = { customers:"Customer's", merchants:"Merchant's", agents:"Agent's" };
-    document.getElementById('drawTitle').textContent  = (typeLabels[type]||"Customer's") + " Weekly Draw — July 21, 2026";
-    document.getElementById('prizeTitle').textContent = label + ' Winners';
+    document.getElementById('drawTitle').textContent  = (typeLabels[type]||"Customer's") + " Draw — July 21, 2026";
+    document.getElementById('prizeTitle').textContent = label;
     document.getElementById('prizeCrumb').textContent = label + ' Winners';
     document.getElementById('drawCrumb').href = `draw-select.html?type=${type}`;
 
-    // ── Expanded mock data ──
-    const CUST = [
-      { no:1,  name:'Selam Kebede',      phone:'251712700105', ticket:'W23EDS34E', region:'Addis Ababa', cluster:'Kality',       status:null },
-      { no:2,  name:'Hiwi Kalab',        phone:'251710766766', ticket:'W23EDS34E', region:'Addis Ababa', cluster:'Kality',       status:null },
-      { no:3,  name:'Fraol Solomon',     phone:'251712700001', ticket:'W23EDS34E', region:'Addis Ababa', cluster:'Bole',         status:null },
-      { no:4,  name:'John Lema',         phone:'251712700002', ticket:'W23EDS34E', region:'Addis Ababa', cluster:'Bole',         status:null },
-      { no:5,  name:'Dawit Solomon',     phone:'251712700003', ticket:'W23EDS34E', region:'Addis Ababa', cluster:'Kality',       status:null },
-      { no:6,  name:'Selam Awiti',       phone:'251712700004', ticket:'W23EDS34E', region:'Addis Ababa', cluster:'Kality',       status:null },
-      { no:7,  name:'Hiwi Tola',         phone:'251712700230', ticket:'W23EDS34E', region:'Dire Dawa',   cluster:'Sabian',       status:null },
-      { no:8,  name:'Liya Haile',        phone:'251712700005', ticket:'W23EDS34E', region:'Hawassa',     cluster:'Tabor',        status:null },
-      { no:9,  name:'Tigist Bekele',     phone:'251712700006', ticket:'W23EDS34E', region:'Bahir Dar',   cluster:'Belay Zeleke', status:null },
-      { no:10, name:'Biruk Assefa',      phone:'251712700007', ticket:'W23EDS34E', region:'Addis Ababa', cluster:'Kality',       status:null },
-      { no:11, name:'Meron Tesfaye',     phone:'251712700008', ticket:'W23EDS34E', region:'Dire Dawa',   cluster:'Sabian',       status:null },
-      { no:12, name:'Abel Hailemariam',  phone:'251712700009', ticket:'W23EDS34E', region:'Hawassa',     cluster:'Tabor',        status:null },
-    ];
-    const MERCH = [
-      { no:1, name:'Manna Hotel Ltd',    phone:'251712700105', till:'10070', ticket:'W23EDS34E', region:'Addis Ababa', cluster:'Kality',       status:null },
-      { no:2, name:'Blessed Hotel Ltd',  phone:'251712700106', till:'10071', ticket:'W23EDS34E', region:'Addis Ababa', cluster:'Kality',       status:null },
-      { no:3, name:'Star Cafe',          phone:'251712700107', till:'10072', ticket:'W23EDS34E', region:'Addis Ababa', cluster:'Bole',         status:null },
-      { no:4, name:'Golden Shop',        phone:'251712700108', till:'10073', ticket:'W23EDS34E', region:'Dire Dawa',   cluster:'Sabian',       status:null },
-      { no:5, name:'Blue Nile Mart',     phone:'251712700109', till:'10074', ticket:'W23EDS34E', region:'Hawassa',     cluster:'Tabor',        status:null },
-      { no:6, name:'Sunshine PLC',       phone:'251712700110', till:'10075', ticket:'W23EDS34E', region:'Bahir Dar',   cluster:'Belay Zeleke', status:null },
-      { no:7, name:'Green Valley PLC',   phone:'251712700111', till:'10076', ticket:'W23EDS34E', region:'Addis Ababa', cluster:'Kality',       status:null },
-      { no:8, name:'Royal Mart',         phone:'251712700112', till:'10077', ticket:'W23EDS34E', region:'Dire Dawa',   cluster:'Sabian',       status:null },
-      { no:9, name:'Emperor Cafe',       phone:'251712700113', till:'10078', ticket:'W23EDS34E', region:'Hawassa',     cluster:'Tabor',        status:null },
-    ];
+    // Check if this is a "No Winner" prize (MEGA PRIZE = 500K ETB)
+    const isNoWinner = prize === 'mega-prize' || label.toLowerCase().includes('mega') || label.toLowerCase().includes('500k');
 
-    const isMerch    = (type === 'merchants');
-    const hasActions = (prize !== 'airtime');
-    const winners    = isMerch ? MERCH : CUST;
+    // ── Mock 2 winners per draw: East 1 + West 1 clusters ──
+    const REGION_WINNERS = {
+      'R-1': [
+        { name: 'Manna Hotel Ltd', phone: '251712700105', till: '10070', ticket: 'W23EDS34E', region: 'Addis Ababa', cluster: 'East 1' },
+        { name: 'Blessed Hotel Ltd', phone: '251712700106', till: '10071', ticket: 'W23EDS35F', region: 'Addis Ababa', cluster: 'West 1' }
+      ],
+      'R-2': [
+        { name: 'Star Cafe', phone: '251712700107', till: '10072', ticket: 'W23EDS36G', region: 'Addis Ababa', cluster: 'East 1' },
+        { name: 'Golden Shop', phone: '251712700108', till: '10073', ticket: 'W23EDS37H', region: 'Dire Dawa', cluster: 'West 1' }
+      ],
+      'R-3': [
+        { name: 'Blue Nile Mart', phone: '251712700109', till: '10074', ticket: 'W23EDS38I', region: 'Hawassa', cluster: 'East 1' },
+        { name: 'Sunshine PLC', phone: '251712700110', till: '10075', ticket: 'W23EDS39J', region: 'Bahir Dar', cluster: 'West 1' }
+      ],
+      'R-4': [
+        { name: 'Green Valley PLC', phone: '251712700111', till: '10076', ticket: 'W23EDS40K', region: 'Addis Ababa', cluster: 'East 1' },
+        { name: 'Royal Mart', phone: '251712700112', till: '10077', ticket: 'W23EDS41L', region: 'Dire Dawa', cluster: 'West 1' }
+      ],
+      'R-5': [
+        { name: 'Emperor Cafe', phone: '251712700113', till: '10078', ticket: 'W23EDS42M', region: 'Hawassa', cluster: 'East 1' },
+        { name: 'Merchant #10079', phone: '251712700114', till: '10079', ticket: 'W23EDS43N', region: 'Bahir Dar', cluster: 'West 1' }
+      ],
+      'R-6': [
+        { name: 'Sunrise Hotel', phone: '251712700115', till: '10080', ticket: 'W23EDS44O', region: 'Addis Ababa', cluster: 'East 1' },
+        { name: 'Moonlight Cafe', phone: '251712700116', till: '10081', ticket: 'W23EDS45P', region: 'Addis Ababa', cluster: 'West 1' }
+      ],
+      'R-7': [
+        { name: 'Crystal Mart', phone: '251712700117', till: '10082', ticket: 'W23EDS46Q', region: 'Dire Dawa', cluster: 'East 1' },
+        { name: 'Diamond Shop', phone: '251712700118', till: '10083', ticket: 'W23EDS47R', region: 'Hawassa', cluster: 'West 1' }
+      ],
+      'R-8': [
+        { name: 'Pearl Hotel', phone: '251712700119', till: '10084', ticket: 'W23EDS48S', region: 'Bahir Dar', cluster: 'East 1' },
+        { name: 'Ruby Cafe', phone: '251712700120', till: '10085', ticket: 'W23EDS49T', region: 'Addis Ababa', cluster: 'West 1' }
+      ],
+      'R-9': [
+        { name: 'Sapphire Mart', phone: '251712700121', till: '10086', ticket: 'W23EDS50U', region: 'Dire Dawa', cluster: 'East 1' },
+        { name: 'Emerald Shop', phone: '251712700122', till: '10087', ticket: 'W23EDS51V', region: 'Hawassa', cluster: 'West 1' }
+      ],
+      'R-10': [
+        { name: 'Topaz Hotel', phone: '251712700123', till: '10088', ticket: 'W23EDS52W', region: 'Bahir Dar', cluster: 'East 1' },
+        { name: 'Opal Cafe', phone: '251712700124', till: '10089', ticket: 'W23EDS53X', region: 'Addis Ababa', cluster: 'West 1' }
+      ]
+    };
 
-    const PER_PAGE = 15;
-    let page = 1;
-    const totalPages = Math.ceil(winners.length / PER_PAGE);
-
-    function gridVariant() {
-      if (isMerch) return hasActions ? 'wg-m-prize' : 'wg-m-air';
-      return hasActions ? 'wg-prize' : 'wg-airtime';
+    function extractRegion(label) {
+      const match = label.match(/R\s*[-–]\s*(\d+)/i);
+      if (match) return 'R-' + match[1];
+      return 'R-1';
     }
 
-    function headCols() {
-      if (isMerch) {
-        const base = ['#', 'Merchant', 'Phone', 'Till', 'Ticket', 'Region', 'Cluster'];
-        return hasActions ? base.concat(['Action']) : base;
+    const regionCode = extractRegion(label);
+    const winners = REGION_WINNERS[regionCode] || REGION_WINNERS['R-1'];
+
+    // Track status per winner by till
+    let winnerStatuses = {};
+    winners.forEach(w => { winnerStatuses[w.till] = null; });
+
+    function renderContent() {
+      const container = document.getElementById('contentContainer');
+      container.innerHTML = '';
+
+      if (isNoWinner) {
+        const div = document.createElement('div');
+        div.className = 'no-winner-display';
+        div.innerHTML = `
+          <div class="nw-icon"><i data-lucide="frown"></i></div>
+          <h3>No Winner This Draw</h3>
+          <p>MEGA PRIZE — 500K ETB<br>No eligible entries matched the draw criteria.</p>
+        `;
+        container.appendChild(div);
+        return;
       }
-      const base = ['#', 'Name', 'Phone', 'Ticket', 'Region', 'Cluster'];
-      return hasActions ? base.concat(['Action']) : base;
+
+      // ── Winners Table ──
+      const wrap = document.createElement('div');
+      wrap.className = 'w-table-wrap';
+
+      const table = document.createElement('table');
+      table.className = 'w-table';
+      table.innerHTML = `
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Merchant</th>
+            <th>Phone</th>
+            <th>Till</th>
+            <th>Ticket</th>
+            <th>Region</th>
+            <th>Cluster</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="winnersTableBody"></tbody>
+      `;
+      wrap.appendChild(table);
+      container.appendChild(wrap);
+
+      // Footer with summary + confirm button
+      const footer = document.createElement('div');
+      footer.className = 'w-footer-summary';
+      footer.innerHTML = `
+        <div class="fs-left">
+          <span class="fs-item">Total Winners: <strong id="totalWinnersCount">${winners.length}</strong></span>
+          <span class="fs-item">Region: <strong>${regionCode}</strong></span>
+          <span class="fs-item">Clusters: <strong>East 1 + West 1</strong></span>
+        </div>
+        <button class="fs-confirm-btn" onclick="openModal()">
+          <i data-lucide="check-circle" style="width:18px;height:18px;"></i> CONFIRM & FINALIZE
+        </button>
+      `;
+      container.appendChild(footer);
+
+      renderTableRows();
+      if (typeof lucide !== 'undefined' && lucide.createIcons) lucide.createIcons();
     }
 
-    function renderHead() {
-      const head = document.getElementById('winnersHead');
-      head.className = 'w-head ' + gridVariant();
-      head.innerHTML = headCols().map(c => `<span>${c}</span>`).join('');
-    }
+    function renderTableRows() {
+      const tbody = document.getElementById('winnersTableBody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
 
-    function actionHtml(w) {
-      if (w.status === 'confirmed')   return `<span class="tag-ok"><i data-lucide="check-circle"></i> CONFIRMED</span>`;
-      if (w.status === 'unreachable') return `<span class="tag-nr"><i data-lucide="x-circle"></i> UNREACHABLE</span>`;
-      return `<div class="ab">
-        <button class="ab-c" onclick="setStatus(${w.no},'confirmed')"><i data-lucide="check" style="width:12px;height:12px;stroke-width:3;"></i> CONFIRM</button>
-        <button class="ab-u" onclick="setStatus(${w.no},'unreachable')"><i data-lucide="x" style="width:12px;height:12px;stroke-width:3;"></i> UNREACHABLE</button>
-      </div>`;
-    }
+      winners.forEach((w, idx) => {
+        const status = winnerStatuses[w.till];
+        const tr = document.createElement('tr');
 
-    function reLucide() {
-      if (typeof lucide !== 'undefined' && lucide.createIcons) { lucide.createIcons(); }
-    }
-
-    function renderPage() {
-      const start = (page - 1) * PER_PAGE;
-      const slice = winners.slice(start, start + PER_PAGE);
-      const list  = document.getElementById('winnersList');
-      list.innerHTML = '';
-
-      slice.forEach(w => {
-        const row = document.createElement('div');
-        row.className = 'w-row ' + gridVariant();
-        if (isMerch) {
-          row.innerHTML = `
-            <span class="wn">${w.no}.</span>
-            <span>${w.name}</span>
-            <span>${w.phone}</span>
-            <span>${w.till}</span>
-            <span>${w.ticket}</span>
-            <span>${w.region}</span>
-            <span>${w.cluster}</span>
-            ${hasActions ? actionHtml(w) : ''}`;
+        let actionHtml = '';
+        if (status === 'confirmed') {
+          actionHtml = `<span class="tag-ok"><i data-lucide="check-circle" style="width:13px;height:13px;"></i> CONFIRMED</span>`;
+        } else if (status === 'redraw') {
+          actionHtml = `<span class="tag-nr"><i data-lucide="refresh-cw" style="width:13px;height:13px;"></i> REDRAW</span>`;
         } else {
-          row.innerHTML = `
-            <span class="wn">${w.no}.</span>
-            <span>${w.name}</span>
-            <span>${w.phone}</span>
-            <span>${w.ticket}</span>
-            <span>${w.region}</span>
-            <span>${w.cluster}</span>
-            ${hasActions ? actionHtml(w) : ''}`;
+          actionHtml = `<div class="w-actions">
+            <button class="w-action-btn w-btn-confirm" onclick="setStatus('${w.till}','confirmed')"><i data-lucide="check"></i> CONFIRM</button>
+            <button class="w-action-btn w-btn-redraw" onclick="setStatus('${w.till}','redraw')"><i data-lucide="refresh-cw"></i> REDRAW</button>
+          </div>`;
         }
-        list.appendChild(row);
+
+        tr.innerHTML = `
+          <td><strong>${idx + 1}.</strong></td>
+          <td><strong>${w.name}</strong></td>
+          <td>${w.phone}</td>
+          <td>${w.till}</td>
+          <td>${w.ticket}</td>
+          <td>${w.region}</td>
+          <td><span class="cluster-badge"><i data-lucide="map-pin"></i> ${w.cluster}</span></td>
+          <td>${actionHtml}</td>
+        `;
+        tbody.appendChild(tr);
       });
-      document.getElementById('pageInfo').textContent = `Page ${page} of ${totalPages}`;
-      reLucide();
 
-      // Disable/enable pagination buttons
-      document.querySelector('.pg-btn[onclick="prevPage()"]').style.opacity = (page <= 1) ? '0.35' : '1';
-      document.querySelector('.pg-btn[onclick="nextPage()"]').style.opacity = (page >= totalPages) ? '0.35' : '1';
+      if (typeof lucide !== 'undefined' && lucide.createIcons) lucide.createIcons();
     }
 
-    function setStatus(no, status) {
-      const w = winners.find(x => x.no === no);
-      if (w) { w.status = status; renderPage(); }
+    function openModal() {
+      // Check if all winners are confirmed or redraw
+      const allConfirmed = winners.every(w => winnerStatuses[w.till] === 'confirmed');
+      const anyRedraw = winners.some(w => winnerStatuses[w.till] === 'redraw');
+      
+      if (anyRedraw) {
+        showToast('Redraw Required', 'Some winners are marked for REDRAW. Please redraw them first.', 'error');
+        return;
+      }
+      
+      if (!allConfirmed) {
+        showToast('Action Required', 'Please CONFIRM or REDRAW all winners before finalizing.', 'error');
+        return;
+      }
+      
+      document.getElementById('confirmModal').classList.add('open');
     }
-
-    function prevPage() { if (page > 1)          { page--; renderPage(); } }
-    function nextPage() { if (page < totalPages) { page++; renderPage(); } }
-
-    function openModal()    { document.getElementById('confirmModal').classList.add('open'); }
+    
     function closeModal()   { document.getElementById('confirmModal').classList.remove('open'); }
+    
     function finalConfirm() {
       window.location.href =
         `print.html?type=${type}&prize=${encodeURIComponent(prize)}&label=${encodeURIComponent(label)}`;
     }
 
-    renderHead();
-    renderPage();
+    // Redraw handler — redirect to loading page to re-run the draw
+    function handleRedraw() {
+      window.location.href =
+        `loading.html?type=${type}&region=${regionCode}&label=${encodeURIComponent(label)}`;
+    }
 
+    // Update setStatus to handle redraw directly
+    function setStatus(till, status) {
+      if (status === 'redraw') {
+        // Redraw clicked — re-run the draw for this region
+        window.location.href =
+          `loading.html?type=${type}&region=${regionCode}&label=${encodeURIComponent(label)}`;
+        return;
+      }
+      if (winnerStatuses[till] !== undefined) {
+        winnerStatuses[till] = status;
+        renderTableRows();
+      }
+    }
+
+    // Simple toast for validation messages
+    function showToast(title, message, type = 'error') {
+      const container = document.getElementById('toastContainer');
+      if (!container) {
+        // Create toast container if not exists
+        const div = document.createElement('div');
+        div.className = 'toast-container';
+        div.id = 'toastContainer';
+        div.style.cssText = 'position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:10px;pointer-events:none;';
+        document.body.appendChild(div);
+      }
+      const c = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.style.cssText = `pointer-events:auto;background:#fff;border-radius:16px;padding:14px 18px;box-shadow:0 10px 25px rgba(0,0,0,0.08);display:flex;align-items:center;gap:12px;min-width:300px;max-width:400px;border-left:4px solid ${type === 'error' ? '#e11d48' : '#239150'};transform:translateX(120%);transition:transform 0.3s cubic-bezier(0.175,0.885,0.32,1.275),opacity 0.3s;opacity:0;font-family:'Barlow',sans-serif;`;
+      const iconColor = type === 'error' ? '#e11d48' : '#239150';
+      toast.innerHTML = `
+        <div style="flex-shrink:0;"><i data-lucide="${type === 'error' ? 'alert-triangle' : 'check-circle'}" style="width:19px;height:19px;color:${iconColor};"></i></div>
+        <div style="flex:1;"><div style="font-size:0.83rem;font-weight:800;color:#0f172a;margin-bottom:2px;">${title}</div><div style="font-size:0.76rem;color:#64748b;font-weight:500;">${message}</div></div>
+        <button style="background:none;border:none;color:#94a3b8;cursor:pointer;padding:0;display:flex;" onclick="this.closest('.toast').remove()"><i data-lucide="x" style="width:14px;height:14px;"></i></button>`;
+      c.appendChild(toast);
+      if (typeof lucide !== 'undefined' && lucide.createIcons) lucide.createIcons();
+      toast.offsetHeight;
+      toast.style.transform = 'translateX(0)';
+      toast.style.opacity = '1';
+      setTimeout(() => {
+        toast.style.transform = 'translateX(120%)';
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
+    renderContent();
     if (typeof lucide !== 'undefined' && lucide.createIcons) { lucide.createIcons(); }
   </script>
-  <noscript>Enable JavaScript to view winners table</noscript>
+  <noscript>Enable JavaScript to view winners</noscript>
   <script src="sidebar.js"></script>
 </body>
 </html>

@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Merchant Tools — Terek Be M-PESA Promo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="portal.css" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body.portal-body {
+      background: #f8fafc;
+      background-image: radial-gradient(#e2e8f0 0.8px, transparent 0.8px);
+      background-size: 20px 20px;
+      font-family: 'Barlow', sans-serif;
+    }
+    .portal-wrap { max-width: 1200px; margin: 0 auto; padding: 24px 32px 100px; }
+
+    /* ── TAB BAR ── */
+    .tab-bar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #ffffff;
+      border-radius: 20px;
+      padding: 6px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04);
+      border: 1px solid rgba(226,232,240,0.8);
+      margin-bottom: 28px;
+      width: fit-content;
+    }
+    .tab-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      padding: 11px 24px;
+      border: none;
+      border-radius: 14px;
+      font-family: 'Barlow', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 700;
+      cursor: pointer;
+      background: transparent;
+      color: #64748b;
+      transition: all 0.22s ease;
+      white-space: nowrap;
+    }
+    .tab-btn [data-lucide] { width: 16px; height: 16px; stroke-width: 2.3; }
+    .tab-btn:hover { background: #f1f5f9; color: #334155; }
+    .tab-btn.active {
+      background: linear-gradient(105deg, #1e7b46 0%, #2fc56d 100%);
+      color: #ffffff;
+      box-shadow: 0 4px 14px rgba(35,145,80,0.28);
+    }
+    .tab-btn.active [data-lucide] { color: #ffffff; }
+
+    /* ── TAB PANELS ── */
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ═══════════════════════════════════
+       ELIGIBILITY TAB STYLES
+    ═══════════════════════════════════ */
+    .el-layout {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 28px;
+    }
+    @media (min-width: 960px) {
+      .el-layout { grid-template-columns: 400px 1fr; align-items: start; }
+    }
+    .el-card {
+      background: #ffffff;
+      border-radius: 24px;
+      padding: 32px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.03), 0 1px 3px rgba(0,0,0,0.01);
+      border: 1px solid rgba(226,232,240,0.8);
+    }
+    .el-card-header { margin-bottom: 24px; text-align: center; }
+    .icon-wrap-green {
+      width: 54px; height: 54px;
+      background: #eaf5ee;
+      border-radius: 16px;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 16px;
+      color: #239150;
+      box-shadow: 0 4px 12px rgba(35,145,80,0.12);
+    }
+    .icon-wrap-green [data-lucide] { width: 26px; height: 26px; stroke-width: 2.2; }
+    .icon-wrap-red {
+      width: 54px; height: 54px;
+      background: #fff0f0;
+      border-radius: 16px;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 16px;
+      color: #e11d48;
+      box-shadow: 0 4px 12px rgba(225,29,72,0.1);
+    }
+    .icon-wrap-red [data-lucide] { width: 26px; height: 26px; stroke-width: 2.2; }
+    .card-title { font-size: 1.3rem; font-weight: 800; color: #0f172a; margin-bottom: 6px; letter-spacing: -0.2px; }
+    .card-subtitle { font-size: 0.87rem; color: #64748b; font-weight: 500; line-height: 1.4; }
+
+    .form-group { margin-bottom: 20px; }
+    .form-label {
+      display: block; font-size: 0.78rem; font-weight: 700;
+      color: #475569; margin-bottom: 8px;
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .input-wrapper { position: relative; display: flex; align-items: center; }
+    .input-icon { position: absolute; left: 16px; color: #94a3b8; pointer-events: none; display: flex; align-items: center; }
+    .input-icon [data-lucide] { width: 18px; height: 18px; }
+    .form-input, .form-select {
+      width: 100%; padding: 13px 16px 13px 44px;
+      background: #f8fafc; border: 1.5px solid #cbd5e1; border-radius: 13px;
+      font-family: 'Barlow', sans-serif; font-size: 0.93rem; font-weight: 600; color: #0f172a;
+      outline: none; transition: all 0.2s ease;
+    }
+    .form-select { appearance: none; cursor: pointer; }
+    .form-input:focus, .form-select:focus {
+      background: #fff; border-color: #239150;
+      box-shadow: 0 0 0 4px rgba(35,145,80,0.1);
+    }
+    .btn-check {
+      width: 100%; padding: 14px 24px; margin-top: 8px;
+      background: linear-gradient(105deg, #239150 0%, #2fc56d 100%);
+      color: #fff; border: none; border-radius: 50px;
+      font-family: 'Barlow', sans-serif; font-size: 0.93rem; font-weight: 800;
+      text-transform: uppercase; letter-spacing: 1px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 9px;
+      box-shadow: 0 6px 18px rgba(35,145,80,0.28); transition: all 0.22s ease;
+    }
+    .btn-check:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(35,145,80,0.38); filter: brightness(1.05); }
+    .btn-check [data-lucide] { width: 17px; height: 17px; }
+
+    /* Result panel */
+    .result-empty { text-align: center; padding: 48px 24px; color: #64748b; }
+    .result-empty [data-lucide] { width: 52px; height: 52px; color: #cbd5e1; margin-bottom: 16px; stroke-width: 1.5; display: inline-block; }
+    .result-box { display: none; }
+    .result-box.active { display: block; }
+    .res-status-banner {
+      border-radius: 16px; padding: 18px 22px;
+      display: flex; align-items: center; gap: 14px; margin-bottom: 22px;
+    }
+    .res-status-banner.eligible { background: #eef8f2; border: 1.5px solid #239150; color: #1b7341; }
+    .res-status-banner.ineligible { background: #fef2f2; border: 1.5px solid #ef4444; color: #991b1b; }
+    .res-status-banner [data-lucide] { width: 26px; height: 26px; stroke-width: 2.4; flex-shrink: 0; }
+    .res-status-title { font-size: 1.1rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.4px; }
+    .res-status-sub { font-size: 0.78rem; font-weight: 600; opacity: 0.82; margin-top: 2px; }
+    .res-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 14px; margin-bottom: 20px; }
+    @media (max-width: 540px) { .res-grid { grid-template-columns: 1fr; } }
+    .res-item { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 13px 16px; }
+    .res-item-lbl { font-size: 0.68rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 3px; }
+    .res-item-val { font-size: 0.97rem; font-weight: 800; color: #0f172a; }
+    .response-code-lbl { font-size: 0.68rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; font-family: 'Barlow', sans-serif; }
+    .response-code-box {
+      background: #0f172a; color: #38bdf8;
+      font-family: monospace; font-size: 0.82rem;
+      padding: 14px 18px; border-radius: 12px; margin-bottom: 20px;
+      line-height: 1.5; word-break: break-all; overflow-x: auto; white-space: pre;
+    }
+    .btn-continue {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%; padding: 14px; border-radius: 50px;
+      background: linear-gradient(105deg, #239150 0%, #2fc56d 100%);
+      color: #fff; text-decoration: none;
+      font-family: 'Barlow', sans-serif; font-size: 0.9rem; font-weight: 800;
+      text-transform: uppercase; letter-spacing: 1px;
+      box-shadow: 0 5px 16px rgba(35,145,80,0.28); transition: all 0.22s;
+    }
+    .btn-continue:hover { transform: translateY(-2px); box-shadow: 0 9px 22px rgba(35,145,80,0.38); }
+
+    /* ═══════════════════════════════════
+       BLACKLIST TAB STYLES
+    ═══════════════════════════════════ */
+    .bl-layout {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 28px;
+    }
+    @media (min-width: 1024px) {
+      .bl-layout { grid-template-columns: 380px 1fr; align-items: start; }
+    }
+    .bl-card {
+      background: #ffffff;
+      border-radius: 24px; padding: 32px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.03), 0 1px 3px rgba(0,0,0,0.01);
+      border: 1px solid rgba(226,232,240,0.8);
+      transition: box-shadow 0.3s ease;
+    }
+    .bl-card:hover { box-shadow: 0 15px 35px rgba(0,0,0,0.05); }
+    .bl-card-header { margin-bottom: 26px; text-align: center; }
+    .bl-table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
+    .records-badge { background: #eaf5ee; color: #239150; padding: 5px 13px; border-radius: 50px; font-size: 0.78rem; font-weight: 700; border: 1px solid rgba(35,145,80,0.15); }
+
+    /* Input styles */
+    .form-group { margin-bottom: 20px; }
+    .input-icon-wrapper { position: relative; display: flex; align-items: center; }
+    .input-icon-wrapper .bl-input-icon {
+      position: absolute; left: 16px;
+      width: 18px; height: 18px; color: #94a3b8; pointer-events: none; transition: color 0.2s;
+    }
+    .input-icon-wrapper input, .reason-select-wrapper select {
+      width: 100%; padding: 13px 16px 13px 46px;
+      border-radius: 13px; border: 1.5px solid #e2e8f0;
+      font-family: 'Barlow', sans-serif; font-size: 0.92rem; font-weight: 600;
+      color: #1e293b; outline: none; background: #f8fafc; transition: all 0.2s ease;
+    }
+    .input-icon-wrapper input:focus, .reason-select-wrapper select:focus {
+      background: #fff; border-color: #239150;
+      box-shadow: 0 0 0 4px rgba(35,145,80,0.1);
+    }
+    .input-icon-wrapper input::placeholder { color: #94a3b8; font-weight: 500; }
+    .reason-select-wrapper {
+      position: relative; display: flex; align-items: center;
+    }
+    .reason-select-wrapper select {
+      appearance: none; -webkit-appearance: none; cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 14px center; background-size: 16px;
+    }
+    .reason-dropdown-wrap { display: flex; flex-direction: column; gap: 8px; }
+    .add-reason-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: transparent; border: 1.5px dashed #cbd5e1; border-radius: 11px;
+      padding: 9px 16px; font-family: 'Barlow', sans-serif; font-size: 0.8rem;
+      font-weight: 700; color: #64748b; cursor: pointer; transition: all 0.2s;
+    }
+    .add-reason-btn:hover { border-color: #239150; color: #239150; background: #eaf5ee; }
+    .add-reason-btn [data-lucide] { width: 15px; height: 15px; }
+    .submit-btn {
+      width: 100%; padding: 14px 20px; border-radius: 13px; border: none;
+      background: linear-gradient(135deg, #2FC56D 0%, #239150 100%);
+      color: #fff; font-family: 'Barlow', sans-serif; font-size: 0.93rem; font-weight: 700;
+      cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+      box-shadow: 0 4px 14px rgba(35,145,80,0.22); transition: all 0.2s;
+    }
+    .submit-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(35,145,80,0.32); filter: brightness(1.04); }
+    .submit-btn [data-lucide] { width: 17px; height: 17px; }
+
+    /* Table */
+    .table-search-bar { margin-bottom: 18px; }
+    .search-input-wrapper { position: relative; display: flex; align-items: center; }
+    .search-icon { position: absolute; left: 16px; width: 18px; height: 18px; color: #94a3b8; pointer-events: none; }
+    .search-input-wrapper input {
+      width: 100%; padding: 11px 16px 11px 46px;
+      border-radius: 12px; border: 1.5px solid #e2e8f0;
+      font-family: 'Barlow', sans-serif; font-size: 0.87rem; font-weight: 500; color: #1e293b;
+      outline: none; background: #f8fafc; transition: all 0.2s;
+    }
+    .search-input-wrapper input:focus { background: #fff; border-color: #239150; box-shadow: 0 0 0 4px rgba(35,145,80,0.08); }
+    .search-input-wrapper input::placeholder { color: #94a3b8; }
+    .table-responsive { overflow-x: auto; border-radius: 16px; border: 1px solid #edf2f7; }
+    .premium-table { width: 100%; border-collapse: collapse; text-align: left; font-family: 'Barlow', sans-serif; }
+    .premium-table th { background: #f8fafc; padding: 14px 18px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: #64748b; border-bottom: 1px solid #edf2f7; }
+    .premium-table td { padding: 14px 18px; font-size: 0.88rem; font-weight: 600; color: #334155; border-bottom: 1px solid #edf2f7; transition: background 0.15s; }
+    .premium-table tbody tr:last-child td { border-bottom: none; }
+    .premium-table tbody tr:hover td { background: #f8fafc; }
+    .premium-table td strong { font-weight: 800; color: #0f172a; }
+    .text-right { text-align: right; }
+    .remove-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 7px 14px; border-radius: 50px;
+      border: 1px solid #fecdd3; background: #fff5f5; color: #e11d48;
+      font-family: 'Barlow', sans-serif; font-size: 0.73rem; font-weight: 700;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .remove-btn:hover { background: #ffe4e6; border-color: #fda4af; transform: translateY(-1px); }
+    .remove-btn [data-lucide] { width: 13px; height: 13px; }
+    .empty-state { text-align: center; padding: 48px 24px; color: #64748b; }
+    .empty-icon { width: 46px; height: 46px; color: #cbd5e1; margin-bottom: 14px; display: inline-block; }
+    .empty-state h3 { font-size: 1rem; font-weight: 700; color: #334155; margin-bottom: 5px; }
+    .empty-state p { font-size: 0.86rem; }
+
+    /* Toasts */
+    .toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+    .toast {
+      pointer-events: auto; background: #fff; border-radius: 16px; padding: 14px 18px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.08); display: flex; align-items: center; gap: 12px;
+      min-width: 300px; max-width: 400px; border-left: 4px solid #239150;
+      transform: translateX(120%); transition: transform 0.3s cubic-bezier(0.175,0.885,0.32,1.275), opacity 0.3s; opacity: 0;
+    }
+    .toast.show { transform: translateX(0); opacity: 1; }
+    .toast-icon [data-lucide] { width: 19px; height: 19px; color: #239150; }
+    .toast-content { flex: 1; }
+    .toast-title { font-size: 0.83rem; font-weight: 800; color: #0f172a; margin-bottom: 2px; }
+    .toast-message { font-size: 0.76rem; color: #64748b; font-weight: 500; }
+    .toast-close { background: none; border: none; color: #94a3b8; cursor: pointer; padding: 0; display: flex; }
+    .toast-close [data-lucide] { width: 14px; height: 14px; }
+
+    /* Modals */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(15,23,42,0.4); backdrop-filter: blur(4px);
+      z-index: 10000; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s;
+    }
+    .modal-overlay.open { display: flex; opacity: 1; }
+    .p-modal {
+      background: #fff; border-radius: 24px; padding: 34px; max-width: 420px; width: 90%;
+      text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+      border: 1px solid rgba(226,232,240,0.8); transform: scale(0.95); transition: transform 0.2s cubic-bezier(0.175,0.885,0.32,1.1);
+    }
+    .modal-overlay.open .p-modal { transform: scale(1); }
+    .modal-icon-wrap { width: 52px; height: 52px; background: #ffe4e6; color: #e11d48; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 18px; }
+    .modal-icon-wrap [data-lucide] { width: 26px; height: 26px; }
+    .p-modal h3 { font-size: 1.15rem; color: #0f172a; margin-bottom: 8px; font-weight: 800; }
+    .p-modal p { color: #64748b; margin-bottom: 24px; font-size: 0.88rem; line-height: 1.5; font-weight: 500; }
+    .modal-btns { display: flex; gap: 10px; justify-content: center; }
+    .modal-btns button { flex: 1; padding: 11px; border-radius: 11px; font-family: 'Barlow', sans-serif; font-size: 0.83rem; font-weight: 700; cursor: pointer; transition: all 0.2s; border: none; }
+    .btn-confirm-delete { background: #e11d48; color: #fff; box-shadow: 0 4px 12px rgba(225,29,72,0.2); }
+    .btn-confirm-delete:hover { background: #be123c; }
+    .btn-cancel { background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0 !important; }
+    .btn-cancel:hover { background: #e2e8f0; }
+
+    /* Add reason modal */
+    .add-reason-modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(15,23,42,0.4); backdrop-filter: blur(4px);
+      z-index: 10001; align-items: center; justify-content: center;
+    }
+    .add-reason-modal-overlay.open { display: flex; }
+    .add-reason-modal {
+      background: #fff; border-radius: 24px; padding: 34px; max-width: 400px; width: 90%;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    }
+    .add-reason-modal h3 { font-size: 1.1rem; font-weight: 800; color: #0f172a; margin-bottom: 6px; text-align: center; }
+    .add-reason-modal p { color: #64748b; margin-bottom: 20px; font-size: 0.86rem; line-height: 1.5; font-weight: 500; text-align: center; }
+    .add-reason-modal input {
+      width: 100%; padding: 13px 16px; border-radius: 13px; border: 1.5px solid #e2e8f0;
+      font-family: 'Barlow', sans-serif; font-size: 0.92rem; font-weight: 600; color: #1e293b;
+      outline: none; background: #f8fafc;
+    }
+    .add-reason-modal input:focus { background: #fff; border-color: #239150; box-shadow: 0 0 0 4px rgba(35,145,80,0.1); }
+    .add-reason-modal .modal-btns { margin-top: 20px; }
+    .btn-add-reason-confirm { background: linear-gradient(135deg, #2FC56D 0%, #239150 100%); color: #fff; box-shadow: 0 4px 12px rgba(35,145,80,0.2); }
+    .btn-add-reason-confirm:hover { filter: brightness(1.05); }
+    .btn-add-reason-cancel { background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0 !important; }
+
+    @keyframes fadeInRow { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-in-row { animation: fadeInRow 0.28s cubic-bezier(0.16,1,0.3,1) forwards; }
+
+    @media (max-width: 620px) {
+      .portal-wrap { padding: 16px 16px 80px; }
+      .tab-bar { width: 100%; }
+      .tab-btn { flex: 1; justify-content: center; }
+    }
+  </style>
+</head>
+<body class="portal-body">
+
+  <!-- Topbar -->
+  <div class="portal-topbar">
+    <div class="brand" style="display:flex;align-items:center;gap:16px;position:relative;z-index:1;">
+      <div class="logo-wrapper" style="display:flex;align-items:center;justify-content:center;background:#fff;border-radius:14px;padding:9px 18px;box-shadow:0 4px 14px rgba(0,0,0,0.16);">
+        <img src="M-Pesa-Logo.png" alt="M-PESA" style="height:30px;object-fit:contain;display:block;" />
+      </div>
+      <span class="brand-title" style="font-family:'Barlow',sans-serif;font-weight:800;font-size:1.05rem;letter-spacing:.6px;text-transform:uppercase;color:#fff;padding-left:16px;border-left:2px solid rgba(255,255,255,0.28);line-height:1.15;">Terek Be M-PESA Promo</span>
+    </div>
+    <div class="topbar-right" style="position:relative;z-index:1;">
+      <a href="index.html" class="logout-btn"><i data-lucide="log-out" style="width:16px;height:16px;stroke-width:2.5;"></i> Logout</a>
+    </div>
+  </div>
+
+  <!-- Breadcrumb -->
+  <div class="portal-nav">
+    <a href="home.html"><i data-lucide="home" style="width:16px;height:16px;vertical-align:middle;margin-right:4px;"></i> Home</a>
+    &nbsp;›&nbsp;
+    <span>Merchant Promo</span>
+    &nbsp;›&nbsp;
+    <span class="crumb-active" id="breadcrumbActive">Merchant Tools</span>
+  </div>
+
+  <div class="portal-wrap">
+
+    <!-- Tab bar -->
+    <div class="tab-bar">
+      <button class="tab-btn active" id="tab-eligibility" onclick="switchTab('eligibility')">
+        <i data-lucide="shield-check"></i> Check Eligibility
+      </button>
+      <button class="tab-btn" id="tab-blacklist" onclick="switchTab('blacklist')">
+        <i data-lucide="shield-alert"></i> BlackList
+      </button>
+    </div>
+
+    <!-- ══════════════════════════════
+         PANEL: Check Eligibility
+    ══════════════════════════════ -->
+    <div class="tab-panel active" id="panel-eligibility">
+      <div class="el-layout">
+        <!-- Form Card -->
+        <div class="el-card">
+          <div class="el-card-header">
+            <div class="icon-wrap-green"><i data-lucide="search-code"></i></div>
+            <h3 class="card-title">Check Eligibility</h3>
+            <p class="card-subtitle">Need to verify a merchant before running the draw? Confirm a short code against the promo service response.</p>
+          </div>
+          <form id="eligibilityForm" onsubmit="handleEligibilityCheck(event)">
+            <div class="form-group">
+              <label class="form-label" for="elShortCode">Merchant Short Code / Till Number</label>
+              <div class="input-wrapper">
+                <span class="input-icon"><i data-lucide="hash"></i></span>
+                <input type="text" id="elShortCode" class="form-input" placeholder="e.g. 10070, 10071…" required />
+              </div>
+            </div>
+            <button type="submit" class="btn-check">
+              <i data-lucide="shield-check"></i> Check Eligibility
+            </button>
+          </form>
+        </div>
+
+        <!-- Result Panel -->
+        <div class="el-card">
+          <div id="elEmptyResult" class="result-empty">
+            <i data-lucide="shield-alert"></i>
+            <h3 style="font-size:1.1rem;font-weight:800;color:#334155;margin-bottom:5px;">No Verification Run Yet</h3>
+            <p style="font-size:0.87rem;max-width:340px;margin:0 auto;line-height:1.4;">Enter a short code and click <strong>Check Eligibility</strong> to verify against the promo service.</p>
+          </div>
+          <div id="elActiveResult" class="result-box">
+            <div class="res-status-banner eligible" id="elStatusBanner">
+              <i data-lucide="check-circle-2" id="elStatusIcon"></i>
+              <div>
+                <div class="res-status-title" id="elStatusTitle">ELIGIBLE FOR DRAW</div>
+                <div class="res-status-sub" id="elStatusSub">Verified against M-PESA Promo Service</div>
+              </div>
+            </div>
+            <div class="res-grid">
+              <div class="res-item"><div class="res-item-lbl">Short Code</div><div class="res-item-val" id="elResCode">—</div></div>
+              <div class="res-item"><div class="res-item-lbl">Merchant Name</div><div class="res-item-val" id="elResName">—</div></div>
+              <div class="res-item"><div class="res-item-lbl">Region / Cluster</div><div class="res-item-val" id="elResRegion">—</div></div>
+              <div class="res-item"><div class="res-item-lbl">Eligible Entries</div><div class="res-item-val" id="elResEntries">—</div></div>
+            </div>
+            <div class="response-msg" id="elResMsg" style="display:none;padding:16px 20px;border-radius:12px;margin-bottom:20px;font-family:'Barlow',sans-serif;font-size:0.9rem;font-weight:600;line-height:1.5;">
+              <div style="display:flex;align-items:flex-start;gap:10px;">
+                <i data-lucide="info" id="resMsgIcon" style="width:20px;height:20px;stroke-width:2.2;flex-shrink:0;margin-top:2px;"></i>
+                <div id="resMsgText"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════
+         PANEL: BlackList
+    ══════════════════════════════ -->
+    <div class="tab-panel" id="panel-blacklist">
+      <div class="bl-layout">
+        <!-- Form Card -->
+        <div class="bl-card">
+          <div class="bl-card-header">
+            <div class="icon-wrap-red"><i data-lucide="shield-alert"></i></div>
+            <h2 class="card-title">BlackList Merchant</h2>
+            <p class="card-subtitle">Enter the short code and blacklist reason</p>
+          </div>
+          <form id="blacklistForm" onsubmit="handleBlacklistSubmit(event)">
+            <div class="form-group">
+              <label for="blShortCode" class="form-label">Short Code</label>
+              <div class="input-icon-wrapper">
+                <i data-lucide="hash" class="bl-input-icon"></i>
+                <input type="text" id="blShortCode" placeholder="Enter short code" required autocomplete="off" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="blReason" class="form-label">Blacklist Reason</label>
+              <div class="reason-dropdown-wrap">
+                <div class="reason-select-wrapper">
+                  <select id="blReason" required>
+                    <option value="suspected fraud">Suspected Fraud</option>
+                    <option value="internal staff/partner">Internal Staff / Partner</option>
+                    <option value="merchant request">Merchant Request</option>
+                    <option value="customer complaint">Customer Complaint</option>
+                    <option value="business closed">Business Closed (Short Code Frozen)</option>
+                  </select>
+                </div>
+                <button type="button" class="add-reason-btn" onclick="openAddReasonModal()">
+                  <i data-lucide="plus"></i> Add Reason
+                </button>
+              </div>
+            </div>
+            <button type="submit" class="submit-btn">
+              <i data-lucide="ban"></i> <span>BlackList Merchant</span>
+            </button>
+          </form>
+        </div>
+
+        <!-- Table Card -->
+        <div class="bl-card">
+          <div class="bl-table-header">
+            <div>
+              <h2 class="card-title">Blacklisted Merchants</h2>
+              <p class="card-subtitle">Merchants blocked from draws and campaigns</p>
+            </div>
+            <span class="records-badge" id="recordsCount">0 records</span>
+          </div>
+          <div class="table-search-bar">
+            <div class="search-input-wrapper">
+              <i data-lucide="search" class="search-icon"></i>
+              <input type="text" id="blSearchQuery" placeholder="Search by short code or reason…" oninput="handleBLSearch()" />
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table class="premium-table">
+              <thead>
+                <tr>
+                  <th>Short Code</th>
+                  <th>Reason</th>
+                  <th>Blacklisted By</th>
+                  <th class="text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody id="blacklistTableBody"></tbody>
+            </table>
+          </div>
+          <div id="blEmptyState" class="empty-state" style="display:none;">
+            <i data-lucide="shield-check" class="empty-icon"></i>
+            <h3>No Blacklisted Merchants</h3>
+            <p>All merchants are currently active and allowed to participate.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /portal-wrap -->
+
+  <!-- Add Reason Modal -->
+  <div class="add-reason-modal-overlay" id="addReasonModal">
+    <div class="add-reason-modal">
+      <div class="modal-icon-wrap" style="background:#eaf5ee;color:#239150;">
+        <i data-lucide="plus-circle"></i>
+      </div>
+      <h3>Add Custom Reason</h3>
+      <p>Type a new blacklist reason to add to the dropdown list.</p>
+      <input type="text" id="newReasonInput" placeholder="Enter new reason…" maxlength="60" />
+      <div class="modal-btns">
+        <button class="btn-add-reason-confirm" id="confirmAddReasonBtn">Add Reason</button>
+        <button class="btn-add-reason-cancel" onclick="closeAddReasonModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Unblock Confirmation Modal -->
+  <div class="modal-overlay" id="unblockModal">
+    <div class="p-modal">
+      <div class="modal-icon-wrap"><i data-lucide="trash-2"></i></div>
+      <h3>Remove from Blacklist</h3>
+      <p id="unblockModalText">Are you sure you want to remove this merchant from the blacklist?<br>They will be active again.</p>
+      <div class="modal-btns">
+        <button class="btn-confirm-delete" id="confirmUnblockBtn">Yes, Remove</button>
+        <button class="btn-cancel" onclick="closeUnblockModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script>
+    /* ════════ TAB SWITCHING ════════ */
+    function switchTab(tab) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      document.getElementById('tab-' + tab).classList.add('active');
+      document.getElementById('panel-' + tab).classList.add('active');
+      document.getElementById('breadcrumbActive').textContent =
+        tab === 'eligibility' ? 'Check Eligibility' : 'BlackList';
+      history.replaceState(null, '', '#' + tab);
+      if (typeof lucide !== 'undefined' && lucide.createIcons) lucide.createIcons();
+    }
+
+    // Handle deep link on load
+    (function() {
+      const hash = window.location.hash.replace('#', '');
+      if (hash === 'blacklist') switchTab('blacklist');
+    })();
+
+    /* ════════ ELIGIBILITY LOGIC ════════ */
+    const MOCK_MERCHANTS = {
+      '10070': { name:'Manna Hotel Ltd', region:'Addis Ababa', cluster:'Kality', entries:142, eligible:true },
+      '10071': { name:'Blessed Hotel Ltd', region:'Addis Ababa', cluster:'Kality', entries:98, eligible:true },
+      '10072': { name:'Star Cafe', region:'Addis Ababa', cluster:'Bole', entries:215, eligible:true },
+      '10073': { name:'Golden Shop', region:'Dire Dawa', cluster:'Sabian', entries:54, eligible:true },
+      '10074': { name:'Blue Nile Mart', region:'Hawassa', cluster:'Tabor', entries:0, eligible:false, reason:'Insufficient transaction volume' },
+      '10075': { name:'Blacklisted Merchant PLC', region:'Bahir Dar', cluster:'Belay Zeleke', entries:0, eligible:false, blacklist:true, reason:'On active BlackList' },
+    };
+
+    function handleEligibilityCheck(e) {
+      e.preventDefault();
+      const code = document.getElementById('elShortCode').value.trim();
+      if (!code) return;
+
+      const data = MOCK_MERCHANTS[code] || {
+        name: `Merchant #${code}`, region:'Addis Ababa', cluster:'Central',
+        entries: Math.floor(Math.random() * 120) + 10, eligible: true
+      };
+
+      document.getElementById('elResCode').textContent = code;
+      document.getElementById('elResName').textContent = data.name;
+      document.getElementById('elResRegion').textContent = `${data.region} (${data.cluster})`;
+      document.getElementById('elResEntries').textContent = `${data.entries} Entries`;
+
+      const banner = document.getElementById('elStatusBanner');
+      const title  = document.getElementById('elStatusTitle');
+      const sub    = document.getElementById('elStatusSub');
+      const icon   = document.getElementById('elStatusIcon');
+
+      if (data.eligible) {
+        banner.className = 'res-status-banner eligible';
+        title.textContent = 'ELIGIBLE FOR DRAW';
+        sub.textContent = 'Confirmed active & verified against Promo Service';
+        icon.setAttribute('data-lucide','check-circle-2');
+      } else {
+        banner.className = 'res-status-banner ineligible';
+        title.textContent = 'NOT ELIGIBLE';
+        sub.textContent = data.reason || 'Verification failed';
+        icon.setAttribute('data-lucide','x-circle');
+      }
+
+      // Show a readable message instead of JSON code
+      const msgEl = document.getElementById('elResMsg');
+      const msgIcon = document.getElementById('resMsgIcon');
+      const msgText = document.getElementById('resMsgText');
+      
+      if (data.eligible) {
+        msgEl.style.display = 'block';
+        msgEl.style.background = '#eef8f2';
+        msgEl.style.border = '1.5px solid #239150';
+        msgEl.style.color = '#1b7341';
+        msgIcon.setAttribute('data-lucide', 'check-circle-2');
+        msgIcon.style.color = '#239150';
+        msgText.innerHTML = `✅ <strong>${data.name}</strong> (Short Code: ${code}) is <strong>ELIGIBLE</strong> for the draw.<br>This merchant has <strong>${data.entries}</strong> entries and is verified against the Promo Service.`;
+      } else {
+        msgEl.style.display = 'block';
+        msgEl.style.background = '#fef2f2';
+        msgEl.style.border = '1.5px solid #ef4444';
+        msgEl.style.color = '#991b1b';
+        msgIcon.setAttribute('data-lucide', 'x-circle');
+        msgIcon.style.color = '#e11d48';
+        msgText.innerHTML = `❌ <strong>${data.name}</strong> (Short Code: ${code}) is <strong>NOT ELIGIBLE</strong>.<br>Reason: ${data.reason || 'Verification failed against Promo Service.'}`;
+      }
+
+      document.getElementById('elEmptyResult').style.display = 'none';
+      document.getElementById('elActiveResult').classList.add('active');
+      if (typeof lucide !== 'undefined' && lucide.createIcons) lucide.createIcons();
+    }
+
+    /* ════════ BLACKLIST LOGIC ════════ */
+    const BLACKLIST_DATA = [
+      { shortCode:'832797', reason:'fraudulent activity', blacklistedBy:'aklilu.tamirat@partner.safaricom.et' }
+    ];
+    const CUSTOM_REASONS = [];
+    let pendingRemoveShortCode = null;
+
+    function showToast(title, message, type = 'success') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      if (type === 'error') toast.style.borderLeftColor = '#e11d48';
+      const iconName  = type === 'success' ? 'check-circle' : 'alert-triangle';
+      const iconColor = type === 'success' ? '#239150' : '#e11d48';
+      toast.innerHTML = `
+        <div class="toast-icon"><i data-lucide="${iconName}" style="color:${iconColor};width:19px;height:19px;"></i></div>
+        <div class="toast-content"><div class="toast-title">${title}</div><div class="toast-message">${message}</div></div>
+        <button class="toast-close" onclick="closeToast(this)"><i data-lucide="x"></i></button>`;
+      container.appendChild(toast);
+      if (typeof lucide !== 'undefined' && lucide.createIcons) lucide.createIcons();
+      toast.offsetHeight;
+      toast.classList.add('show');
+      setTimeout(() => { if (toast.parentNode) { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); } }, 3500);
+    }
+    function closeToast(btn) { const t = btn.closest('.toast'); t.classList.remove('show'); setTimeout(() => t.remove(), 300); }
+
+    function renderBLTable() {
+      const tbody  = document.getElementById('blacklistTableBody');
+      const empty  = document.getElementById('blEmptyState');
+      const badge  = document.getElementById('recordsCount');
+      const query  = document.getElementById('blSearchQuery').value.toLowerCase().trim();
+      const filtered = BLACKLIST_DATA.filter(i =>
+        i.shortCode.toLowerCase().includes(query) ||
+        i.reason.toLowerCase().includes(query) ||
+        i.blacklistedBy.toLowerCase().includes(query)
+      );
+      tbody.innerHTML = '';
+      badge.textContent = `${filtered.length} records`;
+      if (filtered.length === 0) {
+        empty.style.display = 'block';
+        tbody.parentElement.style.display = 'none';
+      } else {
+        empty.style.display = 'none';
+        tbody.parentElement.style.display = '';
+        filtered.forEach(item => {
+          const tr = document.createElement('tr');
+          tr.className = 'fade-in-row';
+          tr.innerHTML = `
+            <td><strong>${item.shortCode}</strong></td>
+            <td>${item.reason}</td>
+            <td><span style="color:#64748b;font-size:0.83rem;">${item.blacklistedBy}</span></td>
+            <td class="text-right"><button class="remove-btn" onclick="openUnblockModal('${item.shortCode}')"><i data-lucide="user-check"></i> Remove</button></td>`;
+          tbody.appendChild(tr);
+        });
+      }
+      if (typeof lucide !== 'undefined' && lucide.createIcons) lucide.createIcons();
+    }
+
+    function handleBlacklistSubmit(event) {
+      event.preventDefault();
+      const codeEl   = document.getElementById('blShortCode');
+      const reasonEl = document.getElementById('blReason');
+      const code   = codeEl.value.trim();
+      const reason = reasonEl.value.trim();
+      if (!code || !reason) { showToast('Error','Please fill in all fields.','error'); return; }
+      if (!/^\d+$/.test(code)) { showToast('Invalid','Short code must be numeric.','error'); return; }
+      if (BLACKLIST_DATA.some(i => i.shortCode === code)) { showToast('Duplicate',`Merchant ${code} is already blacklisted.`,'error'); return; }
+      BLACKLIST_DATA.unshift({ shortCode: code, reason, blacklistedBy:'aklilu.tamirat@partner.safaricom.et' });
+      codeEl.value = ''; reasonEl.value = 'fraudulent activity';
+      showToast('Merchant Blacklisted',`Short code ${code} was added to the blacklist.`);
+      renderBLTable();
+    }
+
+    function handleBLSearch() { renderBLTable(); }
+
+    function openUnblockModal(code) {
+      pendingRemoveShortCode = code;
+      document.getElementById('unblockModalText').innerHTML =
+        `Are you sure you want to remove <strong>${code}</strong> from the blacklist?<br>They will be able to participate in draws again.`;
+      document.getElementById('unblockModal').classList.add('open');
+    }
+    function closeUnblockModal() { document.getElementById('unblockModal').classList.remove('open'); pendingRemoveShortCode = null; }
+    function confirmUnblock() {
+      if (pendingRemoveShortCode) {
+        const idx = BLACKLIST_DATA.findIndex(i => i.shortCode === pendingRemoveShortCode);
+        if (idx !== -1) { BLACKLIST_DATA.splice(idx,1); showToast('Removed',`${pendingRemoveShortCode} removed from blacklist.`); }
+        closeUnblockModal(); renderBLTable();
+      }
+    }
+    document.getElementById('confirmUnblockBtn').addEventListener('click', confirmUnblock);
+
+    function openAddReasonModal() { document.getElementById('newReasonInput').value=''; document.getElementById('addReasonModal').classList.add('open'); setTimeout(()=>document.getElementById('newReasonInput').focus(),100); }
+    function closeAddReasonModal() { document.getElementById('addReasonModal').classList.remove('open'); }
+    function addCustomReason() {
+      const input  = document.getElementById('newReasonInput');
+      const reason = input.value.trim().toLowerCase();
+      if (!reason) { showToast('Empty','Please enter a reason.','error'); return; }
+      const defaults = ['suspected fraud','internal staff/partner','merchant request','customer complaint','business closed'];
+      if (defaults.includes(reason)) { showToast('Duplicate',`"${reason}" is already a default option.`,'error'); return; }
+      if (CUSTOM_REASONS.includes(reason)) { showToast('Duplicate',`"${reason}" is already in the list.`,'error'); return; }
+      CUSTOM_REASONS.push(reason);
+      populateReasonDropdown();
+      closeAddReasonModal();
+      showToast('Reason Added',`"${reason}" has been added to the dropdown.`);
+      document.getElementById('blReason').value = reason;
+    }
+    function populateReasonDropdown() {
+      const sel = document.getElementById('blReason');
+      const cur = sel.value;
+      const defaults = [
+        {value:'suspected fraud',label:'Suspected Fraud'},
+        {value:'internal staff/partner',label:'Internal Staff / Partner'},
+        {value:'merchant request',label:'Merchant Request'},
+        {value:'customer complaint',label:'Customer Complaint'},
+        {value:'business closed',label:'Business Closed (Short Code Frozen)'}
+      ];
+      sel.innerHTML = '';
+      defaults.forEach(o => { const opt=document.createElement('option'); opt.value=o.value; opt.textContent=o.label; sel.appendChild(opt); });
+      if (CUSTOM_REASONS.length > 0) {
+        const div = document.createElement('option'); div.disabled=true; div.textContent='────── Custom ──────'; div.style.color='#94a3b8'; sel.appendChild(div);
+        CUSTOM_REASONS.forEach(r => { const opt=document.createElement('option'); opt.value=r; opt.textContent=r.replace(/\b\w/g,c=>c.toUpperCase()); sel.appendChild(opt); });
+      }
+      if ([...sel.options].some(o => o.value===cur)) sel.value=cur;
+    }
+    document.getElementById('confirmAddReasonBtn').addEventListener('click', addCustomReason);
+    document.getElementById('addReasonModal').addEventListener('click',function(e){if(e.target===this)closeAddReasonModal();});
+    document.getElementById('newReasonInput').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();addCustomReason();}});
+    document.addEventListener('keydown',function(e){
+      if(e.key==='Escape'){
+        if(document.getElementById('addReasonModal').classList.contains('open'))closeAddReasonModal();
+        if(document.getElementById('unblockModal').classList.contains('open'))closeUnblockModal();
+      }
+    });
+
+    window.addEventListener('DOMContentLoaded', () => {
+      populateReasonDropdown();
+      document.getElementById('blReason').value = 'suspected fraud';
+      renderBLTable();
+      if (typeof lucide !== 'undefined' && lucide.createIcons) lucide.createIcons();
+    });
+  </script>
+  <script src="sidebar.js"></script>
+</body>
+</html>
