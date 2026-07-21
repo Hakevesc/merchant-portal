@@ -161,6 +161,67 @@
       padding: 14px 18px; border-radius: 12px; margin-bottom: 20px;
       line-height: 1.5; word-break: break-all; overflow-x: auto; white-space: pre;
     }
+    /* ── Eligibility Result Rows ── */
+    .el-result-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 18px;
+      border-radius: 12px;
+      margin-bottom: 8px;
+      border: 1.5px solid #e2e8f0;
+      background: #fafafa;
+      transition: all 0.15s;
+    }
+    .el-result-row.eligible {
+      background: #eef8f2;
+      border-color: rgba(35,145,80,0.2);
+    }
+    .el-result-row.ineligible {
+      background: #fef2f2;
+      border-color: rgba(239,68,68,0.2);
+    }
+    .el-result-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .el-result-left [data-lucide] {
+      width: 20px;
+      height: 20px;
+    }
+    .el-result-row.eligible .el-result-left [data-lucide] { color: #239150; }
+    .el-result-row.ineligible .el-result-left [data-lucide] { color: #e11d48; }
+    .el-result-code {
+      font-family: 'Barlow', sans-serif;
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: #0f172a;
+    }
+    .el-result-name {
+      font-family: 'Barlow', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #64748b;
+      margin-top: 2px;
+    }
+    .el-result-badge {
+      font-family: 'Barlow', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 800;
+      padding: 6px 16px;
+      border-radius: 50px;
+      white-space: nowrap;
+    }
+    .el-result-badge.badge-ok {
+      background: #239150;
+      color: #fff;
+    }
+    .el-result-badge.badge-no {
+      background: #e11d48;
+      color: #fff;
+    }
+
     .btn-continue {
       display: flex; align-items: center; justify-content: center; gap: 8px;
       width: 100%; padding: 14px; border-radius: 50px;
@@ -575,37 +636,48 @@
 
     function handleEligibilityCheck(e) {
       e.preventDefault();
-      const code = document.getElementById('elShortCode').value.trim();
-      if (!code) return;
+      const input = document.getElementById('elShortCode').value.trim();
+      if (!input) return;
 
-      const data = MOCK_MERCHANTS[code] || {
-        name: `Merchant #${code}`, region:'Addis Ababa', cluster:'Central',
-        entries: Math.floor(Math.random() * 120) + 10, eligible: true
-      };
+      // Support multiple short codes separated by / or ,
+      const codes = input.split(/[\/,]+/).map(c => c.trim()).filter(Boolean);
 
-      document.getElementById('elResCode').textContent = code;
-      document.getElementById('elIsEligible').textContent = data.eligible ? 'Yes' : 'No';
-      document.getElementById('elPrestigious').textContent = data.eligible ? 'Yes' : 'No';
+      // Generate results for each code
+      let resultsHtml = '';
+      codes.forEach((code, idx) => {
+        const data = MOCK_MERCHANTS[code] || {
+          name: `Merchant #${code}`, region:'Addis Ababa', cluster:'Central',
+          entries: Math.floor(Math.random() * 120) + 10, eligible: true
+        };
 
-      const banner = document.getElementById('elStatusBanner');
-      const title  = document.getElementById('elStatusTitle');
-      const sub    = document.getElementById('elStatusSub');
-      const icon   = document.getElementById('elStatusIcon');
-      
-      if (data.eligible) {
-        banner.className = 'res-status-banner eligible';
-        title.textContent = 'ELIGIBLE FOR DRAW';
-        sub.textContent = `${data.name} — ${data.region} (${data.cluster})`;
-        icon.setAttribute('data-lucide','check-circle-2');
-      } else {
-        banner.className = 'res-status-banner ineligible';
-        title.textContent = 'NOT ELIGIBLE';
-        sub.textContent = `${data.name} — ${data.reason || 'Verification failed'}`;
-        icon.setAttribute('data-lucide','x-circle');
-      }
+        const isEligible = data.eligible;
+        const eligibleText = isEligible ? 'Yes ✓' : 'No ✗';
+        const rowClass = isEligible ? 'el-result-row eligible' : 'el-result-row ineligible';
+        const iconName = isEligible ? 'check-circle-2' : 'x-circle';
+
+        resultsHtml += `
+          <div class="${rowClass}">
+            <div class="el-result-left">
+              <i data-lucide="${iconName}" style="width:20px;height:20px;stroke-width:2.5;flex-shrink:0;"></i>
+              <div>
+                <div class="el-result-code"><strong>${code}</strong></div>
+                <div class="el-result-name">${data.name}</div>
+              </div>
+            </div>
+            <div class="el-result-badge ${isEligible ? 'badge-ok' : 'badge-no'}">${eligibleText}</div>
+          </div>
+        `;
+      });
+
+      // Build the result content dynamically
+      const activeResult = document.getElementById('elActiveResult');
+      activeResult.innerHTML = `
+        <div style="margin-bottom:10px;font-size:0.82rem;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:0.5px;">Eligibility Results (${codes.length} merchants)</div>
+        ${resultsHtml}
+      `;
 
       document.getElementById('elEmptyResult').style.display = 'none';
-      document.getElementById('elActiveResult').classList.add('active');
+      activeResult.classList.add('active');
       if (typeof lucide !== 'undefined' && lucide.createIcons) lucide.createIcons();
     }
 
