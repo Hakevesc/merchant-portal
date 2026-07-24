@@ -402,6 +402,147 @@
     @keyframes fadeInRow { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
     .fade-in-row { animation: fadeInRow 0.28s cubic-bezier(0.16,1,0.3,1) forwards; }
 
+    /* ═══════════════════════════════════
+       CHECK WINNER TAB STYLES
+    ═══════════════════════════════════ */
+    .cw-layout {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 28px;
+    }
+    @media (min-width: 960px) {
+      .cw-layout { grid-template-columns: 400px 1fr; align-items: start; }
+    }
+    .cw-card {
+      background: #ffffff;
+      border-radius: 24px;
+      padding: 32px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.03), 0 1px 3px rgba(0,0,0,0.01);
+      border: 1px solid rgba(226,232,240,0.8);
+    }
+    .cw-card-header { margin-bottom: 24px; text-align: center; }
+    .icon-wrap-amber {
+      width: 54px; height: 54px;
+      background: #fef3c7;
+      border-radius: 16px;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 16px;
+      color: #d97706;
+      box-shadow: 0 4px 12px rgba(217,119,6,0.12);
+    }
+    .icon-wrap-amber [data-lucide] { width: 26px; height: 26px; stroke-width: 2.2; }
+
+    /* Radio toggle for search type */
+    .cw-search-toggle {
+      display: flex; gap: 8px; margin-bottom: 20px;
+    }
+    .cw-search-toggle label {
+      flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 10px 14px; border-radius: 12px;
+      border: 1.5px solid #e2e8f0; background: #f8fafc;
+      font-family: 'Barlow', sans-serif; font-size: 0.82rem; font-weight: 700;
+      color: #64748b; cursor: pointer; transition: all 0.2s ease;
+    }
+    .cw-search-toggle label:hover { border-color: #cbd5e1; background: #f1f5f9; }
+    .cw-search-toggle input[type="radio"] { display: none; }
+    .cw-search-toggle input[type="radio"]:checked + label {
+      background: linear-gradient(105deg, #d97706 0%, #f59e0b 100%);
+      color: #ffffff; border-color: transparent;
+      box-shadow: 0 4px 12px rgba(217,119,6,0.25);
+    }
+    .cw-search-toggle [data-lucide] { width: 15px; height: 15px; stroke-width: 2.3; }
+
+    .btn-check-winner {
+      width: 100%; padding: 14px 24px; margin-top: 8px;
+      background: linear-gradient(105deg, #d97706 0%, #f59e0b 100%);
+      color: #fff; border: none; border-radius: 50px;
+      font-family: 'Barlow', sans-serif; font-size: 0.93rem; font-weight: 800;
+      text-transform: uppercase; letter-spacing: 1px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 9px;
+      box-shadow: 0 6px 18px rgba(217,119,6,0.28); transition: all 0.22s ease;
+    }
+    .btn-check-winner:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(217,119,6,0.38); filter: brightness(1.05); }
+    .btn-check-winner [data-lucide] { width: 17px; height: 17px; }
+
+    /* Winner result cards */
+    .cw-result-card {
+      border-radius: 18px; overflow: hidden; margin-bottom: 16px;
+      border: 1.5px solid #e2e8f0;
+      animation: fadeInRow 0.35s cubic-bezier(0.16,1,0.3,1) forwards;
+    }
+    .cw-result-card.winner {
+      border-color: #f59e0b;
+      box-shadow: 0 4px 20px rgba(245,158,11,0.15);
+    }
+    .cw-result-card.not-winner {
+      border-color: #94a3b8;
+    }
+    .cw-result-header {
+      padding: 16px 22px; display: flex; align-items: center; gap: 12px;
+    }
+    .cw-result-card.winner .cw-result-header {
+      background: linear-gradient(105deg, #fef3c7 0%, #fde68a 100%);
+    }
+    .cw-result-card.not-winner .cw-result-header {
+      background: #f1f5f9;
+    }
+    .cw-result-header [data-lucide] { width: 24px; height: 24px; stroke-width: 2.4; flex-shrink: 0; }
+    .cw-result-card.winner .cw-result-header [data-lucide] { color: #d97706; }
+    .cw-result-card.not-winner .cw-result-header [data-lucide] { color: #64748b; }
+    .cw-result-header-text { flex: 1; }
+    .cw-result-title {
+      font-family: 'Barlow', sans-serif; font-size: 1.05rem; font-weight: 800;
+    }
+    .cw-result-card.winner .cw-result-title { color: #92400e; }
+    .cw-result-card.not-winner .cw-result-title { color: #334155; }
+    .cw-result-subtitle {
+      font-family: 'Barlow', sans-serif; font-size: 0.76rem; font-weight: 600; margin-top: 2px;
+    }
+    .cw-result-card.winner .cw-result-subtitle { color: #b45309; opacity: 0.8; }
+    .cw-result-card.not-winner .cw-result-subtitle { color: #64748b; }
+    .cw-result-badge {
+      padding: 6px 18px; border-radius: 50px;
+      font-family: 'Barlow', sans-serif; font-size: 0.75rem; font-weight: 800;
+      white-space: nowrap; text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .cw-result-card.winner .cw-result-badge {
+      background: linear-gradient(105deg, #d97706 0%, #f59e0b 100%);
+      color: #fff; box-shadow: 0 3px 10px rgba(217,119,6,0.25);
+    }
+    .cw-result-card.not-winner .cw-result-badge {
+      background: #64748b; color: #fff;
+    }
+    .cw-result-body {
+      padding: 18px 22px;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+      background: #fff;
+    }
+    .cw-detail-item {}
+    .cw-detail-lbl {
+      font-family: 'Barlow', sans-serif; font-size: 0.68rem; font-weight: 700;
+      color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 3px;
+    }
+    .cw-detail-val {
+      font-family: 'Barlow', sans-serif; font-size: 0.97rem; font-weight: 800; color: #0f172a;
+    }
+
+    /* Confetti burst keyframes */
+    @keyframes confettiBurst {
+      0% { transform: translateY(0) rotate(0deg) scale(1); opacity: 1; }
+      100% { transform: translateY(-120px) rotate(720deg) scale(0); opacity: 0; }
+    }
+    .confetti-container {
+      position: fixed; inset: 0; z-index: 99999; pointer-events: none; overflow: hidden;
+    }
+    .confetti-piece {
+      position: absolute; width: 10px; height: 10px; border-radius: 2px;
+      animation: confettiDrop 2.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    }
+    @keyframes confettiDrop {
+      0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+    }
+
     @media (max-width: 620px) {
       .portal-wrap { padding: 16px 16px 80px; }
       .tab-bar { width: 100%; }
@@ -442,6 +583,9 @@
       </button>
       <button class="tab-btn" id="tab-blacklist" onclick="switchTab('blacklist')">
         <i data-lucide="shield-alert"></i> BlackList
+      </button>
+      <button class="tab-btn" id="tab-checkwinner" onclick="switchTab('checkwinner')">
+        <i data-lucide="trophy"></i> Check Winner
       </button>
     </div>
 
@@ -571,6 +715,51 @@
       </div>
     </div>
 
+    <!-- ══════════════════════════════
+         PANEL: Check Winner
+    ══════════════════════════════ -->
+    <div class="tab-panel" id="panel-checkwinner">
+      <div class="cw-layout">
+        <!-- Form Card -->
+        <div class="cw-card">
+          <div class="cw-card-header">
+            <div class="icon-wrap-amber"><i data-lucide="trophy"></i></div>
+            <h3 class="card-title">Check Winner</h3>
+            <p class="card-subtitle">Validate whether a merchant is a winner by entering their Short Code or Draw Code.</p>
+          </div>
+          <form id="checkWinnerForm" onsubmit="handleCheckWinner(event)">
+            <!-- Search type toggle -->
+            <div class="cw-search-toggle">
+              <input type="radio" name="cwSearchType" id="cwSearchShortCode" value="shortcode" checked />
+              <label for="cwSearchShortCode"><i data-lucide="hash"></i> Short Code</label>
+              <input type="radio" name="cwSearchType" id="cwSearchDrawCode" value="drawcode" />
+              <label for="cwSearchDrawCode"><i data-lucide="ticket"></i> Draw Code</label>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="cwCodeInput" id="cwCodeLabel">Short Code</label>
+              <div class="input-wrapper">
+                <span class="input-icon"><i data-lucide="hash" id="cwCodeIcon"></i></span>
+                <input type="text" id="cwCodeInput" class="form-input" placeholder="e.g. 100070 or 100071" required />
+              </div>
+            </div>
+            <button type="submit" class="btn-check-winner">
+              <i data-lucide="trophy"></i> Check Winner
+            </button>
+          </form>
+        </div>
+
+        <!-- Result Panel -->
+        <div class="cw-card">
+          <div id="cwEmptyResult" class="result-empty">
+            <i data-lucide="trophy" style="color:#f59e0b;"></i>
+            <h3 style="font-size:1.1rem;font-weight:800;color:#334155;margin-bottom:5px;">No Winner Check Yet</h3>
+            <p style="font-size:0.87rem;max-width:340px;margin:0 auto;line-height:1.4;">Enter a Short Code or Draw Code and click <strong>Check Winner</strong> to validate against the promo service.</p>
+          </div>
+          <div id="cwActiveResult" class="result-box"></div>
+        </div>
+      </div>
+    </div>
+
   </div><!-- /portal-wrap -->
 
   <!-- Add Reason Modal -->
@@ -607,13 +796,17 @@
 
   <script>
     /* ════════ TAB SWITCHING ════════ */
+    const TAB_LABELS = {
+      eligibility: 'Check Eligibility',
+      blacklist: 'BlackList',
+      checkwinner: 'Check Winner'
+    };
     function switchTab(tab) {
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
       document.getElementById('tab-' + tab).classList.add('active');
       document.getElementById('panel-' + tab).classList.add('active');
-      document.getElementById('breadcrumbActive').textContent =
-        tab === 'eligibility' ? 'Check Eligibility' : 'BlackList';
+      document.getElementById('breadcrumbActive').textContent = TAB_LABELS[tab] || tab;
       history.replaceState(null, '', '#' + tab);
       if (typeof lucide !== 'undefined' && lucide.createIcons) lucide.createIcons();
     }
@@ -622,6 +815,7 @@
     (function() {
       const hash = window.location.hash.replace('#', '');
       if (hash === 'blacklist') switchTab('blacklist');
+      else if (hash === 'checkwinner') switchTab('checkwinner');
     })();
 
     /* ════════ ELIGIBILITY LOGIC ════════ */
@@ -832,6 +1026,135 @@
         if(document.getElementById('unblockModal').classList.contains('open'))closeUnblockModal();
       }
     });
+
+    /* ════════ CHECK WINNER LOGIC ════════ */
+    const MOCK_WINNERS = {
+      '100070': { name: 'Manna Hotel Ltd', region: 'Addis Ababa', cluster: 'Kality', drawCode: 'DRW-2026-0070', prize: 'Grand Prize — ETB 500,000', drawDate: '2026-07-20', isWinner: true },
+      '100071': { name: 'Blessed Hotel Ltd', region: 'Addis Ababa', cluster: 'Kality', drawCode: 'DRW-2026-0071', prize: '—', drawDate: '2026-07-20', isWinner: false },
+      '100072': { name: 'Star Cafe', region: 'Addis Ababa', cluster: 'Bole', drawCode: 'DRW-2026-0072', prize: '2nd Prize — ETB 100,000', drawDate: '2026-07-18', isWinner: true },
+      '100073': { name: 'Golden Shop', region: 'Dire Dawa', cluster: 'Sabian', drawCode: 'DRW-2026-0073', prize: '—', drawDate: '2026-07-18', isWinner: false },
+      'DRW-2026-0070': { name: 'Manna Hotel Ltd', region: 'Addis Ababa', cluster: 'Kality', shortCode: '100070', prize: 'Grand Prize — ETB 500,000', drawDate: '2026-07-20', isWinner: true },
+      'DRW-2026-0071': { name: 'Blessed Hotel Ltd', region: 'Addis Ababa', cluster: 'Kality', shortCode: '100071', prize: '—', drawDate: '2026-07-20', isWinner: false },
+    };
+
+    // Toggle label + placeholder when search type changes
+    document.querySelectorAll('input[name="cwSearchType"]').forEach(radio => {
+      radio.addEventListener('change', function() {
+        const isShortCode = this.value === 'shortcode';
+        document.getElementById('cwCodeLabel').textContent = isShortCode ? 'Short Code' : 'Draw Code';
+        document.getElementById('cwCodeInput').placeholder = isShortCode ? 'e.g. 100070 or 100071' : 'e.g. DRW-2026-0070';
+        // Swap the input icon
+        const iconEl = document.getElementById('cwCodeIcon');
+        iconEl.setAttribute('data-lucide', isShortCode ? 'hash' : 'ticket');
+        if (typeof lucide !== 'undefined' && lucide.createIcons) lucide.createIcons();
+      });
+    });
+
+    function handleCheckWinner(e) {
+      e.preventDefault();
+      const code = document.getElementById('cwCodeInput').value.trim();
+      if (!code) return;
+
+      const data = MOCK_WINNERS[code];
+
+      if (!data) {
+        // Unknown code
+        const activeResult = document.getElementById('cwActiveResult');
+        activeResult.innerHTML = `
+          <div class="cw-result-card not-winner">
+            <div class="cw-result-header">
+              <i data-lucide="help-circle"></i>
+              <div class="cw-result-header-text">
+                <div class="cw-result-title">Code: ${code}</div>
+                <div class="cw-result-subtitle">No matching record found</div>
+              </div>
+              <span class="cw-result-badge" style="background:#94a3b8;">NOT FOUND</span>
+            </div>
+            <div class="cw-result-body" style="grid-template-columns:1fr;">
+              <div class="cw-detail-item" style="text-align:center;padding:12px 0;">
+                <div class="cw-detail-val" style="color:#64748b;font-weight:600;font-size:0.9rem;">The entered code does not match any draw or merchant record. Please verify and try again.</div>
+              </div>
+            </div>
+          </div>
+        `;
+        document.getElementById('cwEmptyResult').style.display = 'none';
+        activeResult.classList.add('active');
+        if (typeof lucide !== 'undefined' && lucide.createIcons) lucide.createIcons();
+        return;
+      }
+
+      const isWinner = data.isWinner;
+      const displayShortCode = data.shortCode || code;
+      const displayDrawCode = data.drawCode || code;
+
+      const activeResult = document.getElementById('cwActiveResult');
+      activeResult.innerHTML = `
+        <div style="margin-bottom:14px;font-size:0.82rem;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:0.5px;">Winner Validation Result</div>
+        <div class="cw-result-card ${isWinner ? 'winner' : 'not-winner'}">
+          <div class="cw-result-header">
+            <i data-lucide="${isWinner ? 'trophy' : 'x-circle'}"></i>
+            <div class="cw-result-header-text">
+              <div class="cw-result-title">${data.name}</div>
+              <div class="cw-result-subtitle">${isWinner ? 'Congratulations! This merchant is a verified winner.' : 'This merchant is not a winner in this draw.'}</div>
+            </div>
+            <span class="cw-result-badge">${isWinner ? '🏆 WINNER' : 'NOT A WINNER'}</span>
+          </div>
+          <div class="cw-result-body">
+            <div class="cw-detail-item">
+              <div class="cw-detail-lbl">Short Code</div>
+              <div class="cw-detail-val">${displayShortCode}</div>
+            </div>
+            <div class="cw-detail-item">
+              <div class="cw-detail-lbl">Draw Code</div>
+              <div class="cw-detail-val">${displayDrawCode}</div>
+            </div>
+            <div class="cw-detail-item">
+              <div class="cw-detail-lbl">Region</div>
+              <div class="cw-detail-val">${data.region}</div>
+            </div>
+            <div class="cw-detail-item">
+              <div class="cw-detail-lbl">Cluster</div>
+              <div class="cw-detail-val">${data.cluster}</div>
+            </div>
+            <div class="cw-detail-item">
+              <div class="cw-detail-lbl">Draw Date</div>
+              <div class="cw-detail-val">${data.drawDate}</div>
+            </div>
+            <div class="cw-detail-item">
+              <div class="cw-detail-lbl">Prize</div>
+              <div class="cw-detail-val" style="${isWinner ? 'color:#d97706;' : ''}">${data.prize}</div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('cwEmptyResult').style.display = 'none';
+      activeResult.classList.add('active');
+      if (typeof lucide !== 'undefined' && lucide.createIcons) lucide.createIcons();
+
+      // Fire confetti for winners
+      if (isWinner) launchConfetti();
+    }
+
+    function launchConfetti() {
+      const container = document.createElement('div');
+      container.className = 'confetti-container';
+      document.body.appendChild(container);
+      const colors = ['#f59e0b','#d97706','#fbbf24','#239150','#2fc56d','#ef4444','#3b82f6','#8b5cf6'];
+      for (let i = 0; i < 60; i++) {
+        const piece = document.createElement('div');
+        piece.className = 'confetti-piece';
+        piece.style.left = Math.random() * 100 + '%';
+        piece.style.top = '-10px';
+        piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+        piece.style.width = (6 + Math.random() * 8) + 'px';
+        piece.style.height = (6 + Math.random() * 8) + 'px';
+        piece.style.animationDelay = (Math.random() * 0.8) + 's';
+        piece.style.animationDuration = (1.5 + Math.random() * 1.5) + 's';
+        container.appendChild(piece);
+      }
+      setTimeout(() => container.remove(), 3500);
+    }
 
     window.addEventListener('DOMContentLoaded', () => {
       populateReasonDropdown();
