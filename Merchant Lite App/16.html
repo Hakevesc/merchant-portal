@@ -316,7 +316,7 @@
   <!-- Hero summary -->
   <div class="hero-card">
     <div class="hero-thumb">
-      <img id="heroImg" src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&h=400&fit=crop" alt="Smartphone">
+      <img id="heroImg" src="assets/smartphone.jpg" alt="Smartphone">
     </div>
     <div class="hero-body">
       <div class="hero-title" id="heroTitle">Smartphone</div>
@@ -406,10 +406,8 @@
     var NEED  = parseInt(q.get('pts')   || '6667',  10);
     var VALUE = parseInt(q.get('value') || '5000',  10);
     var NAME  = q.get('name') || 'Smartphone';
-    var IMG   = q.get('img')  || 'photo-1511707171634-5f897ff02aa9';
-    if (!/^https?:/i.test(IMG)) {
-      IMG = 'https://images.unsplash.com/' + IMG.replace(/^\/+/, '') + '?w=400&h=400&fit=crop';
-    }
+    /* A relative asset path or an absolute URL both pass through untouched. */
+    var IMG   = q.get('img')  || 'assets/smartphone.jpg';
 
     var n = function (v) { return v.toLocaleString('en-US'); };
     var shortfall = Math.max(0, NEED - HAVE);
