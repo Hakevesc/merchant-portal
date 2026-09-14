@@ -1,0 +1,1255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reward Fulfilment — Merchant Loyalty</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="portal.css" />
+  <link rel="stylesheet" href="loyalty.css" />
+  <style>
+    .fl-head { display: flex; align-items: center; gap: 14px; margin-bottom: 22px; }
+    .fl-head .icon-wrap-green, .fl-head .icon-wrap-amber, .fl-head .icon-wrap-slate {
+      margin: 0; width: 48px; height: 48px; border-radius: 14px;
+    }
+    .fl-head .card-title { font-size: 1.15rem; margin-bottom: 2px; }
+    .fl-head .card-subtitle { font-size: 0.83rem; }
+    .fl-scope-note {
+      display: flex; align-items: center; gap: 8px;
+      background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 12px;
+      padding: 10px 15px; margin-bottom: 20px;
+      font-size: 0.8rem; font-weight: 600; color: #1d4ed8;
+    }
+    .fl-scope-note [data-lucide] { width: 15px; height: 15px; flex-shrink: 0; }
+    .fl-demo-code {
+      text-align: center; font-size: 0.72rem; font-weight: 600; color: #94a3b8; margin-top: 14px;
+    }
+    .fl-demo-code button {
+      background: none; border: none; color: #64748b; font-family: 'Barlow', sans-serif;
+      font-size: 0.72rem; font-weight: 800; cursor: pointer; text-decoration: underline;
+    }
+    .fl-demo-code code {
+      font-family: monospace; font-weight: 800; color: #0f172a;
+      background: #f1f5f9; padding: 2px 7px; border-radius: 6px;
+    }
+  </style>
+</head>
+<body class="portal-body">
+
+  <!-- Topbar -->
+  <div class="portal-topbar">
+    <div class="brand" style="display:flex;align-items:center;gap:16px;position:relative;z-index:1;">
+      <div class="logo-wrapper" style="display:flex;align-items:center;justify-content:center;background:#fff;border-radius:14px;padding:9px 18px;box-shadow:0 4px 14px rgba(0,0,0,0.16);">
+        <img src="M-Pesa-Logo.png" alt="M-PESA" style="height:30px;object-fit:contain;display:block;" />
+      </div>
+      <span class="brand-title" style="font-family:'Barlow',sans-serif;font-weight:800;font-size:1.05rem;letter-spacing:.6px;text-transform:uppercase;color:#fff;padding-left:16px;border-left:2px solid rgba(255,255,255,0.28);line-height:1.15;">Merchant Loyalty</span>
+    </div>
+    <div class="topbar-right" id="topbarRight" style="position:relative;z-index:1;">
+      <a href="#" class="logout-btn" onclick="LP.logout();return false;"><i data-lucide="log-out" style="width:16px;height:16px;stroke-width:2.5;"></i> Logout</a>
+    </div>
+  </div>
+
+  <!-- Breadcrumb -->
+  <div class="portal-nav">
+    <a href="home.html"><i data-lucide="home" style="width:16px;height:16px;vertical-align:middle;margin-right:4px;"></i> Home</a>
+    &nbsp;›&nbsp;
+    <span>Merchant Loyalty</span>
+    &nbsp;›&nbsp;
+    <span class="crumb-active" id="breadcrumbActive">Reward Fulfilment</span>
+  </div>
+
+  <div class="portal-wrap" id="portalWrap">
+
+    <div class="tab-bar" id="tabBar"></div>
+
+    <!-- ══ PANEL: Fulfilment pipeline ══ -->
+    <div class="tab-panel active" id="panel-fulfilment">
+      <div id="flScopeNote"></div>
+      <div class="lp-kpi-row cols-6" id="flKpis"></div>
+
+      <div class="el-card">
+        <div class="lp-card-bar">
+          <div>
+            <h2 class="card-title">Reward Fulfilment</h2>
+            <p class="card-subtitle">Track every reward from allocation through OTP-verified merchant handover.</p>
+          </div>
+          <span class="records-badge" id="flCount">0 records</span>
+        </div>
+
+        <div class="lp-filter-row">
+          <div class="search-input-wrapper">
+            <i data-lucide="search" class="search-icon"></i>
+            <input type="text" id="flSearch" placeholder="Search short code, merchant, reward ID or redemption ref…" oninput="renderFulfilment()" />
+          </div>
+          <select class="form-select" id="flStatus" onchange="renderFulfilment()"></select>
+          <select class="form-select" id="flTdr" onchange="renderFulfilment()"></select>
+          <select class="form-select" id="flType" onchange="renderFulfilment()"></select>
+        </div>
+        <button class="lp-filter-reset" onclick="resetFilters()"><i data-lucide="rotate-ccw"></i> Reset filters</button>
+
+        <div class="table-responsive">
+          <table class="premium-table">
+            <thead><tr>
+              <th>Reward ID</th><th>Merchant</th><th>Short Code</th><th>Reward / Item</th>
+              <th>Redemption Ref</th><th>Assigned TDR / RSM</th><th>Status</th><th class="text-right">Action</th>
+            </tr></thead>
+            <tbody id="flBody"></tbody>
+          </table>
+        </div>
+        <div id="flEmpty" class="empty-state" style="display:none;">
+          <i data-lucide="package-search" class="empty-icon"></i>
+          <h3>No Fulfilment Records</h3>
+          <p>No records match the current filters.</p>
+        </div>
+
+        <div class="lp-pagination" id="flPagination"></div>
+      </div>
+    </div>
+
+    <!-- ══ PANEL: Inventory ══ -->
+    <div class="tab-panel" id="panel-inventory">
+      <div class="el-card">
+        <div class="lp-card-bar">
+          <div>
+            <h2 class="card-title">Reward Inventory</h2>
+            <p class="card-subtitle">Available, allocated, dispatched and fulfilled quantities per reward item.</p>
+          </div>
+          <button class="lp-row-btn" onclick="openInventoryModal()"><i data-lucide="plus"></i> Add Reward Item</button>
+        </div>
+        <div class="table-responsive">
+          <table class="premium-table">
+            <thead><tr>
+              <th>Reward ID</th><th>Reward Item</th><th>Category</th>
+              <th>Available</th><th>Allocated</th><th>Dispatched</th><th>Fulfilled</th>
+              <th>Status</th><th class="text-right">Action</th>
+            </tr></thead>
+            <tbody id="invBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ PANEL: Redemptions ══ -->
+    <div class="tab-panel" id="panel-redemptions">
+      <div class="el-card">
+        <div class="lp-card-bar">
+          <div>
+            <h2 class="card-title">Redemptions</h2>
+            <p class="card-subtitle">Redemption records from the loyalty engine. Allocate a reward to start fulfilment.</p>
+          </div>
+          <span class="records-badge" id="rdmCount">0 records</span>
+        </div>
+        <div class="table-search-bar">
+          <div class="search-input-wrapper">
+            <i data-lucide="search" class="search-icon"></i>
+            <input type="text" id="rdmSearch" placeholder="Search short code, merchant or redemption ref…" oninput="renderRedemptions()" />
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table class="premium-table">
+            <thead><tr>
+              <th>Short Code</th><th>Merchant</th><th>Campaign</th><th>Points Earned</th><th>Points Redeemed</th>
+              <th>Redemption Ref</th><th>Redemption Date</th><th>Reward / Item</th><th>Status</th><th class="text-right">Action</th>
+            </tr></thead>
+            <tbody id="rdmBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ PANEL: Audit ══ -->
+    <div class="tab-panel" id="panel-audit">
+      <div class="el-card">
+        <div class="lp-card-bar">
+          <div>
+            <h2 class="card-title">Audit Trail</h2>
+            <p class="card-subtitle">Every Care Desk search and fulfilment action, traceable to user, date and time.</p>
+          </div>
+          <span class="records-badge" id="audCount">0 entries</span>
+        </div>
+        <div class="lp-filter-row">
+          <div class="search-input-wrapper">
+            <i data-lucide="search" class="search-icon"></i>
+            <input type="text" id="audSearch" placeholder="Search user, action or target…" oninput="renderAudit()" />
+          </div>
+          <select class="form-select" id="audAction" onchange="renderAudit()"></select>
+          <select class="form-select" id="audOutcome" onchange="renderAudit()"></select>
+        </div>
+        <div class="table-responsive">
+          <table class="premium-table">
+            <thead><tr>
+              <th>Timestamp</th><th>User</th><th>Role</th><th>Action</th><th>Target</th><th>Outcome</th>
+            </tr></thead>
+            <tbody id="audBody"></tbody>
+          </table>
+        </div>
+        <div id="audEmpty" class="empty-state" style="display:none;">
+          <i data-lucide="scroll-text" class="empty-icon"></i>
+          <h3>No Audit Entries</h3>
+          <p>Actions performed in this session will appear here.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══════════════ MODALS ══════════════ -->
+
+  <!-- Allocate -->
+  <div class="modal-overlay" id="allocateModal">
+    <div class="p-modal wide">
+      <div class="modal-icon-wrap green"><i data-lucide="user-check"></i></div>
+      <h3>Allocate Reward</h3>
+      <p>Assign this redemption's reward to a TDR / RSM for fulfilment.</p>
+      <div class="lp-modal-note">
+        <div class="lp-modal-note-lbl">Redemption</div>
+        <div class="lp-modal-note-val" id="alcSummary">—</div>
+      </div>
+      <div class="lp-modal-grid">
+        <div class="form-group">
+          <label class="form-label" for="alcTdr">Assign to TDR / RSM</label>
+          <select class="form-select no-icon" id="alcTdr"></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="alcDate">Allocation Date</label>
+          <input type="date" class="form-input no-icon" id="alcDate" />
+        </div>
+      </div>
+      <div class="modal-btns">
+        <button class="btn-confirm-green" onclick="confirmAllocate()">Allocate Reward</button>
+        <button class="btn-cancel" onclick="LP.closeModal('allocateModal')">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dispatch -->
+  <div class="modal-overlay" id="dispatchModal">
+    <div class="p-modal wide">
+      <div class="modal-icon-wrap green"><i data-lucide="truck"></i></div>
+      <h3>Dispatch Reward</h3>
+      <p>Record the physical dispatch of this reward to the assigned TDR / RSM.</p>
+      <div class="lp-modal-note">
+        <div class="lp-modal-note-lbl">Reward</div>
+        <div class="lp-modal-note-val" id="dspSummary">—</div>
+      </div>
+      <div class="lp-modal-grid">
+        <div class="form-group">
+          <label class="form-label" for="dspRef">Dispatch Reference</label>
+          <input type="text" class="form-input no-icon" id="dspRef" readonly />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="dspDate">Dispatch Date</label>
+          <input type="date" class="form-input no-icon" id="dspDate" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="dspFrom">From Location</label>
+          <input type="text" class="form-input no-icon" id="dspFrom" value="Central Warehouse — Addis Ababa" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="dspTo">Destination</label>
+          <input type="text" class="form-input no-icon" id="dspTo" placeholder="e.g. Bole Zone Office" />
+        </div>
+      </div>
+      <div class="modal-btns">
+        <button class="btn-confirm-green" onclick="confirmDispatch()">Confirm Dispatch</button>
+        <button class="btn-cancel" onclick="LP.closeModal('dispatchModal')">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirm receipt -->
+  <div class="modal-overlay" id="receiptModal">
+    <div class="p-modal wide">
+      <div class="modal-icon-wrap green"><i data-lucide="package-check"></i></div>
+      <h3>Confirm Reward Receipt</h3>
+      <p>Confirm you have physically received this reward. Handover cannot start until receipt is confirmed.</p>
+      <div class="lp-modal-note">
+        <div class="lp-modal-note-lbl">Reward</div>
+        <div class="lp-modal-note-val" id="rcpSummary">—</div>
+      </div>
+      <div class="lp-modal-grid">
+        <div class="form-group">
+          <label class="form-label" for="rcpQty">Quantity Received</label>
+          <input type="number" class="form-input no-icon" id="rcpQty" value="1" min="1" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="rcpDate">Received Date</label>
+          <input type="date" class="form-input no-icon" id="rcpDate" />
+        </div>
+      </div>
+      <div class="modal-btns">
+        <button class="btn-confirm-green" onclick="confirmReceipt()">Confirm Receipt</button>
+        <button class="btn-cancel" onclick="LP.closeModal('receiptModal')">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- OTP handover -->
+  <div class="modal-overlay" id="otpModal">
+    <div class="p-modal">
+      <div class="modal-icon-wrap green"><i data-lucide="smartphone"></i></div>
+      <h3>Merchant Handover</h3>
+      <p id="otpSummary">Ask the merchant for the 6-digit handover code shown in their M-PESA app.</p>
+
+      <div class="lp-otp-timer" id="otpTimer">Valid for <b>05:00</b></div>
+      <div class="lp-otp-row" id="otpRow"></div>
+      <div class="lp-otp-error" id="otpError"></div>
+      <div class="lp-otp-hint">The merchant sees this code in the Merchant Lite app after receiving the item. Entering it completes the handover.</div>
+
+      <div class="modal-btns">
+        <button class="btn-confirm-green" id="otpVerifyBtn" onclick="verifyOtp()">Verify &amp; Complete</button>
+        <button class="btn-cancel" onclick="closeOtp()">Cancel</button>
+      </div>
+
+      <div style="text-align:center;margin-top:14px;">
+        <button class="lp-otp-resend" onclick="resendOtp()"><i data-lucide="refresh-cw"></i> Resend OTP to merchant</button>
+      </div>
+      <div class="fl-demo-code" id="otpDemo"></div>
+    </div>
+  </div>
+
+  <!-- Exception -->
+  <div class="modal-overlay" id="exceptionModal">
+    <div class="p-modal wide">
+      <div class="modal-icon-wrap"><i data-lucide="alert-triangle"></i></div>
+      <h3>Raise Exception</h3>
+      <p>Flag a problem with this fulfilment record. It will move out of the normal lifecycle.</p>
+      <div class="lp-modal-note">
+        <div class="lp-modal-note-lbl">Reward</div>
+        <div class="lp-modal-note-val" id="excSummary">—</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="excType">Exception Type</label>
+        <select class="form-select no-icon" id="excType"></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="excNote">Notes</label>
+        <textarea class="form-input" id="excNote" placeholder="Describe what happened…"></textarea>
+      </div>
+      <div class="modal-btns">
+        <button class="btn-confirm-delete" onclick="confirmException()">Raise Exception</button>
+        <button class="btn-cancel" onclick="LP.closeModal('exceptionModal')">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reassign -->
+  <div class="modal-overlay" id="reassignModal">
+    <div class="p-modal wide">
+      <div class="modal-icon-wrap slate"><i data-lucide="repeat"></i></div>
+      <h3>Reassign Reward</h3>
+      <p>Return this record to the fulfilment pipeline under a new TDR / RSM.</p>
+      <div class="lp-modal-note">
+        <div class="lp-modal-note-lbl">Reward</div>
+        <div class="lp-modal-note-val" id="rsnSummary">—</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="rsnTdr">Reassign to</label>
+        <select class="form-select no-icon" id="rsnTdr"></select>
+      </div>
+      <div class="modal-btns">
+        <button class="btn-confirm-green" onclick="confirmReassign()">Reassign</button>
+        <button class="btn-cancel" onclick="LP.closeModal('reassignModal')">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Inventory add / update -->
+  <div class="modal-overlay" id="inventoryModal">
+    <div class="p-modal wide">
+      <div class="modal-icon-wrap green"><i data-lucide="package-plus"></i></div>
+      <h3 id="invModalTitle">Add Reward Item</h3>
+      <p id="invModalSub">Add a new reward to inventory.</p>
+      <div class="lp-modal-grid">
+        <div class="form-group">
+          <label class="form-label" for="invItem">Reward Item</label>
+          <input type="text" class="form-input no-icon" id="invItem" placeholder="e.g. Smartphone — Tecno Spark 20" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="invCategory">Category</label>
+          <select class="form-select no-icon" id="invCategory">
+            <option>Electronics</option><option>Float</option><option>Appliances</option><option>Airtime</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="invStock">Total Stock Quantity</label>
+          <input type="number" class="form-input no-icon" id="invStock" value="10" min="0" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="invStatus">Status</label>
+          <select class="form-select no-icon" id="invStatus">
+            <option>Active</option><option>Out of Stock</option><option>Discontinued</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-btns">
+        <button class="btn-confirm-green" onclick="confirmInventory()" id="invSaveBtn">Add Item</button>
+        <button class="btn-cancel" onclick="LP.closeModal('inventoryModal')">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Record detail -->
+  <div class="modal-overlay" id="detailModal">
+    <div class="p-modal xwide">
+      <button class="lp-modal-close" onclick="LP.closeModal('detailModal')" aria-label="Close"><i data-lucide="x"></i></button>
+      <div class="lp-modal-scroll">
+        <div class="modal-icon-wrap slate"><i data-lucide="file-text"></i></div>
+        <h3 id="detTitle">Fulfilment Record</h3>
+        <p id="detSub">—</p>
+        <div id="detStepper"></div>
+        <div class="res-grid cols-3" id="detGrid"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="loyalty-data.js"></script>
+  <script>
+    /* ── Access control ─────────────────────────────── */
+    var ROLE = LP.requireLogin();
+    var IS_ADMIN = LP.can(['admin']);
+    var IS_TDR   = LP.can(['tdr']);
+    var AUTHORIZED = LP.can(['admin', 'tdr']);
+
+    var TAB_DEFS = [
+      { key: 'fulfilment',  label: 'Fulfilment',  icon: 'package-check', roles: ['admin', 'tdr'] },
+      { key: 'inventory',   label: 'Inventory',   icon: 'boxes',         roles: ['admin'] },
+      { key: 'redemptions', label: 'Redemptions', icon: 'gift',          roles: ['admin'] },
+      { key: 'audit',       label: 'Audit Trail', icon: 'scroll-text',   roles: ['admin'] }
+    ];
+    var TAB_LABELS = {
+      fulfilment: 'Reward Fulfilment', inventory: 'Reward Inventory',
+      redemptions: 'Redemptions', audit: 'Audit Trail'
+    };
+
+    var PAGE_SIZE = 8;
+    var flPage = 1;
+    var activeStatusFilter = '';
+    var currentRecordId = null;
+    var currentRedemptionRef = null;
+    var currentInventoryId = null;
+    var otpTimerHandle = null;
+
+    /* ── Tabs ───────────────────────────────────────── */
+    function buildTabs() {
+      var bar = document.getElementById('tabBar');
+      var html = '';
+      TAB_DEFS.forEach(function (t) {
+        if (t.roles.indexOf(ROLE) === -1) {
+          var panel = document.getElementById('panel-' + t.key);
+          if (panel) panel.remove();
+          return;
+        }
+        html += '<button class="tab-btn" id="tab-' + t.key + '" onclick="switchTab(\'' + t.key + '\')">' +
+                  '<i data-lucide="' + t.icon + '"></i> ' + t.label + '</button>';
+      });
+      bar.innerHTML = html;
+    }
+
+    function switchTab(tab) {
+      if (!document.getElementById('panel-' + tab)) tab = 'fulfilment';
+      document.querySelectorAll('.tab-btn').forEach(function (b) { b.classList.remove('active'); });
+      document.querySelectorAll('.tab-panel').forEach(function (p) { p.classList.remove('active'); });
+      var btn = document.getElementById('tab-' + tab);
+      var panel = document.getElementById('panel-' + tab);
+      if (btn) btn.classList.add('active');
+      if (panel) panel.classList.add('active');
+      document.getElementById('breadcrumbActive').textContent = TAB_LABELS[tab] || tab;
+      history.replaceState(null, '', '#' + tab);
+      renderTab(tab);
+      LP.icons();
+    }
+
+    function renderTab(tab) {
+      if (tab === 'fulfilment') renderFulfilment();
+      else if (tab === 'inventory') renderInventory();
+      else if (tab === 'redemptions') renderRedemptions();
+      else if (tab === 'audit') renderAudit();
+    }
+
+    function refresh() {
+      var active = document.querySelector('.tab-panel.active');
+      renderTab(active ? active.id.replace('panel-', '') : 'fulfilment');
+    }
+
+    /* ── Filters ────────────────────────────────────── */
+    function buildFilters() {
+      var st = document.getElementById('flStatus');
+      st.innerHTML = '<option value="">All statuses</option>' +
+        Object.keys(LP.STATUS_LABELS).filter(function (k) { return k !== 'available'; })
+          .map(function (k) { return '<option value="' + k + '">' + LP.STATUS_LABELS[k] + '</option>'; }).join('');
+
+      var td = document.getElementById('flTdr');
+      if (IS_TDR) {
+        td.innerHTML = '<option value="' + LP.CURRENT_TDR + '">' + LP.tdrName(LP.CURRENT_TDR) + '</option>';
+        td.disabled = true;
+      } else {
+        td.innerHTML = '<option value="">All TDR / RSM</option>' +
+          LP.TDRS.map(function (t) { return '<option value="' + t.id + '">' + t.name + ' (' + t.id + ')</option>'; }).join('');
+      }
+
+      var types = {};
+      LP.state().inventory.forEach(function (i) { types[i.category] = true; });
+      document.getElementById('flType').innerHTML = '<option value="">All reward types</option>' +
+        Object.keys(types).map(function (c) { return '<option value="' + c + '">' + c + '</option>'; }).join('');
+    }
+
+    function resetFilters() {
+      document.getElementById('flSearch').value = '';
+      document.getElementById('flStatus').value = '';
+      if (!IS_TDR) document.getElementById('flTdr').value = '';
+      document.getElementById('flType').value = '';
+      activeStatusFilter = '';
+      flPage = 1;
+      renderFulfilment();
+    }
+
+    function filterByStatus(status) {
+      activeStatusFilter = (activeStatusFilter === status) ? '' : status;
+      document.getElementById('flStatus').value = activeStatusFilter;
+      flPage = 1;
+      renderFulfilment();
+    }
+
+    /* ── KPI strip ──────────────────────────────────── */
+    function renderKpis() {
+      var c = LP.statusCounts();
+      var tiles = [
+        ['allocated', 'Allocated', 'user-check', ''],
+        ['dispatched', 'Dispatched', 'truck', ''],
+        ['received', 'Received', 'package-check', ''],
+        ['pending', 'Pending Handover', 'clock', 'tone-amber'],
+        ['fulfilled', 'Fulfilled', 'check-circle', 'tone-green'],
+        ['exception', 'Exceptions', 'alert-triangle', 'tone-red']
+      ];
+      document.getElementById('flKpis').innerHTML = tiles.map(function (t) {
+        var isActive = activeStatusFilter === t[0];
+        return '<button class="lp-kpi ' + t[3] + (isActive ? ' active' : '') + '" onclick="filterByStatus(\'' + t[0] + '\')">' +
+          '<div class="lp-kpi-icon"><i data-lucide="' + t[2] + '"></i></div>' +
+          '<div class="lp-kpi-val">' + c[t[0]] + '</div>' +
+          '<div class="lp-kpi-lbl">' + t[1] + '</div>' +
+        '</button>';
+      }).join('');
+    }
+
+    /* ── Fulfilment table ───────────────────────────── */
+    function renderFulfilment() {
+      renderKpis();
+
+      var q = (document.getElementById('flSearch').value || '').toLowerCase().trim();
+      var status = document.getElementById('flStatus').value;
+      var tdrSel = IS_TDR ? '' : document.getElementById('flTdr').value;
+      var type = document.getElementById('flType').value;
+      activeStatusFilter = status;
+
+      var rows = LP.visibleRecords().filter(function (r) {
+        if (status && r.status !== status) return false;
+        if (tdrSel && r.tdr !== tdrSel) return false;
+        if (type) {
+          var inv = LP.inventoryItem(r.rewardItemId);
+          if (!inv || inv.category !== type) return false;
+        }
+        if (q) {
+          var hay = [r.id, r.shortCode, LP.merchantName(r.shortCode), r.item, r.redemptionRef, LP.tdrName(r.tdr)]
+            .join(' ').toLowerCase();
+          if (hay.indexOf(q) === -1) return false;
+        }
+        return true;
+      });
+
+      document.getElementById('flCount').textContent = rows.length + (rows.length === 1 ? ' record' : ' records');
+
+      var pages = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
+      if (flPage > pages) flPage = pages;
+      var slice = rows.slice((flPage - 1) * PAGE_SIZE, flPage * PAGE_SIZE);
+
+      var tbody = document.getElementById('flBody');
+      var empty = document.getElementById('flEmpty');
+      var wrap = tbody.closest('.table-responsive');
+
+      if (rows.length === 0) {
+        tbody.innerHTML = '';
+        wrap.style.display = 'none';
+        empty.style.display = 'block';
+      } else {
+        wrap.style.display = 'block';
+        empty.style.display = 'none';
+        tbody.innerHTML = slice.map(function (r) {
+          return '<tr class="fade-in-row clickable" onclick="openDetail(\'' + r.id + '\')">' +
+            '<td><strong>' + LP.esc(r.id) + '</strong></td>' +
+            '<td>' + LP.esc(LP.merchantName(r.shortCode)) + '</td>' +
+            '<td>' + LP.esc(r.shortCode) + '</td>' +
+            '<td>' + LP.esc(r.item) + '</td>' +
+            '<td><span class="lp-mono">' + LP.esc(r.redemptionRef) + '</span></td>' +
+            '<td class="lp-muted">' + LP.esc(LP.tdrName(r.tdr)) + '</td>' +
+            '<td>' + LP.chip(r.status) + '</td>' +
+            '<td class="text-right" onclick="event.stopPropagation()">' + rowActions(r) + '</td>' +
+          '</tr>';
+        }).join('');
+      }
+
+      renderPagination(rows.length, pages);
+      LP.icons();
+    }
+
+    /* One action per row, decided by the record's status and the viewer's role. */
+    function rowActions(r) {
+      var btns = [];
+      if (r.status === 'allocated' && IS_ADMIN)
+        btns.push(btn('Dispatch', 'truck', "openDispatch('" + r.id + "')", ''));
+      if (r.status === 'dispatched' && IS_TDR)
+        btns.push(btn('Confirm Receipt', 'package-check', "openReceipt('" + r.id + "')", ''));
+      if (r.status === 'received' && IS_TDR)
+        btns.push(btn('Start Handover', 'smartphone', "startHandover('" + r.id + "')", ''));
+      if (r.status === 'pending' && IS_TDR)
+        btns.push(btn('Enter OTP', 'key-round', "openOtp('" + r.id + "')", 'amber'));
+      if (r.status === 'exception' && IS_ADMIN)
+        btns.push(btn('Reassign', 'repeat', "openReassign('" + r.id + "')", 'ghost'));
+      if (IS_ADMIN && ['fulfilled', 'exception', 'cancelled'].indexOf(r.status) === -1)
+        btns.push(btn('Exception', 'alert-triangle', "openException('" + r.id + "')", 'danger'));
+      if (btns.length === 0)
+        btns.push(btn('View', 'eye', "openDetail('" + r.id + "')", 'ghost'));
+      return '<div class="lp-row-actions">' + btns.join('') + '</div>';
+    }
+
+    function btn(label, icon, onclick, tone) {
+      return '<button class="lp-row-btn ' + tone + '" onclick="' + onclick + '">' +
+             '<i data-lucide="' + icon + '"></i> ' + label + '</button>';
+    }
+
+    function renderPagination(total, pages) {
+      var from = total === 0 ? 0 : (flPage - 1) * PAGE_SIZE + 1;
+      var to = Math.min(flPage * PAGE_SIZE, total);
+      document.getElementById('flPagination').innerHTML =
+        '<span class="pg-info">Showing ' + from + '–' + to + ' of ' + total + '</span>' +
+        '<div class="lp-pager">' +
+          '<button class="pg-btn" ' + (flPage <= 1 ? 'disabled' : '') + ' onclick="gotoPage(' + (flPage - 1) + ')">' +
+            '<i data-lucide="chevron-left"></i> Prev</button>' +
+          '<span class="pg-info">Page ' + flPage + ' of ' + pages + '</span>' +
+          '<button class="pg-btn" ' + (flPage >= pages ? 'disabled' : '') + ' onclick="gotoPage(' + (flPage + 1) + ')">' +
+            'Next <i data-lucide="chevron-right"></i></button>' +
+        '</div>';
+    }
+    function gotoPage(p) { flPage = p; renderFulfilment(); }
+
+    /* ── Inventory ──────────────────────────────────── */
+    function renderInventory() {
+      var inv = LP.state().inventory;
+      document.getElementById('invBody').innerHTML = inv.map(function (i) {
+        var c = LP.inventoryCounts(i.id);
+        var avail = LP.availableStock(i.id);
+        var status = avail === 0 ? 'Out of Stock' : i.status;
+        var tone = avail === 0 ? 'lp-chip-exception' : 'lp-chip-fulfilled';
+        return '<tr class="fade-in-row">' +
+          '<td><strong>' + LP.esc(i.id) + '</strong></td>' +
+          '<td>' + LP.esc(i.item) + '</td>' +
+          '<td class="lp-muted">' + LP.esc(i.category) + '</td>' +
+          '<td><strong>' + avail + '</strong></td>' +
+          '<td>' + c.allocated + '</td>' +
+          '<td>' + c.dispatched + '</td>' +
+          '<td>' + c.fulfilled + '</td>' +
+          '<td><span class="lp-chip ' + tone + '">' + LP.esc(status) + '</span></td>' +
+          '<td class="text-right"><button class="lp-row-btn ghost" onclick="openInventoryModal(\'' + i.id + '\')">' +
+            '<i data-lucide="pencil"></i> Update</button></td>' +
+        '</tr>';
+      }).join('');
+      LP.icons();
+    }
+
+    function openInventoryModal(id) {
+      currentInventoryId = id || null;
+      var t = document.getElementById('invModalTitle');
+      var s = document.getElementById('invModalSub');
+      var save = document.getElementById('invSaveBtn');
+      if (id) {
+        var i = LP.inventoryItem(id);
+        t.textContent = 'Update Reward Item';
+        s.textContent = 'Update stock and status for ' + i.id + '.';
+        save.textContent = 'Save Changes';
+        document.getElementById('invItem').value = i.item;
+        document.getElementById('invCategory').value = i.category;
+        document.getElementById('invStock').value = i.stock;
+        document.getElementById('invStatus').value = i.status;
+      } else {
+        t.textContent = 'Add Reward Item';
+        s.textContent = 'Add a new reward to inventory.';
+        save.textContent = 'Add Item';
+        document.getElementById('invItem').value = '';
+        document.getElementById('invStock').value = 10;
+        document.getElementById('invStatus').value = 'Active';
+      }
+      LP.openModal('inventoryModal');
+    }
+
+    function confirmInventory() {
+      var item = document.getElementById('invItem').value.trim();
+      var category = document.getElementById('invCategory').value;
+      var stock = parseInt(document.getElementById('invStock').value, 10);
+      var status = document.getElementById('invStatus').value;
+
+      if (!item) { LP.toast('Missing item name', 'Enter a reward item name.', 'error'); return; }
+      if (isNaN(stock) || stock < 0) { LP.toast('Invalid quantity', 'Stock quantity must be zero or more.', 'error'); return; }
+
+      var s = LP.state();
+      if (currentInventoryId) {
+        var i = LP.inventoryItem(currentInventoryId);
+        i.item = item; i.category = category; i.stock = stock; i.status = status;
+        LP.save();
+        LP.audit('Inventory updated', i.id + ' · ' + item, 'Success');
+        LP.toast('Inventory updated', item + ' now has ' + stock + ' in stock.');
+      } else {
+        var id = 'RWD-' + category.substring(0, 2).toUpperCase() + '-' + LP.pad(s.inventory.length + 1, 2);
+        s.inventory.push({ id: id, item: item, category: category, stock: stock, status: status });
+        LP.save();
+        LP.audit('Reward created', id + ' · ' + item, 'Success');
+        LP.toast('Reward added', item + ' added to inventory.');
+      }
+      LP.closeModal('inventoryModal');
+      buildFilters();
+      refresh();
+    }
+
+    /* ── Redemptions ────────────────────────────────── */
+    function renderRedemptions() {
+      var q = (document.getElementById('rdmSearch').value || '').toLowerCase().trim();
+      var rows = LP.state().redemptions.filter(function (r) {
+        if (!q) return true;
+        return [r.shortCode, LP.merchantName(r.shortCode), r.ref, r.item].join(' ').toLowerCase().indexOf(q) !== -1;
+      });
+
+      document.getElementById('rdmCount').textContent = rows.length + (rows.length === 1 ? ' record' : ' records');
+      document.getElementById('rdmBody').innerHTML = rows.map(function (r) {
+        var ful = LP.fulfilmentFor(r.ref);
+        var pts = LP.pointsFor(r.shortCode);
+        var statusCell = ful
+          ? LP.chip(ful.status)
+          : '<span class="lp-chip lp-chip-available"><i data-lucide="package"></i> Not Allocated</span>';
+        var action = ful
+          ? btn('View', 'eye', "openDetail('" + ful.id + "')", 'ghost')
+          : btn('Allocate', 'user-check', "openAllocate('" + r.ref + "')", '');
+        return '<tr class="fade-in-row">' +
+          '<td><strong>' + LP.esc(r.shortCode) + '</strong></td>' +
+          '<td>' + LP.esc(LP.merchantName(r.shortCode)) + '</td>' +
+          '<td class="lp-muted">' + LP.esc(LP.CAMPAIGN) + '</td>' +
+          '<td>' + (pts ? LP.points(pts.earned) : '—') + '</td>' +
+          '<td>' + LP.points(r.points) + '</td>' +
+          '<td><span class="lp-mono">' + LP.esc(r.ref) + '</span></td>' +
+          '<td>' + LP.esc(r.date) + '</td>' +
+          '<td>' + LP.esc(r.item) + '</td>' +
+          '<td>' + statusCell + '</td>' +
+          '<td class="text-right"><div class="lp-row-actions">' + action + '</div></td>' +
+        '</tr>';
+      }).join('');
+      LP.icons();
+    }
+
+    /* ── Allocate ───────────────────────────────────── */
+    function openAllocate(ref) {
+      var r = LP.redemption(ref);
+      if (!r) return;
+
+      /* A reward cannot be allocated without available inventory. */
+      if (LP.availableStock(r.rewardItemId) <= 0) {
+        LP.toast('Reward unavailable', 'There is no available inventory for ' + r.item + '.', 'error');
+        LP.audit('Reward allocation blocked', ref + ' · ' + r.item, 'Reward unavailable');
+        refresh();
+        return;
+      }
+
+      currentRedemptionRef = ref;
+      document.getElementById('alcSummary').textContent =
+        r.ref + ' · ' + LP.merchantName(r.shortCode) + ' (' + r.shortCode + ') · ' + r.item;
+      document.getElementById('alcTdr').innerHTML =
+        LP.TDRS.map(function (t) { return '<option value="' + t.id + '">' + t.name + ' (' + t.id + ') — ' + t.region + '</option>'; }).join('');
+      document.getElementById('alcDate').value = LP.today();
+      LP.openModal('allocateModal');
+    }
+
+    function confirmAllocate() {
+      var r = LP.redemption(currentRedemptionRef);
+      if (!r) return;
+      var tdrId = document.getElementById('alcTdr').value;
+      var date = document.getElementById('alcDate').value || LP.today();
+
+      var s = LP.state();
+      var id = LP.nextFulfilmentId();
+      s.fulfilment.unshift({
+        id: id, redemptionRef: r.ref, shortCode: r.shortCode,
+        rewardItemId: r.rewardItemId, item: r.item,
+        tdr: tdrId, status: 'allocated',
+        allocatedAt: date, dispatchRef: null, dispatchedAt: null,
+        fromLocation: null, toLocation: null, receivedAt: null, handoverAt: null,
+        txnRef: null, otpVerified: false, otp: null, otpExpiresAt: null, otpAttempts: 0
+      });
+      LP.save();
+      LP.audit('Reward allocated', id + ' · ' + r.ref + ' → ' + LP.tdrName(tdrId), 'Success');
+      LP.toast('Reward allocated', id + ' assigned to ' + LP.tdrName(tdrId) + '.');
+      LP.closeModal('allocateModal');
+      refresh();
+    }
+
+    /* ── Dispatch ───────────────────────────────────── */
+    function openDispatch(id) {
+      var r = LP.record(id);
+      if (!r) return;
+      currentRecordId = id;
+      document.getElementById('dspSummary').textContent = r.id + ' · ' + r.item + ' · ' + LP.merchantName(r.shortCode);
+      document.getElementById('dspRef').value = LP.nextDispatchRef();
+      document.getElementById('dspDate').value = LP.today();
+      document.getElementById('dspTo').value = '';
+      LP.openModal('dispatchModal');
+    }
+
+    function confirmDispatch() {
+      var r = LP.record(currentRecordId);
+      if (!r) return;
+      var to = document.getElementById('dspTo').value.trim();
+      if (!to) { LP.toast('Missing destination', 'Enter the destination location.', 'error'); return; }
+
+      r.dispatchRef = document.getElementById('dspRef').value;
+      r.dispatchedAt = document.getElementById('dspDate').value || LP.today();
+      r.fromLocation = document.getElementById('dspFrom').value.trim();
+      r.toLocation = to;
+      r.status = 'dispatched';
+      LP.save();
+      LP.audit('Reward dispatched', r.id + ' · ' + r.dispatchRef + ' → ' + to, 'Success');
+      LP.toast('Reward dispatched', r.id + ' is on its way to ' + to + '.');
+      LP.closeModal('dispatchModal');
+      refresh();
+    }
+
+    /* ── Confirm receipt ────────────────────────────── */
+    function openReceipt(id) {
+      var r = LP.record(id);
+      if (!r) return;
+      currentRecordId = id;
+      document.getElementById('rcpSummary').textContent = r.id + ' · ' + r.item + ' · ' + LP.dash(r.dispatchRef);
+      document.getElementById('rcpQty').value = 1;
+      document.getElementById('rcpDate').value = LP.today();
+      LP.openModal('receiptModal');
+    }
+
+    function confirmReceipt() {
+      var r = LP.record(currentRecordId);
+      if (!r) return;
+      var qty = parseInt(document.getElementById('rcpQty').value, 10);
+      if (isNaN(qty) || qty < 1) { LP.toast('Invalid quantity', 'Quantity received must be at least 1.', 'error'); return; }
+
+      r.receivedAt = document.getElementById('rcpDate').value || LP.today();
+      r.receivedQty = qty;
+      r.status = 'received';
+      LP.save();
+      LP.audit('Receipt confirmed', r.id + ' · qty ' + qty, 'Success');
+      LP.toast('Receipt confirmed', r.id + ' received. You can now start merchant handover.');
+      LP.closeModal('receiptModal');
+      refresh();
+    }
+
+    /* ── Handover + OTP ─────────────────────────────── */
+    var OTP_TTL_MS = 5 * 60 * 1000;
+
+    function randomOtp() {
+      return String(Math.floor(100000 + Math.random() * 900000));
+    }
+
+    /* Received → Pending Handover: generate the code the merchant will see. */
+    function startHandover(id) {
+      var r = LP.record(id);
+      if (!r) return;
+      if (!r.receivedAt) {
+        LP.toast('Receipt required', 'Confirm receipt of the reward before starting handover.', 'error');
+        return;
+      }
+      r.otp = randomOtp();
+      r.otpExpiresAt = Date.now() + OTP_TTL_MS;
+      r.otpAttempts = 0;
+      r.status = 'pending';
+      LP.save();
+      LP.audit('Handover started', r.id + ' · OTP sent to ' + r.shortCode, 'Success');
+      LP.toast('OTP sent', 'A handover code was sent to ' + LP.merchantName(r.shortCode) + '.');
+      refresh();
+      openOtp(id);
+    }
+
+    function openOtp(id) {
+      var r = LP.record(id);
+      if (!r) return;
+      currentRecordId = id;
+
+      document.getElementById('otpSummary').textContent =
+        r.item + ' · ' + LP.merchantName(r.shortCode) + ' (' + r.shortCode + ')';
+
+      var row = document.getElementById('otpRow');
+      row.className = 'lp-otp-row';
+      row.innerHTML = '';
+      for (var i = 0; i < 6; i++) {
+        var box = document.createElement('input');
+        box.type = 'text';
+        box.className = 'lp-otp-box';
+        box.maxLength = 1;
+        box.inputMode = 'numeric';
+        box.autocomplete = 'off';
+        box.dataset.index = i;
+        box.addEventListener('input', onOtpInput);
+        box.addEventListener('keydown', onOtpKeydown);
+        box.addEventListener('paste', onOtpPaste);
+        row.appendChild(box);
+      }
+
+      hideOtpError();
+      document.getElementById('otpVerifyBtn').disabled = false;
+      renderDemoCode(r);
+      startOtpTimer(r);
+      LP.openModal('otpModal');
+      setTimeout(function () { row.firstChild.focus(); }, 80);
+    }
+
+    function renderDemoCode(r) {
+      var el = document.getElementById('otpDemo');
+      el.innerHTML = 'Demo aid — the merchant\'s app is showing: ' +
+        '<button onclick="revealDemoCode()">reveal code</button>' +
+        '<span id="otpDemoVal" style="display:none;"> <code>' + LP.esc(r.otp || '—') + '</code></span>';
+    }
+    function revealDemoCode() {
+      var v = document.getElementById('otpDemoVal');
+      if (v) v.style.display = 'inline';
+    }
+
+    function onOtpInput(e) {
+      var v = e.target.value.replace(/\D/g, '');
+      e.target.value = v.slice(0, 1);
+      e.target.classList.toggle('filled', !!e.target.value);
+      hideOtpError();
+      if (e.target.value && e.target.nextSibling) e.target.nextSibling.focus();
+    }
+    function onOtpKeydown(e) {
+      if (e.key === 'Backspace' && !e.target.value && e.target.previousSibling) {
+        e.target.previousSibling.focus();
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        verifyOtp();
+      }
+    }
+    function onOtpPaste(e) {
+      e.preventDefault();
+      var text = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '').slice(0, 6);
+      var boxes = document.querySelectorAll('#otpRow .lp-otp-box');
+      for (var i = 0; i < boxes.length; i++) {
+        boxes[i].value = text[i] || '';
+        boxes[i].classList.toggle('filled', !!boxes[i].value);
+      }
+      if (text.length) boxes[Math.min(text.length, 5)].focus();
+    }
+
+    function otpValue() {
+      return Array.prototype.map.call(document.querySelectorAll('#otpRow .lp-otp-box'), function (b) { return b.value; }).join('');
+    }
+
+    function startOtpTimer(r) {
+      stopOtpTimer();
+      var el = document.getElementById('otpTimer');
+      function tick() {
+        var left = (r.otpExpiresAt || 0) - Date.now();
+        if (left <= 0) {
+          el.classList.add('expiring');
+          el.innerHTML = 'Code <b>expired</b>';
+          stopOtpTimer();
+          return;
+        }
+        var m = Math.floor(left / 60000), s = Math.floor((left % 60000) / 1000);
+        el.classList.toggle('expiring', left < 60000);
+        el.innerHTML = 'Valid for <b>' + LP.pad(m, 2) + ':' + LP.pad(s, 2) + '</b>';
+      }
+      tick();
+      otpTimerHandle = setInterval(tick, 1000);
+    }
+    function stopOtpTimer() {
+      if (otpTimerHandle) { clearInterval(otpTimerHandle); otpTimerHandle = null; }
+    }
+    function closeOtp() {
+      stopOtpTimer();
+      LP.closeModal('otpModal');
+    }
+
+    function showOtpError(msg, lock) {
+      var e = document.getElementById('otpError');
+      e.textContent = msg;
+      e.classList.add('show');
+      var row = document.getElementById('otpRow');
+      row.classList.add('error');
+      if (lock) {
+        row.classList.add('locked');
+        document.querySelectorAll('#otpRow .lp-otp-box').forEach(function (b) { b.disabled = true; });
+        document.getElementById('otpVerifyBtn').disabled = true;
+      }
+    }
+    function hideOtpError() {
+      document.getElementById('otpError').classList.remove('show');
+      document.getElementById('otpRow').classList.remove('error');
+    }
+
+    var MAX_OTP_ATTEMPTS = 3;
+
+    function verifyOtp() {
+      var r = LP.record(currentRecordId);
+      if (!r) return;
+
+      if (r.otpAttempts >= MAX_OTP_ATTEMPTS) {
+        showOtpError('Maximum OTP attempts exceeded. Raise an exception to continue.', true);
+        return;
+      }
+
+      var code = otpValue();
+      if (code.length < 6) {
+        showOtpError('Enter all six digits of the merchant\'s code.');
+        return;
+      }
+
+      /* Expired codes can never complete a handover. */
+      if (!r.otpExpiresAt || Date.now() > r.otpExpiresAt) {
+        showOtpError('Expired OTP. Ask the merchant for a new code, or resend it.');
+        LP.audit('OTP verification', r.id + ' · ' + r.shortCode, 'Expired OTP');
+        LP.save();
+        return;
+      }
+
+      if (code !== r.otp) {
+        r.otpAttempts = (r.otpAttempts || 0) + 1;
+        LP.save();
+        var left = MAX_OTP_ATTEMPTS - r.otpAttempts;
+        if (left <= 0) {
+          showOtpError('Maximum OTP attempts exceeded. Raise an exception to continue.', true);
+          LP.audit('OTP verification', r.id + ' · ' + r.shortCode, 'Max attempts exceeded');
+        } else {
+          showOtpError('Invalid OTP. ' + left + (left === 1 ? ' attempt' : ' attempts') + ' remaining.');
+          LP.audit('OTP verification', r.id + ' · ' + r.shortCode, 'Invalid OTP');
+        }
+        return;
+      }
+
+      /* Success — Received → Fulfilled */
+      r.otpVerified = true;
+      r.status = 'fulfilled';
+      r.handoverAt = LP.stamp().slice(0, 16);
+      r.txnRef = LP.nextTxnRef();
+      r.otp = null;
+      r.otpExpiresAt = null;
+      LP.save();
+
+      LP.audit('OTP verification', r.id + ' · ' + r.shortCode, 'Verified');
+      LP.audit('Handover completed', r.id + ' · ' + r.txnRef + ' · ' + LP.merchantName(r.shortCode), 'Fulfilled');
+
+      closeOtp();
+      LP.toast('Handover complete', LP.merchantName(r.shortCode) + ' received ' + r.item + '. Ref ' + r.txnRef + '.');
+      refresh();
+      setTimeout(function () { openDetail(r.id); }, 400);
+    }
+
+    function resendOtp() {
+      var r = LP.record(currentRecordId);
+      if (!r) return;
+      r.otp = randomOtp();
+      r.otpExpiresAt = Date.now() + OTP_TTL_MS;
+      r.otpAttempts = 0;
+      LP.save();
+
+      document.querySelectorAll('#otpRow .lp-otp-box').forEach(function (b) {
+        b.value = ''; b.disabled = false; b.classList.remove('filled');
+      });
+      document.getElementById('otpRow').classList.remove('locked');
+      document.getElementById('otpVerifyBtn').disabled = false;
+      hideOtpError();
+      renderDemoCode(r);
+      startOtpTimer(r);
+
+      LP.audit('OTP resent', r.id + ' · ' + r.shortCode, 'Success');
+      LP.toast('OTP resent', 'A new code was sent to ' + LP.merchantName(r.shortCode) + '.');
+      document.querySelector('#otpRow .lp-otp-box').focus();
+    }
+
+    /* ── Exception ──────────────────────────────────── */
+    function openException(id) {
+      var r = LP.record(id);
+      if (!r) return;
+      currentRecordId = id;
+      document.getElementById('excSummary').textContent = r.id + ' · ' + r.item + ' · ' + LP.merchantName(r.shortCode);
+      document.getElementById('excType').innerHTML =
+        LP.EXCEPTION_TYPES.map(function (t) { return '<option>' + t + '</option>'; }).join('');
+      document.getElementById('excNote').value = '';
+      LP.openModal('exceptionModal');
+    }
+
+    function confirmException() {
+      var r = LP.record(currentRecordId);
+      if (!r) return;
+      r.exceptionType = document.getElementById('excType').value;
+      r.exceptionNote = document.getElementById('excNote').value.trim();
+      r.status = 'exception';
+      LP.save();
+      LP.audit('Exception raised', r.id + ' · ' + r.exceptionType, 'Exception');
+      LP.toast('Exception raised', r.id + ' flagged as ' + r.exceptionType + '.', 'error');
+      LP.closeModal('exceptionModal');
+      refresh();
+    }
+
+    /* ── Reassign ───────────────────────────────────── */
+    function openReassign(id) {
+      var r = LP.record(id);
+      if (!r) return;
+      currentRecordId = id;
+      document.getElementById('rsnSummary').textContent =
+        r.id + ' · ' + r.item + ' · currently ' + LP.tdrName(r.tdr);
+      document.getElementById('rsnTdr').innerHTML =
+        LP.TDRS.map(function (t) { return '<option value="' + t.id + '">' + t.name + ' (' + t.id + ') — ' + t.region + '</option>'; }).join('');
+      LP.openModal('reassignModal');
+    }
+
+    function confirmReassign() {
+      var r = LP.record(currentRecordId);
+      if (!r) return;
+      var to = document.getElementById('rsnTdr').value;
+      r.tdr = to;
+      r.status = 'allocated';
+      r.dispatchRef = null; r.dispatchedAt = null; r.receivedAt = null;
+      r.exceptionType = null; r.exceptionNote = null;
+      LP.save();
+      LP.audit('Reward reassigned', r.id + ' → ' + LP.tdrName(to), 'Success');
+      LP.toast('Reward reassigned', r.id + ' reassigned to ' + LP.tdrName(to) + '.');
+      LP.closeModal('reassignModal');
+      refresh();
+    }
+
+    /* ── Detail ─────────────────────────────────────── */
+    function openDetail(id) {
+      var r = LP.record(id);
+      if (!r) return;
+      document.getElementById('detTitle').textContent = r.id + ' — ' + r.item;
+      document.getElementById('detSub').textContent =
+        LP.merchantName(r.shortCode) + ' (' + r.shortCode + ') · ' + r.redemptionRef;
+      document.getElementById('detStepper').innerHTML = LP.stepper(r.status);
+
+      var fields = [
+        ['Reward ID', r.id], ['Redemption Reference', r.redemptionRef],
+        ['Merchant Name', LP.merchantName(r.shortCode)], ['Merchant Short Code', r.shortCode],
+        ['Reward / Item', r.item], ['Reward Item ID', r.rewardItemId],
+        ['Assigned TDR / RSM', LP.tdrName(r.tdr)], ['Fulfilment Status', LP.STATUS_LABELS[r.status]],
+        ['Allocation Date', r.allocatedAt], ['Dispatch Reference', r.dispatchRef],
+        ['Dispatch Date', r.dispatchedAt], ['From Location', r.fromLocation],
+        ['Destination', r.toLocation], ['Received Date', r.receivedAt],
+        ['Handover Date / Time', r.handoverAt],
+        ['OTP Verification', r.otpVerified ? 'Verified' : 'Not verified'],
+        ['Transaction Reference', r.txnRef]
+      ];
+      if (r.status === 'exception') {
+        fields.push(['Exception Type', r.exceptionType], ['Exception Notes', r.exceptionNote]);
+      }
+
+      document.getElementById('detGrid').innerHTML = fields.map(function (f) {
+        return '<div class="res-item"><div class="res-item-lbl">' + LP.esc(f[0]) + '</div>' +
+               '<div class="res-item-val">' + LP.esc(LP.dash(f[1])) + '</div></div>';
+      }).join('');
+
+      LP.openModal('detailModal');
+    }
+
+    /* ── Audit ──────────────────────────────────────── */
+    function renderAudit() {
+      var entries = LP.state().audit;
+      var actions = {}, outcomes = {};
+      entries.forEach(function (e) { actions[e.action] = true; outcomes[e.outcome] = true; });
+
+      var aSel = document.getElementById('audAction');
+      var oSel = document.getElementById('audOutcome');
+      var aVal = aSel.value, oVal = oSel.value;
+      aSel.innerHTML = '<option value="">All actions</option>' +
+        Object.keys(actions).map(function (a) { return '<option>' + LP.esc(a) + '</option>'; }).join('');
+      oSel.innerHTML = '<option value="">All outcomes</option>' +
+        Object.keys(outcomes).map(function (o) { return '<option>' + LP.esc(o) + '</option>'; }).join('');
+      aSel.value = aVal; oSel.value = oVal;
+
+      var q = (document.getElementById('audSearch').value || '').toLowerCase().trim();
+      var rows = entries.filter(function (e) {
+        if (aVal && e.action !== aVal) return false;
+        if (oVal && e.outcome !== oVal) return false;
+        if (q && [e.user, e.action, e.target, e.role].join(' ').toLowerCase().indexOf(q) === -1) return false;
+        return true;
+      });
+
+      document.getElementById('audCount').textContent = rows.length + (rows.length === 1 ? ' entry' : ' entries');
+
+      var tbody = document.getElementById('audBody');
+      var empty = document.getElementById('audEmpty');
+      var wrap = tbody.closest('.table-responsive');
+
+      if (rows.length === 0) {
+        tbody.innerHTML = '';
+        wrap.style.display = 'none';
+        empty.style.display = 'block';
+      } else {
+        wrap.style.display = 'block';
+        empty.style.display = 'none';
+        tbody.innerHTML = rows.map(function (e) {
+          var tone = (e.outcome === 'Success' || e.outcome === 'Verified' || e.outcome === 'Fulfilled')
+            ? 'lp-chip-fulfilled'
+            : (e.outcome === 'Not found' || e.outcome === 'No loyalty record') ? 'lp-chip-available' : 'lp-chip-exception';
+          return '<tr class="fade-in-row">' +
+            '<td><span class="lp-mono">' + LP.esc(e.at) + '</span></td>' +
+            '<td class="lp-muted">' + LP.esc(e.user) + '</td>' +
+            '<td>' + LP.esc(e.role) + '</td>' +
+            '<td><strong>' + LP.esc(e.action) + '</strong></td>' +
+            '<td class="lp-muted">' + LP.esc(e.target) + '</td>' +
+            '<td><span class="lp-chip ' + tone + '">' + LP.esc(e.outcome) + '</span></td>' +
+          '</tr>';
+        }).join('');
+      }
+      LP.icons();
+    }
+
+    /* ── Init ───────────────────────────────────────── */
+    (function init() {
+      if (!ROLE) return;
+      LP.mountRoleChip('topbarRight');
+
+      if (!AUTHORIZED) {
+        document.getElementById('portalWrap').innerHTML =
+          '<div class="el-card"><div class="result-empty is-error">' +
+            '<i data-lucide="shield-off"></i><h3>Access Denied</h3>' +
+            '<p>You are not authorized to access Merchant Loyalty fulfilment.</p>' +
+          '</div></div>';
+        LP.icons();
+        return;
+      }
+
+      buildTabs();
+      buildFilters();
+
+      if (IS_TDR) {
+        document.getElementById('flScopeNote').innerHTML =
+          '<div class="fl-scope-note"><i data-lucide="info"></i> ' +
+          'You are viewing only the fulfilment records assigned to you (' + LP.esc(LP.tdrName(LP.CURRENT_TDR)) + ').</div>';
+        document.getElementById('flTdr').value = LP.CURRENT_TDR;
+      }
+
+      var hash = (window.location.hash || '').replace('#', '');
+      switchTab(document.getElementById('panel-' + hash) ? hash : 'fulfilment');
+
+      /* Escape closes whichever modal is open */
+      document.addEventListener('keydown', function (e) {
+        if (e.key !== 'Escape') return;
+        var open = document.querySelector('.modal-overlay.open');
+        if (!open) return;
+        if (open.id === 'otpModal') closeOtp(); else open.classList.remove('open');
+      });
+
+      LP.icons();
+    })();
+  </script>
+  <noscript>Enable JavaScript to view Merchant Loyalty fulfilment.</noscript>
+  <script src="sidebar.js"></script>
+</body>
+</html>

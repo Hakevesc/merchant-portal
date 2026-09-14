@@ -124,6 +124,35 @@
         </a>
       </li>
 
+      <!-- Merchant Loyalty (sub-items filtered by the user's access level) -->
+      <li class="sb-item" id="sb-merchant-loyalty" data-loyalty>
+        <div class="sb-link sb-has-sub" role="button" tabindex="0" aria-expanded="false">
+          <span class="sb-link-icon"><i data-lucide="award"></i></span>
+          <span class="sb-link-text">Merchant Loyalty</span>
+          <span class="sb-arrow"><i data-lucide="chevron-down"></i></span>
+        </div>
+        <ul class="sb-sub">
+          <li class="sb-item" data-loyalty data-roles="care-desk,admin">
+            <a class="sb-link sb-sub-link" href="loyalty-care-desk.html" data-page="loyalty-care-desk">
+              <span class="sb-link-icon"><i data-lucide="headphones"></i></span>
+              <span class="sb-link-text">Care Desk Lookup</span>
+            </a>
+          </li>
+          <li class="sb-item" data-loyalty data-roles="admin,tdr">
+            <a class="sb-link sb-sub-link" href="loyalty-fulfilment.html" data-page="loyalty-fulfilment">
+              <span class="sb-link-icon"><i data-lucide="package-check"></i></span>
+              <span class="sb-link-text">Reward Fulfilment</span>
+            </a>
+          </li>
+          <li class="sb-item" data-loyalty data-roles="admin">
+            <a class="sb-link sb-sub-link" href="loyalty-fulfilment.html#audit" data-page="loyalty-audit">
+              <span class="sb-link-icon"><i data-lucide="scroll-text"></i></span>
+              <span class="sb-link-text">Audit Trail</span>
+            </a>
+          </li>
+        </ul>
+      </li>
+
     </ul>
   </nav>
 </aside>
@@ -154,16 +183,35 @@
   }
   runLucide();
 
+  /* ── 3b. Loyalty group visibility (role based) ──
+     The Loyalty nav only appears while a loyalty role is held, so the
+     Merchant Promo portal's sidebar is unchanged. Within it, each item
+     is filtered by the roles listed in its data-roles attribute.       */
+  let loyaltyRole = null;
+  try { loyaltyRole = sessionStorage.getItem('mpesa_loyalty_role'); } catch (e) { /* blocked storage */ }
+
+  shell.querySelectorAll('[data-loyalty]').forEach(el => {
+    const roles = el.getAttribute('data-roles');
+    const allowed = !!loyaltyRole && (!roles || roles.split(',').indexOf(loyaltyRole) !== -1);
+    if (!allowed) el.remove();
+  });
+
+  // Drop the parent group if this access level left it with no sub-items
+  const loyaltyGroup = shell.querySelector('#sb-merchant-loyalty');
+  if (loyaltyGroup && !loyaltyGroup.querySelector('.sb-sub .sb-item')) loyaltyGroup.remove();
+
   /* ── 4. Active link detection ── */
   const page = window.location.pathname.split('/').pop().split('?')[0];
   const matchMap = {
-    'home.html':            'home',
-    'draw-select.html':     'home',
-    'loading.html':         'home',
-    'winners.html':         'home',
-    'eligibility.html':     'merchant-tools',
-    'blacklist.html':       'merchant-tools',
-    'merchant-tools.html':  'merchant-tools',
+    'home.html':               'home',
+    'draw-select.html':        'home',
+    'loading.html':            'home',
+    'winners.html':            'home',
+    'eligibility.html':        'merchant-tools',
+    'blacklist.html':          'merchant-tools',
+    'merchant-tools.html':     'merchant-tools',
+    'loyalty-care-desk.html':  'loyalty-care-desk',
+    'loyalty-fulfilment.html': 'loyalty-fulfilment',
   };
   const activePage = matchMap[page] || page;
 

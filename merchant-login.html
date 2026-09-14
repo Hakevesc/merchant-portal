@@ -103,6 +103,11 @@
       const p = document.getElementById('password').value.trim();
       const err = document.getElementById('errorMsg');
       if (u === 'admin' && p === 'admin') {
+        /* Access level for the Merchant Loyalty module. In production this comes
+           from the signed-in user's permissions; here it seeds the prototype so
+           the Loyalty nav renders. Switch level from the topbar chip on any
+           Loyalty page to demonstrate role-based access. */
+        try { sessionStorage.setItem('mpesa_loyalty_role', 'admin'); } catch (e) {}
         window.location.href = 'home.html';
       } else {
         err.textContent = 'Invalid username or password. Please try again.';
