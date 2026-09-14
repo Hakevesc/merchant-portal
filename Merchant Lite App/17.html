@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Confirm Order</title>
+<style>
+  @font-face{font-family:'Switzer';src:url('assets/fonts/switzer-300.woff2') format('woff2');font-weight:300;font-style:normal;font-display:swap}
+  @font-face{font-family:'Switzer';src:url('assets/fonts/switzer-400.woff2') format('woff2');font-weight:400;font-style:normal;font-display:swap}
+  @font-face{font-family:'Switzer';src:url('assets/fonts/switzer-500.woff2') format('woff2');font-weight:500;font-style:normal;font-display:swap}
+  @font-face{font-family:'Switzer';src:url('assets/fonts/switzer-600.woff2') format('woff2');font-weight:600;font-style:normal;font-display:swap}
+  @font-face{font-family:'Switzer';src:url('assets/fonts/switzer-700.woff2') format('woff2');font-weight:700;font-style:normal;font-display:swap}
+  @font-face{font-family:'Switzer';src:url('assets/fonts/switzer-800.woff2') format('woff2');font-weight:800;font-style:normal;font-display:swap}
+  @font-face{font-family:'Switzer';src:url('assets/fonts/switzer-900.woff2') format('woff2');font-weight:900;font-style:normal;font-display:swap}
+
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+
+  html{
+    background:linear-gradient(45deg,#1c9b52 0%,#c41e2a 58%,#e8343e 100%);
+    min-height:100vh;
+    display:flex;align-items:center;justify-content:center;
+  }
+
+  body{
+    font-family:'Switzer','Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+    background:#fff;
+    max-width:390px;
+    position:relative;
+    -webkit-font-smoothing:antialiased;
+    /* real phone screen: 390 x 844, scrolls inside the frame */
+    width:390px;max-width:100%;
+    height:844px;max-height:100vh;
+    margin:0 auto;
+    overflow:hidden;
+    position:relative;
+    /* contains position:fixed children inside the phone */
+    transform:translateZ(0);
+    box-shadow:0 18px 50px rgba(0,0,0,.32);
+  }
+
+  /* ---------- Header ---------- */
+  /* ---------- Header ---------- */
+  .header{
+    display:grid;grid-template-columns:auto 1fr auto;align-items:center;
+    background:#fff;position:sticky;top:0;z-index:50;
+    padding:10px 16px 34px;
+  }
+  .back-btn{
+    grid-column:1;grid-row:1;
+    width:28px;height:28px;margin-left:-4px;
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;background:none;border:none;padding:0;
+  }
+  .back-btn svg{width:20px;height:20px;fill:#1a1a1a}
+  .info-btn{
+    grid-column:3;grid-row:1;
+    width:28px;height:28px;
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;background:none;border:none;padding:0;
+  }
+  .info-btn svg{width:20px;height:20px;fill:#1a1a1a}
+  .header-title{
+    grid-column:1/-1;grid-row:2;
+    text-align:center;margin-top:11px;line-height:1.15;
+    font-size:22px;font-weight:500;color:#000;
+    letter-spacing:.5px;white-space:nowrap;
+    overflow:hidden;text-overflow:ellipsis;
+  }
+  .header-spacer{display:none}
+
+  .page{padding:14px 16px 0}
+
+  .card{
+    background:#fff;
+    border:1px solid #e9ebef;
+    border-radius:14px;
+    box-shadow:0 1px 3px rgba(0,0,0,.04);
+    margin-bottom:12px;
+  }
+
+  .card-pad{padding:14px}
+
+  .card-title{
+    font-size:14px;
+    font-weight:700;
+    color:#16181d;
+    letter-spacing:-.1px;
+    margin-bottom:4px;
+  }
+
+  /* ---------- Item card ---------- */
+  .item-card{
+    display:flex;
+    align-items:center;
+    gap:13px;
+    padding:10px;
+  }
+
+  .item-thumb{
+    width:86px;height:86px;
+    flex-shrink:0;
+    border-radius:11px;
+    overflow:hidden;
+    background:#f4f5f7;
+  }
+  .item-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+
+  .item-body{flex:1;min-width:0}
+
+  .item-name{
+    font-size:14px;
+    font-weight:800;
+    color:#16181d;
+    letter-spacing:.3px;
+    line-height:1.25;
+  }
+
+  .item-value{
+    margin-top:5px;
+    font-size:12.5px;
+    font-weight:500;
+    color:#7b8089;
+  }
+
+  .item-points{
+    margin-top:6px;
+    font-size:13px;
+    font-weight:800;
+    color:#e0342a;
+    letter-spacing:-.1px;
+  }
+
+  /* ---------- Summary rows ---------- */
+  .srow{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    padding:11px 0;
+    border-bottom:1px solid #f1f2f5;
+  }
+  .srow:last-of-type{border-bottom:none}
+
+  .slabel{
+    font-size:12.5px;
+    font-weight:500;
+    color:#6b7079;
+    line-height:1.35;
+  }
+
+  .svalue{
+    font-size:13.5px;
+    font-weight:800;
+    color:#16181d;
+    letter-spacing:-.2px;
+    text-align:right;
+    white-space:nowrap;
+  }
+  .svalue.red{color:#e0342a}
+  .svalue.green{color:#1c9b52}
+
+  .summary-note{
+    margin-top:10px;
+    font-size:11px;
+    font-weight:400;
+    color:#9aa0a6;
+    line-height:1.45;
+  }
+
+  /* ---------- Delivery ---------- */
+  .drow{display:flex;gap:10px}
+
+  .drow-icon{flex-shrink:0;width:18px;display:flex;justify-content:center;padding-top:2px}
+  .drow-icon svg{width:16px;height:16px;fill:#5b6169}
+
+  .drow-body{flex:1;min-width:0}
+
+  .drow-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    margin-bottom:6px;
+  }
+
+  .drow-label{
+    font-size:12px;
+    font-weight:500;
+    color:#7b8089;
+  }
+
+  .change-link{
+    font-size:11.5px;
+    font-weight:800;
+    color:#e0342a;
+    letter-spacing:.5px;
+    text-decoration:none;
+    cursor:pointer;
+    background:none;
+    border:none;
+    font-family:inherit;
+  }
+
+  .address{
+    font-size:13px;
+    font-weight:700;
+    color:#16181d;
+    line-height:1.5;
+  }
+
+  .contact{
+    margin-top:7px;
+    padding-top:8px;
+    border-top:1px solid #f1f2f5;
+    font-size:12px;
+    font-weight:500;
+    color:#6b7079;
+    line-height:1.5;
+  }
+  .contact b{font-weight:700;color:#16181d}
+
+  .ref-note{
+    font-size:11.5px;
+    font-weight:400;
+    color:#8a9099;
+    line-height:1.45;
+    margin-top:3px;
+  }
+
+  /* ---------- Actions ---------- */
+  .actions{
+    padding:8px 16px 0;
+    display:flex;
+    flex-direction:column;
+    gap:11px;
+  }
+
+  .btn{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    height:52px;
+    border-radius:26px;
+    font-family:inherit;
+    font-size:14.5px;
+    font-weight:700;
+    letter-spacing:1px;
+    cursor:pointer;
+    text-decoration:none;
+    border:none;
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .btn:active{transform:translateY(1px)}
+
+  .btn-confirm{
+    background:linear-gradient(135deg,#33ca73,#1f9e52);
+    color:#fff;
+    box-shadow:0 6px 18px rgba(46,197,109,.30);
+  }
+
+  .btn-confirm[disabled]{
+    background:#dfe3e8;
+    color:#9aa0a6;
+    box-shadow:none;
+    cursor:not-allowed;
+  }
+
+  .btn-cancel{
+    background:#fff;
+    color:#1c9b52;
+    border:1.5px solid #e2e5e9;
+  }
+
+  .short-note{
+    display:none;
+    margin-top:2px;
+    text-align:center;
+    font-size:11.5px;
+    font-weight:600;
+    color:#e0342a;
+  }
+  .short-note.show{display:block}
+
+  /* ---------- Bottom nav ---------- */
+
+
+
+  /* ---------- Header (consistent) ---------- */
+
+
+  .phone-scroll{
+    height:calc(100% - 24px);
+    overflow-y:auto;
+    overflow-x:hidden;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+  }
+  .phone-scroll::-webkit-scrollbar{display:none}
+  body.sheet-open .phone-scroll{overflow:hidden}
+
+  .gesture-bar{
+    position:fixed;
+    left:0;right:0;bottom:0;
+    height:24px;
+    background:#fff;
+    display:flex;align-items:center;justify-content:center;
+    z-index:400;
+    pointer-events:none;
+  }
+  .gesture-bar::after{
+    content:'';
+    width:134px;height:5px;
+    border-radius:3px;
+    background:#1a1a1a;
+  }
+</style>
+</head>
+<body>
+<div class="phone-scroll">
+<!-- Header -->
+<div class="header">
+  <button class="back-btn" onclick="goBack('16.html')" aria-label="Go back">
+    <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+  </button>
+  <div class="header-title">CONFIRM ORDER</div>
+  <div class="header-spacer"></div>
+</div>
+
+<div class="page">
+
+  <!-- Item -->
+  <div class="card item-card">
+    <div class="item-thumb">
+      <img id="itemImg" src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&h=400&fit=crop" alt="Reward">
+    </div>
+    <div class="item-body">
+      <div class="item-name" id="itemName">SMARTPHONE</div>
+      <div class="item-value" id="itemValue">5,000 ETB Value</div>
+      <div class="item-points" id="itemPoints">6,667 Points Required</div>
+    </div>
+  </div>
+
+  <!-- Redemption summary -->
+  <div class="card card-pad">
+    <div class="card-title">Redemption Summary</div>
+
+    <div class="srow">
+      <span class="slabel">Your Loyalty Points</span>
+      <span class="svalue" id="sHave">6,667 PTS</span>
+    </div>
+    <div class="srow">
+      <span class="slabel">Points Required</span>
+      <span class="svalue red" id="sNeed">6,667 PTS</span>
+    </div>
+    <div class="srow">
+      <span class="slabel">Equivalent Value</span>
+      <span class="svalue green" id="sValue">5,000 ETB</span>
+    </div>
+    <div class="srow">
+      <span class="slabel">Remaining Points (After Redemption)</span>
+      <span class="svalue" id="sLeft">0 PTS</span>
+    </div>
+
+    <div class="summary-note">You will earn more points from future transactions.</div>
+  </div>
+
+  <!-- Delivery information -->
+  <div class="card card-pad">
+    <div class="card-title">Delivery Information</div>
+    <div class="drow" style="margin-top:10px">
+      <div class="drow-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 2C8.1 2 5 5.1 5 9c0 5.2 7 13 7 13s7-7.8 7-13c0-3.9-3.1-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>
+      </div>
+      <div class="drow-body">
+        <div class="drow-head">
+          <span class="drow-label">Delivery Address</span>
+          <button class="change-link" id="changeAddr">CHANGE</button>
+        </div>
+        <div class="address">
+          Bole Road, Bole Sub City,<br>
+          Woreda 03, House No. 123<br>
+          Addis Ababa, Ethiopia
+        </div>
+        <div class="contact" id="contact"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Order reference -->
+  <div class="card card-pad">
+    <div class="drow">
+      <div class="drow-icon">
+        <svg viewBox="0 0 24 24"><path d="M14 2H6.6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10.8a2 2 0 0 0 2-2V7.4L14 2zm2.2 16H7.8v-1.8h8.4V18zm0-3.6H7.8v-1.8h8.4v1.8zm-3-4.6V3.6l5 5h-5z"/></svg>
+      </div>
+      <div class="drow-body">
+        <div class="card-title" style="margin-bottom:0">Order Reference</div>
+        <div class="ref-note">A new order reference will be generated after you confirm.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Actions -->
+<div class="actions">
+  <button class="btn btn-confirm" id="confirmBtn">CONFIRM DELIVERY</button>
+  <div class="short-note" id="shortNote"></div>
+  <button class="btn btn-cancel" onclick="goBack('16.html')">CANCEL</button>
+</div>
+
+
+<!-- Bottom navigation -->
+
+
+<script>
+  (function () {
+    var q = new URLSearchParams(location.search);
+
+    var name  = q.get('item')  || 'SMARTPHONE';
+    var value = parseInt(q.get('value') || '5000', 10);
+    var need  = parseInt(q.get('pts')   || '6667', 10);
+    // Balance defaults to exactly covering the item so the journey stays walkable.
+    var have  = parseInt(q.get('have')  || String(need), 10);
+    var img   = q.get('img');
+
+    var n = function (v) { return v.toLocaleString('en-US'); };
+
+    if (img) document.getElementById('itemImg').src = decodeURIComponent(img);
+    document.getElementById('itemName').textContent   = name.toUpperCase();
+    document.getElementById('itemValue').textContent  = n(value) + ' ETB Value';
+    document.getElementById('itemPoints').textContent = n(need) + ' Points Required';
+
+    document.getElementById('sHave').textContent  = n(have) + ' PTS';
+    document.getElementById('sNeed').textContent  = n(need) + ' PTS';
+    document.getElementById('sValue').textContent = n(value) + ' ETB';
+
+    var enough = have >= need;
+    var left   = enough ? have - need : 0;
+    document.getElementById('sLeft').textContent = n(left) + ' PTS';
+
+    // The PRD forbids redeeming past the available balance.
+    var btn  = document.getElementById('confirmBtn');
+    var note = document.getElementById('shortNote');
+
+    if (!enough) {
+      btn.disabled = true;
+      note.textContent = 'You need ' + n(need - have) + ' more points to redeem this reward.';
+      note.classList.add('show');
+    }
+
+    document.getElementById('changeAddr').addEventListener('click', function () {
+      window.location.href = '19.html';
+    });
+
+    /* Show the delivery contact captured on the details screen. */
+    try {
+      var d = JSON.parse(sessionStorage.getItem('deliveryDetails') || '{}');
+      if (d.recipient || d.phone) {
+        var line = '<b>' + (d.recipient || '') + '</b>';
+        if (d.phone) line += (d.recipient ? ' &middot; ' : '') + d.phone;
+        if (d.notes) line += '<br>Note: ' + d.notes;
+        document.getElementById('contact').innerHTML = line;
+      }
+    } catch (e) { /* storage unavailable */ }
+
+    btn.addEventListener('click', function () {
+      if (btn.disabled) return;
+      var p = new URLSearchParams({ item: name, value: String(value) });
+      if (img) p.set('img', img);
+      window.location.href = '18.html?' + p.toString();
+    });
+  })();
+</script>
+
+<script>
+function goBack(f){if(history.length>1){history.back()}else{window.location.href=f}}
+</script>
+</div>
+
+<div class="gesture-bar"></div>
+
+</body>
+</html>

@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Track Delivery</title>
+<style>
+  @font-face{font-family:'Switzer';src:url('assets/fonts/switzer-300.woff2') format('woff2');font-weight:300;font-style:normal;font-display:swap}
+  @font-face{font-family:'Switzer';src:url('assets/fonts/switzer-400.woff2') format('woff2');font-weight:400;font-style:normal;font-display:swap}
+  @font-face{font-family:'Switzer';src:url('assets/fonts/switzer-500.woff2') format('woff2');font-weight:500;font-style:normal;font-display:swap}
+  @font-face{font-family:'Switzer';src:url('assets/fonts/switzer-600.woff2') format('woff2');font-weight:600;font-style:normal;font-display:swap}
+  @font-face{font-family:'Switzer';src:url('assets/fonts/switzer-700.woff2') format('woff2');font-weight:700;font-style:normal;font-display:swap}
+  @font-face{font-family:'Switzer';src:url('assets/fonts/switzer-800.woff2') format('woff2');font-weight:800;font-style:normal;font-display:swap}
+  @font-face{font-family:'Switzer';src:url('assets/fonts/switzer-900.woff2') format('woff2');font-weight:900;font-style:normal;font-display:swap}
+
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+
+  html{
+    background:linear-gradient(45deg,#1c9b52 0%,#c41e2a 58%,#e8343e 100%);
+    min-height:100vh;
+    display:flex;align-items:center;justify-content:center;
+  }
+
+  body{
+    font-family:'Switzer','Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+    background:#fff;
+    max-width:390px;
+    position:relative;
+    -webkit-font-smoothing:antialiased;
+    /* real phone screen: 390 x 844, scrolls inside the frame */
+    width:390px;max-width:100%;
+    height:844px;max-height:100vh;
+    margin:0 auto;
+    overflow:hidden;
+    position:relative;
+    /* contains position:fixed children inside the phone */
+    transform:translateZ(0);
+    box-shadow:0 18px 50px rgba(0,0,0,.32);
+  }
+
+  /* ---------- Header ---------- */
+  /* ---------- Header ---------- */
+  .header{
+    display:grid;grid-template-columns:auto 1fr auto;align-items:center;
+    background:#fff;position:sticky;top:0;z-index:50;
+    padding:10px 16px 34px;
+  }
+  .back-btn{
+    grid-column:1;grid-row:1;
+    width:28px;height:28px;margin-left:-4px;
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;background:none;border:none;padding:0;
+  }
+  .back-btn svg{width:20px;height:20px;fill:#1a1a1a}
+  .info-btn{
+    grid-column:3;grid-row:1;
+    width:28px;height:28px;
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;background:none;border:none;padding:0;
+  }
+  .info-btn svg{width:20px;height:20px;fill:#1a1a1a}
+  .header-title{
+    grid-column:1/-1;grid-row:2;
+    text-align:center;margin-top:11px;line-height:1.15;
+    font-size:22px;font-weight:500;color:#000;
+    letter-spacing:.5px;white-space:nowrap;
+    overflow:hidden;text-overflow:ellipsis;
+  }
+  .header-spacer{display:none}
+
+  .page{padding:14px 16px 0}
+
+  .card{
+    background:#fff;
+    border:1px solid #e9ebef;
+    border-radius:14px;
+    box-shadow:0 1px 3px rgba(0,0,0,.04);
+    margin-bottom:12px;
+  }
+
+  /* ---------- Item ---------- */
+  .item-card{display:flex;align-items:center;gap:13px;padding:10px}
+
+  .item-thumb{
+    width:86px;height:86px;flex-shrink:0;
+    border-radius:11px;overflow:hidden;background:#f4f5f7;
+  }
+  .item-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+
+  .item-body{flex:1;min-width:0}
+
+  .item-name{font-size:14px;font-weight:800;color:#16181d;letter-spacing:.3px;line-height:1.25}
+  .item-value{margin-top:5px;font-size:12.5px;font-weight:500;color:#7b8089}
+  .item-ref{margin-top:4px;font-size:11.5px;font-weight:500;color:#8a9099}
+  .item-status{margin-top:6px;font-size:13px;font-weight:800;color:#1c9b52;letter-spacing:-.1px}
+
+  /* ---------- Map ---------- */
+  .map-card{
+    position:relative;
+    height:206px;
+    border-radius:14px;
+    overflow:hidden;
+    border:1px solid #e9ebef;
+    margin-bottom:12px;
+    background:#eef1f4;
+  }
+
+  .map-card svg.map{position:absolute;inset:0;width:100%;height:100%;display:block}
+
+  .map-pill{
+    position:absolute;
+    background:#fff;
+    border-radius:10px;
+    padding:7px 11px;
+    box-shadow:0 3px 10px rgba(0,0,0,.14);
+    max-width:170px;
+  }
+
+  .map-pill .pl{font-size:9.5px;font-weight:500;color:#8a9099;line-height:1.2}
+  .map-pill .pv{margin-top:2px;font-size:12px;font-weight:800;color:#16181d;letter-spacing:-.1px;line-height:1.25}
+
+  .pill-eta{top:14px;right:12px;text-align:right}
+  .pill-to{top:92px;right:38px}
+
+  /* ---------- Progress ---------- */
+  .prog-card{padding:15px 16px 6px}
+
+  .prog-title{
+    font-size:12.5px;
+    font-weight:800;
+    color:#16181d;
+    letter-spacing:.7px;
+    margin-bottom:14px;
+  }
+
+  .step{
+    position:relative;
+    display:flex;
+    gap:12px;
+    padding-bottom:16px;
+  }
+  .step:last-child{padding-bottom:10px}
+
+  .step::before{
+    content:'';
+    position:absolute;
+    left:10px;
+    top:23px;
+    bottom:2px;
+    width:2px;
+    background:#d8ecdf;
+  }
+  .step:last-child::before{display:none}
+  .step.pending::before{background:#eceef1}
+
+  .dot{
+    position:relative;
+    z-index:1;
+    width:21px;height:21px;
+    flex-shrink:0;
+    border-radius:50%;
+    background:#22a55b;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .dot svg{width:12px;height:12px;fill:none;stroke:#fff;stroke-width:2.8;stroke-linecap:round;stroke-linejoin:round}
+
+  .dot.hollow,
+  .step.pending .dot{
+    background:#fff;
+    border:2px solid #dfe3e8;
+  }
+  .step.pending .dot svg{display:none}
+
+  .step-body{flex:1;min-width:0;padding-top:1px}
+
+  .step-name{font-size:13px;font-weight:700;color:#16181d;line-height:1.25}
+  .step-time{margin-top:3px;font-size:11px;font-weight:400;color:#8a9099}
+
+  .step.current .step-name{color:#1c9b52}
+  .step.pending .step-name{color:#a4a9b0}
+  .step.pending .step-time{color:#b6bbc2}
+
+  /* ---------- Actions ---------- */
+  .actions{padding:4px 16px 0}
+
+  .text-link[disabled]{
+    color:#b6bbc2;
+    border-color:#e6e8eb;
+    cursor:not-allowed;
+  }
+
+  .primary-btn{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:9px;
+    width:100%;
+    height:52px;
+    background:linear-gradient(135deg,#33ca73,#1f9e52);
+    color:#fff;
+    border:none;
+    border-radius:26px;
+    font-family:inherit;
+    font-size:14.5px;
+    font-weight:800;
+    letter-spacing:1px;
+    cursor:pointer;
+    box-shadow:0 6px 18px rgba(46,197,109,.30);
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .primary-btn:active{transform:translateY(1px);box-shadow:0 3px 10px rgba(46,197,109,.24)}
+  .primary-btn svg{width:18px;height:18px;fill:#fff;flex-shrink:0}
+
+  .text-link{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width:100%;
+    height:50px;
+    margin-top:12px;
+    background:#fff;
+    border:1.5px solid #d8ede1;
+    border-radius:25px;
+    font-family:inherit;
+    font-size:13.5px;
+    font-weight:700;
+    color:#1c9b52;
+    letter-spacing:.4px;
+    text-align:center;
+    text-decoration:none;
+    cursor:pointer;
+    transition:transform .15s ease;
+  }
+  .text-link:active{transform:translateY(1px)}
+
+  /* ---------- OTP sheet ---------- */
+  .sheet-backdrop{
+    position:fixed;inset:0;
+    background:rgba(16,20,24,.45);
+    opacity:0;visibility:hidden;
+    transition:opacity .25s ease, visibility .25s ease;
+    z-index:200;
+  }
+  .sheet-backdrop.open{opacity:1;visibility:visible}
+
+    .sheet{visibility:hidden;transition:visibility .32s ease}
+  .sheet.open{visibility:visible}
+.sheet{
+    position:fixed;left:50%;bottom:24px;
+    transform:translate(-50%,100%);
+    width:100%;max-width:390px;
+    background:#fff;
+    border-radius:24px 24px 0 0;
+    padding:10px 20px 26px;
+    z-index:201;
+    box-shadow:0 -8px 30px rgba(0,0,0,.16);
+    transition:transform .32s cubic-bezier(.22,1,.36,1);
+  }
+  .sheet.open{transform:translate(-50%,0)}
+
+  .sheet-handle{width:40px;height:4px;border-radius:2px;background:#dfe2e6;margin:0 auto 18px}
+
+  .sheet-icon{
+    width:54px;height:54px;margin:0 auto 14px;
+    border-radius:50%;background:#eef8f2;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .sheet-icon svg{width:26px;height:26px;fill:#1c9b52}
+  .sheet-icon.danger{background:#fdecec}
+  .sheet-icon.danger svg{fill:#e8343e;stroke:#e8343e}
+
+  .sheet-title{
+    text-align:center;font-size:18px;font-weight:800;
+    color:#16181d;letter-spacing:-.3px;margin-bottom:6px;
+  }
+  .sheet-sub{
+    text-align:center;font-size:12.5px;font-weight:400;
+    color:#6b7079;line-height:1.5;margin-bottom:18px;
+  }
+
+  .otp-row{display:flex;justify-content:center;gap:8px;margin-bottom:12px}
+
+  .otp-box{
+    width:44px;height:54px;
+    border-radius:11px;
+    background:#f4f7f5;
+    border:1.5px solid #d8ede1;
+    display:flex;align-items:center;justify-content:center;
+    font-size:22px;font-weight:800;color:#16181d;
+    letter-spacing:-.5px;
+  }
+
+  .otp-timer{
+    text-align:center;font-size:12px;font-weight:600;
+    color:#8a9099;margin-bottom:18px;
+  }
+  .otp-timer b{color:#1c9b52}
+  .otp-timer.expired b{color:#e0342a}
+
+  .otp-actions{display:flex;gap:10px;margin-bottom:12px}
+
+  [hidden]{display:none!important}
+
+  .otp-btn{
+    flex:1;
+    text-decoration:none;
+    height:50px;
+    border-radius:25px;
+    display:flex;align-items:center;justify-content:center;gap:8px;
+    font-family:inherit;
+    font-size:13.5px;
+    font-weight:700;
+    letter-spacing:.4px;
+    cursor:pointer;
+    transition:transform .15s ease;
+  }
+  .otp-btn:active{transform:translateY(1px)}
+  .otp-btn svg{width:17px;height:17px;flex-shrink:0}
+
+  .otp-btn.ghost{
+    background:#fff;
+    color:#1c9b52;
+    border:1.5px solid #d8ede1;
+  }
+  .otp-btn.ghost svg{fill:#1c9b52}
+
+  .otp-btn.danger{
+    background:linear-gradient(135deg,#ef4238,#d3211f);
+    color:#fff;
+    border:none;
+    box-shadow:0 6px 16px rgba(211,33,31,.26);
+  }
+  .otp-btn.solid{
+    background:linear-gradient(135deg,#33ca73,#1f9e52);
+    color:#fff;
+    border:none;
+    box-shadow:0 6px 16px rgba(46,197,109,.28);
+  }
+  .otp-btn.solid svg{fill:#fff}
+
+  .copied{
+    text-align:center;
+    font-size:12px;
+    font-weight:700;
+    color:#1c9b52;
+    min-height:16px;
+    line-height:1.45;
+    margin-bottom:8px;
+    opacity:0;
+    transition:opacity .2s ease;
+  }
+  .copied.error{color:#e8343e}
+  .copied.show{opacity:1}
+
+  .sheet-close{
+    display:block;
+    width:100%;
+    padding:8px 0;
+    background:none;color:#8a9099;
+    border:none;
+    font-family:inherit;font-size:13px;font-weight:700;
+    letter-spacing:.3px;cursor:pointer;
+  }
+
+  .otp-hint{
+    text-align:center;
+    font-size:11.5px;
+    font-weight:400;
+    color:#8a9099;
+    line-height:1.5;
+    margin-bottom:16px;
+  }
+
+  body.sheet-open{overflow:hidden}
+
+  /* ---------- Bottom nav ---------- */
+
+
+
+  /* ---------- Header (consistent) ---------- */
+
+
+  .phone-scroll{
+    height:calc(100% - 24px);
+    overflow-y:auto;
+    overflow-x:hidden;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+  }
+  .phone-scroll::-webkit-scrollbar{display:none}
+  body.sheet-open .phone-scroll{overflow:hidden}
+
+  .gesture-bar{
+    position:fixed;
+    left:0;right:0;bottom:0;
+    height:24px;
+    background:#fff;
+    display:flex;align-items:center;justify-content:center;
+    z-index:400;
+    pointer-events:none;
+  }
+  .gesture-bar::after{
+    content:'';
+    width:134px;height:5px;
+    border-radius:3px;
+    background:#1a1a1a;
+  }
+</style>
+</head>
+<body>
+<div class="phone-scroll">
+<!-- Header -->
+<div class="header">
+  <button class="back-btn" onclick="goBack('17.html')" aria-label="Go back">
+    <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+  </button>
+  <div class="header-title">TRACK DELIVERY</div>
+  <div class="header-spacer"></div>
+</div>
+
+<div class="page">
+
+  <!-- Item -->
+  <div class="card item-card">
+    <div class="item-thumb">
+      <img id="itemImg" src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&h=400&fit=crop" alt="Reward">
+    </div>
+    <div class="item-body">
+      <div class="item-name" id="itemName">SMARTPHONE</div>
+      <div class="item-value" id="itemValue">5,000 ETB Value</div>
+      <div class="item-ref">Order Ref: <span id="itemRef">MP987654321</span></div>
+      <div class="item-status" id="itemStatus">Order Placed</div>
+    </div>
+  </div>
+
+  <!-- Map -->
+  <div class="map-card">
+    <svg class="map" viewBox="0 0 358 206" preserveAspectRatio="xMidYMid slice">
+      <rect width="358" height="206" fill="#eef1f4"/>
+
+      <!-- parks / blocks -->
+      <ellipse cx="52" cy="150" rx="46" ry="30" fill="#e2eee6"/>
+      <ellipse cx="150" cy="176" rx="54" ry="26" fill="#e6f0ea"/>
+      <ellipse cx="292" cy="52" rx="42" ry="26" fill="#e6f0ea"/>
+
+      <!-- street grid -->
+      <g stroke="#dfe4e9" stroke-width="1.4">
+        <path d="M0 42h358M0 88h358M0 134h358M0 180h358"/>
+        <path d="M58 0v206M132 0v206M206 0v206M280 0v206"/>
+      </g>
+      <g stroke="#d3dae1" stroke-width="2.6">
+        <path d="M0 110h358"/>
+        <path d="M168 0v206"/>
+      </g>
+
+      <!-- delivery route -->
+      <path d="M42 46 C 96 66, 78 118, 132 128 C 186 138, 178 168, 224 166"
+            fill="none" stroke="#22a55b" stroke-width="2.6"
+            stroke-linecap="round" stroke-dasharray="7 7"/>
+    </svg>
+
+    <!-- courier marker -->
+    <svg class="map" viewBox="0 0 358 206" style="pointer-events:none">
+      <circle cx="42" cy="46" r="17" fill="#22a55b"/>
+      <circle cx="42" cy="46" r="21" fill="#22a55b" opacity=".18"/>
+      <g transform="translate(31,36)" fill="#fff">
+        <path d="M1.2 2.2h10.4c.5 0 .9.4.9.9v8.2H2.1c-.5 0-.9-.4-.9-.9V2.2z"/>
+        <path d="M13.4 5.4h3.4l2.6 3v3.4c0 .3-.3.5-.6.5h-5.4V5.4z"/>
+        <circle cx="5.6" cy="13.4" r="2.1"/>
+        <circle cx="15.4" cy="13.4" r="2.1"/>
+      </g>
+      <!-- destination pin -->
+      <g transform="translate(212,146)">
+        <path d="M12 0C6.9 0 2.8 4.1 2.8 9.2c0 6.9 9.2 17 9.2 17s9.2-10.1 9.2-17C21.2 4.1 17.1 0 12 0z" fill="#e0342a"/>
+        <circle cx="12" cy="9.2" r="3.4" fill="#fff"/>
+      </g>
+    </svg>
+
+    <div class="map-pill pill-eta">
+      <div class="pl">Estimated Delivery</div>
+      <div class="pv">Today, 5:10 PM</div>
+    </div>
+
+    <div class="map-pill pill-to">
+      <div class="pl">Delivery to</div>
+      <div class="pv">Bole Road, Addis Ababa</div>
+    </div>
+  </div>
+
+  <!-- Delivery progress -->
+  <div class="card prog-card">
+    <div class="prog-title">DELIVERY PROGRESS</div>
+
+    <div class="step pending">
+      <div class="dot"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7"/></svg></div>
+      <div class="step-body">
+        <div class="step-name">Order Placed</div>
+        <div class="step-time" id="t1">Pending</div>
+      </div>
+    </div>
+
+    <div class="step pending">
+      <div class="dot"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7"/></svg></div>
+      <div class="step-body">
+        <div class="step-name">Processing</div>
+        <div class="step-time" id="t2">Pending</div>
+      </div>
+    </div>
+
+    <div class="step pending">
+      <div class="dot"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7"/></svg></div>
+      <div class="step-body">
+        <div class="step-name">Dispatched</div>
+        <div class="step-time" id="t3">Pending</div>
+      </div>
+    </div>
+
+    <div class="step pending">
+      <div class="dot"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7"/></svg></div>
+      <div class="step-body">
+        <div class="step-name">Out for Delivery</div>
+        <div class="step-time" id="t4">Pending</div>
+      </div>
+    </div>
+
+    <div class="step pending">
+      <div class="dot"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7"/></svg></div>
+      <div class="step-body">
+        <div class="step-name">Delivered</div>
+        <div class="step-time" id="t5">Pending</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="actions">
+  <button class="primary-btn" id="receiptBtn">
+    <svg viewBox="0 0 24 24"><path d="M12 1.8 4 5.2v6c0 5 3.4 9.7 8 11 4.6-1.3 8-6 8-11v-6l-8-3.4zm-1.3 15.1-3.6-3.6 1.5-1.5 2.1 2.1 5.2-5.2 1.5 1.5-6.7 6.7z"/></svg>
+    CONFIRM RECEIPT
+  </button>
+  <button class="text-link" id="cancelBtn" type="button">CANCEL ORDER</button>
+</div>
+
+<!-- OTP sheet -->
+<div class="sheet-backdrop" id="otpBackdrop"></div>
+<div class="sheet" id="otpSheet" role="dialog" aria-modal="true" aria-labelledby="otpTitle">
+  <div class="sheet-handle"></div>
+  <div class="sheet-icon">
+    <svg viewBox="0 0 24 24"><path d="M17 8.5h-1V6.8a4 4 0 0 0-8 0v1.7H7a1.6 1.6 0 0 0-1.6 1.6v9A1.6 1.6 0 0 0 7 20.7h10a1.6 1.6 0 0 0 1.6-1.6v-9A1.6 1.6 0 0 0 17 8.5zm-7.1-1.7a2.1 2.1 0 0 1 4.2 0v1.7H9.9V6.8zM12 16.4a1.9 1.9 0 1 1 0-3.8 1.9 1.9 0 0 1 0 3.8z"/></svg>
+  </div>
+  <div class="sheet-title" id="otpTitle">Confirm receipt</div>
+  <div class="sheet-sub">You will receive this 6-digit code by SMS on your registered number <b id="otpMsisdn">0712 345678</b>.</div>
+
+  <div class="otp-row" id="otpRow"></div>
+  <div class="otp-timer" id="otpTimer">Valid for <b>05:00</b></div>
+
+  <div class="otp-hint">Give this code to the delivery person <b>after</b> you have received your item. Your order is marked <b>Delivered</b> once they enter it.</div>
+
+  <div class="copied" id="copied">Code copied</div>
+
+  <div class="otp-actions">
+    <button class="otp-btn ghost" id="otpCancel">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#1c9b52" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+      CANCEL
+    </button>
+    <button class="otp-btn solid" id="otpShare">
+      <svg viewBox="0 0 24 24"><path d="M18 16.1c-.8 0-1.5.3-2 .8l-7.1-4.2c.1-.2.1-.5.1-.7s0-.5-.1-.7L16 7.1c.5.5 1.2.8 2 .8a2.9 2.9 0 1 0-2.9-2.9c0 .3 0 .5.1.7L8.1 9.9a2.9 2.9 0 1 0 0 4.2l7.2 4.2c-.1.2-.1.4-.1.6a2.8 2.8 0 1 0 2.8-2.8z"/></svg>
+      SHARE
+    </button>
+  </div>
+
+  <div class="otp-actions" id="doneActions" hidden>
+    <a class="otp-btn solid" id="orderHistoryBtn" href="20.html?tab=order">
+      <svg viewBox="0 0 24 24"><path d="M13 3a9 9 0 1 0 8.5 12h-2.2A6.8 6.8 0 1 1 13 5.2c1.9 0 3.6.8 4.8 2L14.5 10.5H22V3l-2.6 2.6A8.96 8.96 0 0 0 13 3z"/><path d="M12.2 8v5.2l4.3 2.6.8-1.4-3.5-2.1V8z"/></svg>
+      VIEW ORDER HISTORY
+    </a>
+  </div>
+
+  <button class="sheet-close" id="otpClose">DONE</button>
+</div>
+
+<!-- Cancel order sheet -->
+<div class="sheet-backdrop" id="cancelBackdrop"></div>
+<div class="sheet" id="cancelSheet" role="dialog" aria-modal="true" aria-labelledby="cancelTitle">
+  <div class="sheet-handle"></div>
+  <div class="sheet-icon danger">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+  </div>
+  <div class="sheet-title" id="cancelTitle">Cancel this order?</div>
+  <div class="sheet-sub">Your delivery will be cancelled and the redeemed points returned to your balance. This cannot be undone.</div>
+
+  <div class="otp-actions">
+    <button class="otp-btn ghost" id="cancelKeep">KEEP ORDER</button>
+    <button class="otp-btn danger" id="cancelConfirm">CANCEL ORDER</button>
+  </div>
+</div>
+
+
+
+<!-- Bottom navigation -->
+
+
+<script>
+  (function () {
+    var q = new URLSearchParams(location.search);
+
+    var name  = q.get('item')  || 'SMARTPHONE';
+    var value = parseInt(q.get('value') || '5000', 10);
+    var img   = q.get('img');
+
+    if (img) document.getElementById('itemImg').src = decodeURIComponent(img);
+    document.getElementById('itemName').textContent  = name.toUpperCase();
+    document.getElementById('itemValue').textContent = value.toLocaleString('en-US') + ' ETB Value';
+
+    // Order reference generated at confirmation time.
+    var chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ0123456789', ref = 'MP';
+    for (var i = 0; i < 9; i++) ref += chars[Math.floor(Math.random() * chars.length)];
+    document.getElementById('itemRef').textContent = ref;
+
+    // Progress timestamps anchored to today so the trail always reads as current.
+    var now = new Date();
+    function stamp(h, m) {
+      var d = new Date(now.getFullYear(), now.getMonth(), now.getDate(), h, m);
+      return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+           + ', ' + d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+    }
+    function nowStamp() { return stamp(now.getHours(), now.getMinutes()); }
+
+    /* ----- Delivery progress: every step starts unchecked. The trail begins
+       5s after load and advances one step every 2s, up to Out for Delivery.
+       Delivered is only ticked once the courier code is confirmed. ----- */
+    var steps     = document.querySelectorAll('.prog-card .step');
+    var statusEl  = document.getElementById('itemStatus');
+    var cancelBtn = document.getElementById('cancelBtn');
+    var autoTimer = null;
+    var reached   = -1;
+
+    function completeStep(i) {
+      if (i <= reached || i >= steps.length) return;
+      reached = i;
+      var step = steps[i];
+      step.classList.remove('pending');
+      steps.forEach(function (s) { s.classList.remove('current'); });
+      step.classList.add('current');
+      var time = step.querySelector('.step-time');
+      if (time) time.textContent = nowStamp();
+      statusEl.textContent = step.querySelector('.step-name').textContent;
+    }
+
+    function advance() {
+      completeStep(reached + 1);
+      /* Out for Delivery is the last automatic step - the order can no
+         longer be cancelled once the courier is on the way. */
+      if (reached >= 3) {
+        clearInterval(autoTimer);
+        cancelBtn.disabled = true;
+      }
+    }
+
+    setTimeout(function () {
+      advance();
+      autoTimer = setInterval(advance, 2000);
+    }, 5000);
+
+    var cancelBackdrop = document.getElementById('cancelBackdrop');
+    var cancelSheet    = document.getElementById('cancelSheet');
+
+    function closeCancelSheet() {
+      cancelBackdrop.classList.remove('open');
+      cancelSheet.classList.remove('open');
+      document.body.classList.remove('sheet-open');
+    }
+
+    cancelBtn.addEventListener('click', function () {
+      if (cancelBtn.disabled) return;
+      cancelBackdrop.classList.add('open');
+      cancelSheet.classList.add('open');
+      document.body.classList.add('sheet-open');
+    });
+
+    document.getElementById('cancelKeep').addEventListener('click', closeCancelSheet);
+    cancelBackdrop.addEventListener('click', closeCancelSheet);
+    document.getElementById('cancelConfirm').addEventListener('click', function () {
+      window.location.href = '20.html?tab=order';
+    });
+
+    /* ----- Confirm receipt: OTP sheet (PRD: OTP is sent to the
+       registered number and handed to the courier on delivery). ----- */
+    var backdrop = document.getElementById('otpBackdrop');
+    var sheet    = document.getElementById('otpSheet');
+    var timerEl  = document.getElementById('otpTimer');
+    var countdown = null;
+
+    var currentOtp = '';
+
+    function renderOtp() {
+      var row = document.getElementById('otpRow');
+      row.innerHTML = '';
+      currentOtp = '';
+      for (var i = 0; i < 6; i++) {
+        var d = Math.floor(Math.random() * 10);
+        currentOtp += d;
+        var b = document.createElement('div');
+        b.className = 'otp-box';
+        b.textContent = d;
+        row.appendChild(b);
+      }
+
+      /* Show the number the SMS goes to, if delivery details were captured. */
+      try {
+        var saved = JSON.parse(sessionStorage.getItem('deliveryDetails') || '{}');
+        if (saved.phone) document.getElementById('otpMsisdn').textContent = saved.phone;
+      } catch (e) { /* storage unavailable */ }
+    }
+
+    var flashTimer = null;
+    function flashCopied(text, isError) {
+      var el = document.getElementById('copied');
+      el.textContent = text;
+      el.classList.toggle('error', !!isError);
+      el.classList.add('show');
+      clearTimeout(flashTimer);
+      flashTimer = setTimeout(function () { el.classList.remove('show'); }, isError ? 3500 : 1800);
+    }
+
+
+    function legacyCopy(msg) {
+      var ta = document.createElement('textarea');
+      ta.value = msg;
+      ta.setAttribute('readonly', '');
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy'); flashCopied('Code copied'); }
+      catch (e) { flashCopied('Copy not supported'); }
+      document.body.removeChild(ta);
+    }
+
+    function shareCode() {
+      var ref = document.getElementById('itemRef').textContent;
+      var text = 'My M-PESA delivery confirmation code is ' + currentOtp
+               + ' (order ' + ref + '). Please enter it to complete the delivery.';
+
+      if (navigator.share) {
+        navigator.share({ title: 'Delivery confirmation code', text: text })
+          .catch(function () { /* dismissed */ });
+      } else {
+        /* No share sheet on this device - put it on the clipboard instead. */
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(
+            function () { flashCopied('Message copied - paste to share'); },
+            function () { legacyCopy(text); }
+          );
+        } else {
+          legacyCopy(text);
+        }
+      }
+    }
+
+    function startTimer() {
+      var left = 300;
+      timerEl.classList.remove('expired');
+      clearInterval(countdown);
+      countdown = setInterval(function () {
+        left--;
+        if (left <= 0) {
+          clearInterval(countdown);
+          timerEl.innerHTML = 'Code expired';
+          timerEl.classList.add('expired');
+          return;
+        }
+        var m = String(Math.floor(left / 60)).padStart(2, '0');
+        var sec = String(left % 60).padStart(2, '0');
+        timerEl.innerHTML = 'Valid for <b>' + m + ':' + sec + '</b>';
+      }, 1000);
+    }
+
+    function closeSheet() {
+      backdrop.classList.remove('open');
+      sheet.classList.remove('open');
+      document.body.classList.remove('sheet-open');
+      clearInterval(countdown);
+    }
+
+    document.getElementById('receiptBtn').addEventListener('click', function () {
+      if (!confirmed) {
+        renderOtp();
+        startTimer();
+        openedAt = Date.now();
+      }
+      backdrop.classList.add('open');
+      sheet.classList.add('open');
+      document.body.classList.add('sheet-open');
+    });
+
+    /* The sheet has two states: waiting for the courier code, then confirmed. */
+    var sheetActions = document.querySelector('.otp-actions');
+    var doneActions  = document.getElementById('doneActions');
+    var closeBtn     = document.getElementById('otpClose');
+    var confirmed    = false;
+    var openedAt     = 0;
+    var CONFIRM_WAIT = 10000;
+
+    function markDelivered() {
+      confirmed = true;
+      clearInterval(autoTimer);
+      clearInterval(countdown);
+      completeStep(steps.length - 1);
+      cancelBtn.disabled = true;
+
+      document.getElementById('otpTitle').textContent = 'Delivery confirmed';
+      document.querySelector('.sheet-sub').textContent = 'Your order is marked as delivered.';
+      document.getElementById('otpRow').hidden = true;
+      timerEl.hidden = true;
+      document.querySelector('.otp-hint').hidden = true;
+      sheetActions.hidden = true;
+      doneActions.hidden = false;
+      closeBtn.textContent = 'CLOSE';
+    }
+
+    document.getElementById('otpCancel').addEventListener('click', closeSheet);
+    document.getElementById('otpShare').addEventListener('click', shareCode);
+    closeBtn.addEventListener('click', function () {
+      if (confirmed) { closeSheet(); return; }
+      /* The courier still has to key the code in - refuse an early DONE. */
+      if (Date.now() - openedAt < CONFIRM_WAIT) {
+        flashCopied('Order is not confirmed yet. Please wait 10 minutes and try to confirm again.', true);
+        return;
+      }
+      markDelivered();
+    });
+    backdrop.addEventListener('click', closeSheet);
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'Escape') return;
+      closeSheet();
+      closeCancelSheet();
+    });
+  })();
+</script>
+
+<script>
+function goBack(f){if(history.length>1){history.back()}else{window.location.href=f}}
+</script>
+</div>
+
+<div class="gesture-bar"></div>
+
+</body>
+</html>

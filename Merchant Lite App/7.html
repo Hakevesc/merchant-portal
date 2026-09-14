@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Prize Matrix</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+  @font-face{font-family:'Switzer';src:url('assets/fonts/switzer-300.woff2') format('woff2');font-weight:300;font-style:normal;font-display:swap}
+  @font-face{font-family:'Switzer';src:url('assets/fonts/switzer-400.woff2') format('woff2');font-weight:400;font-style:normal;font-display:swap}
+  @font-face{font-family:'Switzer';src:url('assets/fonts/switzer-500.woff2') format('woff2');font-weight:500;font-style:normal;font-display:swap}
+  @font-face{font-family:'Switzer';src:url('assets/fonts/switzer-600.woff2') format('woff2');font-weight:600;font-style:normal;font-display:swap}
+  @font-face{font-family:'Switzer';src:url('assets/fonts/switzer-700.woff2') format('woff2');font-weight:700;font-style:normal;font-display:swap}
+  @font-face{font-family:'Switzer';src:url('assets/fonts/switzer-800.woff2') format('woff2');font-weight:800;font-style:normal;font-display:swap}
+  @font-face{font-family:'Switzer';src:url('assets/fonts/switzer-900.woff2') format('woff2');font-weight:900;font-style:normal;font-display:swap}
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html{
+    background:linear-gradient(45deg,#1c9b52 0%,#c41e2a 58%,#e8343e 100%);
+    min-height:100vh;
+    display:flex;align-items:center;justify-content:center;
+  }
+
+  body{
+    font-family: 'Switzer', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background:#fff;
+    max-width: 390px;
+    position: relative;
+    /* real phone screen: 390 x 844, scrolls inside the frame */
+    width:390px;max-width:100%;
+    height:844px;max-height:100vh;
+    margin:0 auto;
+    overflow:hidden;
+    position:relative;
+    /* contains position:fixed children inside the phone */
+    transform:translateZ(0);
+    box-shadow:0 18px 50px rgba(0,0,0,.32);
+  }
+
+  /* Status Bar */
+  .status-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px 4px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #000;
+  }
+
+  .status-bar .time {
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .status-icons {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .status-icons svg {
+    width: 16px;
+    height: 16px;
+    fill: #000;
+  }
+
+  /* Header */
+  /* ---------- Header ---------- */
+  .header{
+    display:grid;grid-template-columns:auto 1fr auto;align-items:center;
+    background:#fff;position:sticky;top:0;z-index:50;
+    padding:10px 16px 34px;
+  }
+  .back-btn{
+    grid-column:1;grid-row:1;
+    width:28px;height:28px;margin-left:-4px;
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;background:none;border:none;padding:0;
+  }
+  .back-btn svg{width:20px;height:20px;fill:#1a1a1a}
+  .info-btn{
+    grid-column:3;grid-row:1;
+    width:28px;height:28px;
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;background:none;border:none;padding:0;
+  }
+  .info-btn svg{width:20px;height:20px;fill:#1a1a1a}
+  .header-title{
+    grid-column:1/-1;grid-row:2;
+    text-align:center;margin-top:11px;line-height:1.15;
+    font-size:22px;font-weight:500;color:#000;
+    letter-spacing:.5px;white-space:nowrap;
+    overflow:hidden;text-overflow:ellipsis;
+  }
+  .header-spacer{display:none}
+
+
+
+  /* Page Title */
+  .page-title {
+    text-align: center;
+    font-size: 24px;
+    font-weight: 800;
+    color: #000;
+    letter-spacing: 1px;
+    margin: 16px 0 20px;
+    font-family: 'Switzer', 'Inter', sans-serif;
+  }
+
+  /* Content */
+  .content {
+    padding: 16px 16px 0;
+  }
+
+  /* Red Banner */
+  .red-banner {
+    background: linear-gradient(135deg, #c0392b 0%, #a93226 50%, #922b21 100%);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .red-banner-text {
+    flex: 1;
+    padding-right: 12px;
+  }
+
+  .red-banner-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 8px;
+    font-family: 'Switzer', 'Inter', sans-serif;
+  }
+
+  .red-banner-desc {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.9);
+    line-height: 1.5;
+    font-family: 'Switzer', 'Inter', sans-serif;
+  }
+
+  .red-banner-icon {
+    flex-shrink: 0;
+  }
+
+  .money-icon {
+    width: 64px;
+    height: 64px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .money-icon svg {
+    width: 36px;
+    height: 36px;
+    fill: #fff;
+  }
+
+  /* Section Header */
+  .section-header {
+    font-size: 14px;
+    font-weight: 800;
+    color: #1a1a1a;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+    font-family: 'Switzer', 'Inter', sans-serif;
+  }
+
+  /* Prize Cards */
+  .prize-card {
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  .prize-card-green {
+    background: linear-gradient(135deg, #27ae60 0%, #2ecc71 60%, #58d68d 100%);
+  }
+
+  .prize-card-orange {
+    background: linear-gradient(135deg, #fdf2e9 0%, #fdebd0 30%, #f39c12 100%);
+  }
+
+  .prize-card-blue {
+    background: linear-gradient(135deg, #eaf2f8 0%, #d6eaf8 30%, #3498db 100%);
+  }
+
+  .prize-info {
+    flex: 1;
+    z-index: 2;
+  }
+
+  .prize-label {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+    font-family: 'Switzer', 'Inter', sans-serif;
+  }
+
+  .prize-label-white {
+    color: #fff;
+  }
+
+  .prize-label-dark {
+    color: #1a1a1a;
+  }
+
+  .prize-amount {
+    font-size: 22px;
+    font-weight: 800;
+    font-family: 'Switzer', 'Inter', sans-serif;
+  }
+
+  .prize-amount-white {
+    color: #fff;
+  }
+
+  .prize-amount-dark {
+    color: #1a1a1a;
+  }
+
+  .prize-image {
+    flex-shrink: 0;
+    z-index: 2;
+    margin-left: 8px;
+  }
+
+  .prize-image img {
+    width: 100px;
+    height: 80px;
+    object-fit: contain;
+  }
+
+  /* Money stack SVG */
+  .money-stack {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 110px;
+    height: 90px;
+    z-index: 1;
+  }
+
+  /* Confetti dots */
+  .confetti {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    z-index: 1;
+  }
+
+  /* Float Card */
+  .float-card {
+    background: linear-gradient(135deg, #e8f8f0 0%, #d5f5e3 100%);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  }
+
+  .float-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+  }
+
+  .float-gift-icon {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+  }
+
+  .float-gift-icon svg {
+    width: 40px;
+    height: 40px;
+  }
+
+  .float-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: #1a1a1a;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+    font-family: 'Switzer', 'Inter', sans-serif;
+  }
+
+  .float-amounts {
+    display: flex;
+    gap: 4px;
+  }
+
+  .float-amount-pill {
+    background: #27ae60;
+    color: #fff;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: 'Switzer', 'Inter', sans-serif;
+  }
+
+  .float-amount-pill:first-child {
+    border-radius: 8px 4px 4px 8px;
+  }
+
+  .float-amount-pill:last-child {
+    border-radius: 4px 8px 8px 4px;
+  }
+
+  .float-amount-pill:not(:first-child):not(:last-child) {
+    border-radius: 4px;
+  }
+
+  /* Bottom Navigation */
+
+
+
+
+
+
+
+
+
+  /* Decorative circle on float card */
+  .float-card::before {
+    content: '';
+    position: absolute;
+    right: -20px;
+    top: -20px;
+    width: 120px;
+    height: 120px;
+    background: rgba(39, 174, 96, 0.08);
+    border-radius: 50%;
+  }
+
+  /* Prize card decorative elements */
+  .prize-card-green::before {
+    content: '';
+    position: absolute;
+    right: -10px;
+    top: -10px;
+    width: 100px;
+    height: 100px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+  }
+
+  .prize-card-orange::before {
+    content: '';
+    position: absolute;
+    right: -20px;
+    top: -20px;
+    width: 140px;
+    height: 140px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+  }
+
+  .prize-card-blue::before {
+    content: '';
+    position: absolute;
+    left: -20px;
+    top: -20px;
+    width: 120px;
+    height: 120px;
+    background: rgba(255, 255, 255, 0.4);
+    border-radius: 50%;
+  }
+  /* ---------- Header (consistent) ---------- */
+
+
+  .phone-scroll{
+    height:calc(100% - 24px);
+    overflow-y:auto;
+    overflow-x:hidden;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+  }
+  .phone-scroll::-webkit-scrollbar{display:none}
+  body.sheet-open .phone-scroll{overflow:hidden}
+
+  .gesture-bar{
+    position:fixed;
+    left:0;right:0;bottom:0;
+    height:24px;
+    background:#fff;
+    display:flex;align-items:center;justify-content:center;
+    z-index:400;
+    pointer-events:none;
+  }
+  .gesture-bar::after{
+    content:'';
+    width:134px;height:5px;
+    border-radius:3px;
+    background:#1a1a1a;
+  }
+</style>
+</head>
+<body>
+<div class="phone-scroll">
+<!-- Header -->
+<div class="header">
+  <button class="back-btn" onclick="goBack('index.html')" aria-label="Go back">
+    <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+  </button>
+  <div class="header-title">PRIZE MATRIX</div>
+  <div class="header-spacer"></div>
+</div>
+
+<!-- Content -->
+<div class="content">
+
+  <!-- Red Banner -->
+  <div class="red-banner">
+    <div class="red-banner-text">
+      <div class="red-banner-title">Transact More To Earn Big!</div>
+      <div class="red-banner-desc">Earn 1 draw code for every 50 ETB Airtime & Package sold. Earn another code when receiving payment for every 250 ETB!!</div>
+    </div>
+    <div class="red-banner-icon">
+      <div class="money-icon">
+        <svg viewBox="0 0 24 24"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.11.89-2 2-2h14c1.1 0 2 .89 2 2v1h-9c-1.11 0-2 .89-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- Grand Cash Prizes -->
+  <div class="section-header">GRAND CASH PRIZES</div>
+
+  <!-- Grand Prize Card -->
+  <div class="prize-card prize-card-green">
+    <div class="prize-info">
+      <div class="prize-label prize-label-white">GRAND PRIZE</div>
+      <div class="prize-amount prize-amount-white">1,000,000 ETB</div>
+    </div>
+    <div class="prize-image">
+      <svg width="100" height="80" viewBox="0 0 100 80">
+        <!-- Money stack -->
+        <rect x="10" y="40" width="70" height="12" rx="2" fill="#8e44ad" opacity="0.9"/>
+        <rect x="10" y="32" width="70" height="12" rx="2" fill="#9b59b6" opacity="0.9"/>
+        <rect x="10" y="24" width="70" height="12" rx="2" fill="#a569bd" opacity="0.9"/>
+        <rect x="10" y="16" width="70" height="12" rx="2" fill="#b07cc6" opacity="0.9"/>
+        <rect x="10" y="8" width="70" height="12" rx="2" fill="#c39bd3" opacity="0.9"/>
+        <!-- Band -->
+        <rect x="30" y="8" width="20" height="44" rx="2" fill="#f39c12" opacity="0.8"/>
+        <text x="40" y="35" text-anchor="middle" font-size="8" fill="#fff" font-weight="bold">$</text>
+        <!-- Confetti -->
+        <circle cx="5" cy="5" r="2" fill="#e74c3c"/>
+        <circle cx="90" cy="10" r="2" fill="#f1c40f"/>
+        <circle cx="85" cy="5" r="1.5" fill="#3498db"/>
+        <circle cx="15" cy="3" r="1.5" fill="#2ecc71"/>
+        <circle cx="95" cy="20" r="2" fill="#e74c3c"/>
+        <circle cx="3" cy="20" r="1.5" fill="#f39c12"/>
+        <rect x="88" y="3" width="3" height="3" fill="#9b59b6" transform="rotate(45 89.5 4.5)"/>
+        <rect x="8" y="2" width="3" height="3" fill="#3498db" transform="rotate(30 9.5 3.5)"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Mega Prize Card -->
+  <div class="prize-card prize-card-orange">
+    <div class="prize-info">
+      <div class="prize-label prize-label-dark">MEGA PRIZE</div>
+      <div class="prize-amount prize-amount-dark">500,000 ETB</div>
+    </div>
+    <div class="prize-image">
+      <svg width="100" height="80" viewBox="0 0 100 80">
+        <rect x="10" y="40" width="70" height="12" rx="2" fill="#8e44ad" opacity="0.9"/>
+        <rect x="10" y="32" width="70" height="12" rx="2" fill="#9b59b6" opacity="0.9"/>
+        <rect x="10" y="24" width="70" height="12" rx="2" fill="#a569bd" opacity="0.9"/>
+        <rect x="10" y="16" width="70" height="12" rx="2" fill="#b07cc6" opacity="0.9"/>
+        <rect x="10" y="8" width="70" height="12" rx="2" fill="#c39bd3" opacity="0.9"/>
+        <rect x="30" y="8" width="20" height="44" rx="2" fill="#f39c12" opacity="0.8"/>
+        <text x="40" y="35" text-anchor="middle" font-size="8" fill="#fff" font-weight="bold">$</text>
+        <circle cx="5" cy="5" r="2" fill="#e74c3c"/>
+        <circle cx="90" cy="10" r="2" fill="#f1c40f"/>
+        <circle cx="85" cy="5" r="1.5" fill="#3498db"/>
+        <circle cx="15" cy="3" r="1.5" fill="#2ecc71"/>
+        <circle cx="95" cy="20" r="2" fill="#e74c3c"/>
+        <circle cx="3" cy="20" r="1.5" fill="#f39c12"/>
+        <rect x="88" y="3" width="3" height="3" fill="#9b59b6" transform="rotate(45 89.5 4.5)"/>
+        <rect x="8" y="2" width="3" height="3" fill="#3498db" transform="rotate(30 9.5 3.5)"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Super Prize Card -->
+  <div class="prize-card prize-card-blue">
+    <div class="prize-info">
+      <div class="prize-label prize-label-dark">SUPER PRIZE</div>
+      <div class="prize-amount prize-amount-dark">100,000 ETB</div>
+    </div>
+    <div class="prize-image">
+      <svg width="100" height="80" viewBox="0 0 100 80">
+        <rect x="10" y="40" width="70" height="12" rx="2" fill="#8e44ad" opacity="0.9"/>
+        <rect x="10" y="32" width="70" height="12" rx="2" fill="#9b59b6" opacity="0.9"/>
+        <rect x="10" y="24" width="70" height="12" rx="2" fill="#a569bd" opacity="0.9"/>
+        <rect x="10" y="16" width="70" height="12" rx="2" fill="#b07cc6" opacity="0.9"/>
+        <rect x="10" y="8" width="70" height="12" rx="2" fill="#c39bd3" opacity="0.9"/>
+        <rect x="30" y="8" width="20" height="44" rx="2" fill="#f39c12" opacity="0.8"/>
+        <text x="40" y="35" text-anchor="middle" font-size="8" fill="#fff" font-weight="bold">$</text>
+        <circle cx="5" cy="5" r="2" fill="#e74c3c"/>
+        <circle cx="90" cy="10" r="2" fill="#f1c40f"/>
+        <circle cx="85" cy="5" r="1.5" fill="#3498db"/>
+        <circle cx="15" cy="3" r="1.5" fill="#2ecc71"/>
+        <circle cx="95" cy="20" r="2" fill="#e74c3c"/>
+        <circle cx="3" cy="20" r="1.5" fill="#f39c12"/>
+        <rect x="88" y="3" width="3" height="3" fill="#9b59b6" transform="rotate(45 89.5 4.5)"/>
+        <rect x="8" y="2" width="3" height="3" fill="#3498db" transform="rotate(30 9.5 3.5)"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Daily Float Drops -->
+  <div class="section-header" style="margin-top: 20px;">DAILY FLOAT DROPS</div>
+
+  <!-- Float Reward Card -->
+  <div class="float-card">
+    <div class="float-info">
+      <div class="float-gift-icon">
+        <svg viewBox="0 0 40 40" fill="none">
+          <rect x="4" y="14" width="32" height="22" rx="3" fill="#27ae60" opacity="0.3"/>
+          <rect x="4" y="10" width="32" height="8" rx="2" fill="#27ae60" opacity="0.5"/>
+          <rect x="17" y="4" width="6" height="28" rx="2" fill="#27ae60" opacity="0.7"/>
+          <path d="M20 10 C14 6, 8 8, 10 14 C12 10, 16 10, 20 10Z" fill="#27ae60" opacity="0.7"/>
+          <path d="M20 10 C26 6, 32 8, 30 14 C28 10, 24 10, 20 10Z" fill="#27ae60" opacity="0.7"/>
+        </svg>
+      </div>
+      <div>
+        <div class="float-label">FLOAT REWARD</div>
+        <div class="float-amounts">
+          <div class="float-amount-pill">50</div>
+          <div class="float-amount-pill">100</div>
+          <div class="float-amount-pill">200</div>
+          <div class="float-amount-pill">500</div>
+          <div class="float-amount-pill">1,000</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+
+
+
+<script>
+function goBack(f){if(history.length>1){history.back()}else{window.location.href=f}}
+</script>
+</div>
+
+<div class="gesture-bar"></div>
+
+</body>
+</html>

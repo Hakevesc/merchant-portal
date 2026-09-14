@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>History</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+  @font-face{font-family:'Switzer';src:url('assets/fonts/switzer-300.woff2') format('woff2');font-weight:300;font-style:normal;font-display:swap}
+  @font-face{font-family:'Switzer';src:url('assets/fonts/switzer-400.woff2') format('woff2');font-weight:400;font-style:normal;font-display:swap}
+  @font-face{font-family:'Switzer';src:url('assets/fonts/switzer-500.woff2') format('woff2');font-weight:500;font-style:normal;font-display:swap}
+  @font-face{font-family:'Switzer';src:url('assets/fonts/switzer-600.woff2') format('woff2');font-weight:600;font-style:normal;font-display:swap}
+  @font-face{font-family:'Switzer';src:url('assets/fonts/switzer-700.woff2') format('woff2');font-weight:700;font-style:normal;font-display:swap}
+  @font-face{font-family:'Switzer';src:url('assets/fonts/switzer-800.woff2') format('woff2');font-weight:800;font-style:normal;font-display:swap}
+  @font-face{font-family:'Switzer';src:url('assets/fonts/switzer-900.woff2') format('woff2');font-weight:900;font-style:normal;font-display:swap}
+
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+
+  html{
+    background:linear-gradient(45deg,#1c9b52 0%,#c41e2a 58%,#e8343e 100%);
+    min-height:100vh;
+    display:flex;align-items:center;justify-content:center;
+  }
+
+  body{
+    font-family:'Switzer','Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+    background:#fff;
+    width:390px;max-width:100%;
+    height:844px;max-height:100vh;
+    margin:0 auto;
+    overflow:hidden;
+    position:relative;
+    transform:translateZ(0);
+    box-shadow:0 18px 50px rgba(0,0,0,.32);
+    -webkit-font-smoothing:antialiased;
+  }
+
+  .phone-scroll{
+    height:calc(100% - 24px);
+    overflow-y:auto;
+    overflow-x:hidden;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+  }
+  .phone-scroll::-webkit-scrollbar{display:none}
+  body.sheet-open .phone-scroll{overflow:hidden}
+
+  /* ---------- Header ---------- */
+  .header{
+    display:grid;grid-template-columns:auto 1fr auto;align-items:center;
+    background:#fff;position:sticky;top:0;z-index:50;
+    padding:10px 16px 20px;
+  }
+  .back-btn{
+    grid-column:1;grid-row:1;
+    width:28px;height:28px;margin-left:-4px;
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;background:none;border:none;padding:0;
+  }
+  .back-btn svg{width:20px;height:20px;fill:#1a1a1a}
+
+  /* Top filter button in header */
+  .filter-top-btn{
+    grid-column:3;grid-row:1;
+    position:relative;
+    width:32px;height:32px;
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;background:#f2f3f5;border:1px solid #e1e3e7;padding:0;
+    border-radius:50%;color:#16181d;
+    transition:all .18s ease;
+  }
+  .filter-top-btn:hover{background:#e5e8ed}
+  .filter-top-btn.active{
+    background:#e8f7ee;
+    border-color:#1c9b52;
+    color:#1c9b52;
+  }
+  .filter-top-btn.active::after{
+    content:'';
+    position:absolute;top:2px;right:2px;
+    width:7px;height:7px;border-radius:50%;
+    background:#1c9b52;border:1.5px solid #fff;
+  }
+
+  .header-title{
+    grid-column:1/-1;grid-row:2;
+    text-align:center;margin-top:10px;line-height:1.15;
+    font-size:22px;font-weight:500;color:#000;
+    letter-spacing:.5px;white-space:nowrap;
+    overflow:hidden;text-overflow:ellipsis;
+  }
+
+  /* ---------- Page ---------- */
+  .page{padding:4px 16px 24px}
+
+  /* ---------- Segmented Tabs ---------- */
+  .tabs-container{
+    margin-bottom:14px;
+  }
+  .tab-pill-bar{
+    display:flex;
+    background:#e8eaee;
+    padding:4px;
+    border-radius:14px;
+    gap:4px;
+  }
+  .tab-pill{
+    flex:1;
+    padding:9px 4px;
+    border:none;
+    background:transparent;
+    font-family:'Switzer','Inter',sans-serif;
+    font-size:13px;
+    font-weight:600;
+    color:#5b6169;
+    border-radius:10px;
+    cursor:pointer;
+    transition:all .2s cubic-bezier(0.4, 0, 0.2, 1);
+    text-align:center;
+    white-space:nowrap;
+  }
+  .tab-pill.active{
+    background:#e8343e;
+    color:#fff;
+    box-shadow:0 2px 8px rgba(232,52,62,.28);
+  }
+
+  /* Filter indicator bar */
+  .active-filters-bar{
+    display:none;
+    align-items:center;justify-content:space-between;
+    background:#f7f8fa;border:1px solid #eceef1;
+    border-radius:10px;padding:6px 12px;margin-bottom:12px;
+    font-size:11.5px;color:#5b6169;font-weight:600;
+  }
+  .active-filters-bar.show{display:flex}
+  .clear-filters-link{
+    color:#e8343e;text-decoration:none;cursor:pointer;font-weight:700;font-size:11px;
+  }
+
+  /* ---------- Tab Panes ---------- */
+  .tab-pane{display:none}
+  .tab-pane.active{display:block}
+
+  /* ---------- Entries ---------- */
+  .day-group{
+    margin-top:14px;
+    font-size:11.5px;font-weight:700;color:#8a9099;
+    letter-spacing:.4px;
+  }
+  .day-group:first-child{margin-top:4px}
+
+  .entry{
+    display:flex;
+    align-items:center;
+    gap:13px;
+    padding:13px 14px;
+    background:#fff;
+    border:1px solid #ececf0;
+    border-radius:12px;
+    margin-top:8px;
+    box-shadow:0 1px 3px rgba(0,0,0,.04);
+  }
+
+  .entry-icon{
+    width:38px;height:38px;
+    border-radius:50%;
+    flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+    background:#e4f9ed;
+  }
+  .entry-icon.red{background:#fde8ea}
+  .entry-icon svg{width:18px;height:18px}
+
+  .entry-info{flex:1;min-width:0}
+  .entry-title{
+    font-size:13px;font-weight:700;color:#16181d;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .entry-desc{
+    font-size:11px;color:#8a9099;margin-top:2px;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .entry-right{text-align:right;flex-shrink:0}
+  .entry-points{
+    font-size:13.5px;font-weight:800;letter-spacing:-.2px;
+    line-height:1.2;
+  }
+  .pt-green{color:#1c9b52}
+  .pt-red{color:#e8343e}
+  .entry-points span{font-size:10px;font-weight:700}
+  .entry-time{font-size:10.5px;color:#8a9099;margin-top:2px}
+
+  /* Order badges */
+  .order-badge{
+    display:inline-flex;align-items:center;gap:4px;
+    padding:2px 7px;border-radius:6px;
+    font-size:10px;font-weight:700;
+  }
+  .badge-transit{background:#fef5e6;color:#c9820a}
+  .badge-delivered{background:#e8f7ee;color:#1c9b52}
+  .badge-processing{background:#ebf2fc;color:#2f6fd0}
+
+  .empty-state{
+    display:none;
+    text-align:center;
+    padding:48px 16px;
+    color:#8a9099;
+    font-size:13px;
+    font-weight:600;
+  }
+
+  /* ---------- Filter Bottom Sheet ---------- */
+  .filter-overlay{
+    position:fixed;inset:0;
+    background:rgba(15,22,36,.45);
+    z-index:90;
+    opacity:0;pointer-events:none;
+    transition:opacity .2s ease;
+  }
+  .filter-overlay.show{opacity:1;pointer-events:auto}
+
+  .filter-sheet{
+    visibility:hidden;
+    position:fixed;left:50%;
+    transform:translateX(-50%);
+    bottom:-100%;
+    width:100%;max-width:390px;max-height:76vh;
+    overflow-y:auto;overflow-x:hidden;
+    background:#fff;
+    border-radius:18px 18px 0 0;
+    z-index:91;
+    box-shadow:0 8px 30px rgba(0,0,0,.18);
+    padding:4px 18px 22px;
+    transition:bottom .25s ease,visibility .25s ease;
+  }
+  .filter-sheet.show{
+    visibility:visible;
+    bottom:24px;
+  }
+
+  .sheet-handle{
+    width:36px;height:4px;border-radius:2px;
+    background:#d4d7dd;
+    margin:8px auto 6px;
+  }
+  .sheet-title{
+    text-align:center;
+    font-size:15px;font-weight:800;color:#16181d;
+    letter-spacing:.3px;
+    margin-bottom:14px;
+  }
+  .sheet-group{margin:8px 0 14px}
+  .sheet-group-title{
+    font-size:11px;font-weight:700;color:#8a9099;
+    letter-spacing:.6px;
+    margin-bottom:8px;
+  }
+  .sheet-chips{display:flex;flex-wrap:wrap;gap:8px}
+  .filter-chip{
+    padding:8px 14px;
+    border:1px solid #ececf0;
+    background:#f2f3f5;
+    color:#5b6169;
+    font-size:12px;font-weight:600;
+    letter-spacing:.2px;
+    border-radius:20px;
+    cursor:pointer;
+    font-family:'Switzer','Inter',sans-serif;
+    transition:all .15s ease;
+  }
+  .filter-chip.active{
+    background:#e8343e;
+    border-color:#e8343e;
+    color:#fff;
+    box-shadow:0 1px 3px rgba(232,52,62,.25);
+  }
+  .sheet-actions{display:flex;gap:10px;margin-top:22px}
+  .sheet-btn{
+    flex:1;height:44px;border-radius:12px;
+    font-size:13px;font-weight:800;
+    cursor:pointer;
+    font-family:'Switzer','Inter',sans-serif;
+    transition:all .15s ease;
+  }
+  .sheet-btn.reset{background:#f2f3f5;border:1px solid #ececf0;color:#5b6169}
+  .sheet-btn.reset:hover{background:#e5e7eb}
+  .sheet-btn.done{background:#1c9b52;border:none;color:#fff}
+  .sheet-btn.done:hover{background:#168545}
+
+  /* ---------- Gesture bar ---------- */
+  .gesture-bar{
+    position:fixed;
+    left:0;right:0;bottom:0;
+    height:24px;
+    background:#fff;
+    display:flex;align-items:center;justify-content:center;
+    z-index:400;
+    pointer-events:none;
+  }
+  .gesture-bar::after{
+    content:'';
+    width:134px;height:5px;
+    border-radius:3px;
+    background:#1a1a1a;
+  }
+</style>
+</head>
+<body>
+<div class="phone-scroll">
+
+<!-- Header -->
+<div class="header">
+  <button class="back-btn" onclick="goBack('20.html')" aria-label="Go back">
+    <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+  </button>
+  <div class="header-title" id="headerTitle">HISTORY</div>
+  <button type="button" class="filter-top-btn" id="topFilterBtn" onclick="openFilter()" aria-label="Filter history">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+  </button>
+</div>
+
+<div class="page">
+
+  <!-- Segmented Tabs: Accumulation, Redemption, Order -->
+  <div class="tabs-container">
+    <div class="tab-pill-bar" role="tablist">
+      <button type="button" role="tab" aria-selected="true" class="tab-pill active" id="tabBtn-accumulation" onclick="selectTab('accumulation')">Accumulation</button>
+      <button type="button" role="tab" aria-selected="false" class="tab-pill" id="tabBtn-redemption" onclick="selectTab('redemption')">Redemption</button>
+      <button type="button" role="tab" aria-selected="false" class="tab-pill" id="tabBtn-order" onclick="selectTab('order')">Order</button>
+    </div>
+  </div>
+
+  <!-- Active filter indicator -->
+  <div class="active-filters-bar" id="activeFilterBar">
+    <span id="activeFilterText">Filtered view</span>
+    <span class="clear-filters-link" onclick="resetFilters()">Clear Filters</span>
+  </div>
+
+  <!-- ==================== PANE: ACCUMULATION ==================== -->
+  <div class="tab-pane active" id="pane-accumulation">
+    <div class="list-container" id="list-accumulation">
+      <div class="day-group">TODAY</div>
+
+      <div class="entry" data-type="airtime" data-time="today">
+        <div class="entry-icon">
+          <svg viewBox="0 0 24 24" fill="#22a55b"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+        </div>
+        <div class="entry-info">
+          <div class="entry-title">Airtime Top-Up</div>
+          <div class="entry-desc">Ref #LP994821 &middot; Self top-up</div>
+        </div>
+        <div class="entry-right">
+          <div class="entry-points pt-green">+15 <span>PTS</span></div>
+          <div class="entry-time">10:45 AM</div>
+        </div>
+      </div>
+
+      <div class="entry" data-type="payment" data-time="today">
+        <div class="entry-icon">
+          <svg viewBox="0 0 24 24" fill="#22a55b"><path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg>
+        </div>
+        <div class="entry-info">
+          <div class="entry-title">Merchant Payment</div>
+          <div class="entry-desc">Ref #MP883109 &middot; London Cafe</div>
+        </div>
+        <div class="entry-right">
+          <div class="entry-points pt-green">+50 <span>PTS</span></div>
+          <div class="entry-time">09:12 AM</div>
+        </div>
+      </div>
+
+      <div class="entry" data-type="package" data-time="today">
+        <div class="entry-icon">
+          <svg viewBox="0 0 24 24" fill="#22a55b"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>
+        </div>
+        <div class="entry-info">
+          <div class="entry-title">Package Purchase</div>
+          <div class="entry-desc">Ref #PK124590 &middot; Monthly Combo</div>
+        </div>
+        <div class="entry-right">
+          <div class="entry-points pt-green">+25 <span>PTS</span></div>
+          <div class="entry-time">08:30 AM</div>
+        </div>
+      </div>
+
+      <div class="day-group">YESTERDAY</div>
+
+      <div class="entry" data-type="airtime" data-time="yesterday">
+        <div class="entry-icon">
+          <svg viewBox="0 0 24 24" fill="#22a55b"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+        </div>
+        <div class="entry-info">
+          <div class="entry-title">Airtime Top-Up</div>
+          <div class="entry-desc">Ref #LP993201 &middot; Direct top-up</div>
+        </div>
+        <div class="entry-right">
+          <div class="entry-points pt-green">+10 <span>PTS</span></div>
+          <div class="entry-time">04:20 PM</div>
+        </div>
+      </div>
+
+      <div class="entry" data-type="payment" data-time="yesterday">
+        <div class="entry-icon">
+          <svg viewBox="0 0 24 24" fill="#22a55b"><path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg>
+        </div>
+        <div class="entry-info">
+          <div class="entry-title">Merchant Payment</div>
+          <div class="entry-desc">Ref #MP882044 &middot; Central Mart</div>
+        </div>
+        <div class="entry-right">
+          <div class="entry-points pt-green">+40 <span>PTS</span></div>
+          <div class="entry-time">02:15 PM</div>
+        </div>
+      </div>
+
+      <div class="entry" data-type="payment" data-time="yesterday">
+        <div class="entry-icon">
+          <svg viewBox="0 0 24 24" fill="#22a55b"><path d="M4 10v7h3v-7H4zm6 0v7h3v-7h-3zM2 22h19v-3H2v3zm14-12v7h3v-7h-3zm-4.5-9L2 6v2h19V6l-9.5-5z"/></svg>
+        </div>
+        <div class="entry-info">
+          <div class="entry-title">ET-Switch Interoperability</div>
+          <div class="entry-desc">Ref #ES773102 &middot; Bank transfer in</div>
+        </div>
+        <div class="entry-right">
+          <div class="entry-points pt-green">+30 <span>PTS</span></div>
+          <div class="entry-time">11:00 AM</div>
+        </div>
+      </div>
+
+      <div class="day-group">THIS WEEK</div>
+
+      <div class="entry" data-type="package" data-time="week">
+        <div class="entry-icon">
+          <svg viewBox="0 0 24 24" fill="#22a55b"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>
+        </div>
+        <div class="entry-info">
+          <div class="entry-title">Package Purchase</div>
+          <div class="entry-desc">Ref #PK123908 &middot; Weekly Data 2GB</div>
+        </div>
+        <div class="entry-right">
+          <div class="entry-points pt-green">+20 <span>PTS</span></div>
+          <div class="entry-time">05:40 PM</div>
+        </div>
+      </div>
+
+      <div class="entry" data-type="airtime" data-time="week">
+        <div class="entry-icon">
+          <svg viewBox="0 0 24 24" fill="#22a55b"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+        </div>
+        <div class="entry-info">
+          <div class="entry-title">Airtime Top-Up</div>
+          <div class="entry-desc">Ref #LP991204 &middot; 100 ETB Airtime</div>
+        </div>
+        <div class="entry-right">
+          <div class="entry-points pt-green">+15 <span>PTS</span></div>
+          <div class="entry-time">01:25 PM</div>
+        </div>
+      </div>
+
+      <div class="entry" data-type="payment" data-time="week">
+        <div class="entry-icon">
+          <svg viewBox="0 0 24 24" fill="#22a55b"><path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg>
+        </div>
+        <div class="entry-info">
+          <div class="entry-title">Merchant Payment</div>
+          <div class="entry-desc">Ref #MP880199 &middot; Supermarket LC</div>
+        </div>
+        <div class="entry-right">
+          <div class="entry-points pt-green">+65 <span>PTS</span></div>
+          <div class="entry-time">11:10 AM</div>
+        </div>
+      </div>
+
+      <div class="day-group">AUGUST</div>
+
+      <div class="entry" data-type="payment" data-time="month">
+        <div class="entry-icon">
+          <svg viewBox="0 0 24 24" fill="#22a55b"><path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg>
+        </div>
+        <div class="entry-info">
+          <div class="entry-title">Merchant Payment</div>
+          <div class="entry-desc">Ref #MP876543 &middot; Retail Store</div>
+        </div>
+        <div class="entry-right">
+          <div class="entry-points pt-green">+100 <span>PTS</span></div>
+          <div class="entry-time">28 AUG</div>
+        </div>
+      </div>
+
+      <div class="entry" data-type="package" data-time="month">
+        <div class="entry-icon">
+          <svg viewBox="0 0 24 24" fill="#22a55b"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>
+        </div>
+        <div class="entry-info">
+          <div class="entry-title">Package Purchase</div>
+          <div class="entry-desc">Ref #PK121102 &middot; Voice Bundle</div>
+        </div>
+        <div class="entry-right">
+          <div class="entry-points pt-green">+35 <span>PTS</span></div>
+          <div class="entry-time">25 AUG</div>
+        </div>
+      </div>
+
+      <div class="entry" data-type="airtime" data-time="month">
+        <div class="entry-icon">
+          <svg viewBox="0 0 24 24" fill="#22a55b"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+        </div>
+        <div class="entry-info">
+          <div class="entry-title">Airtime Top-Up</div>
+          <div class="entry-desc">Ref #LP988712 &middot; Friend top-up</div>
+        </div>
+        <div class="entry-right">
+          <div class="entry-points pt-green">+20 <span>PTS</span></div>
+          <div class="entry-time">20 AUG</div>
+        </div>
+      </div>
+
+      <div class="entry" data-type="payment" data-time="month">
+        <div class="entry-icon">
+          <svg viewBox="0 0 24 24" fill="#22a55b"><path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg>
+        </div>
+        <div class="entry-info">
+          <div class="entry-title">Merchant Payment</div>
+          <div class="entry-desc">Ref #MP872390 &middot; London Cafe</div>
+        </div>
+        <div class="entry-right">
+          <div class="entry-points pt-green">+80 <span>PTS</span></div>
+          <div class="entry-time">15 AUG</div>
+        </div>
+      </div>
+    </div>
+    <div class="empty-state" id="empty-accumulation">No accumulation history found</div>
+  </div>
+
+  <!-- ==================== PANE: REDEMPTION ==================== -->
+  <div class="tab-pane" id="pane-redemption">
+    <div class="list-container" id="list-redemption">
+      <div class="day-group">TODAY</div>
+
+      <div class="entry" data-type="float" data-time="today">
+        <div class="entry-icon red">
+          <svg viewBox="0 0 24 24" fill="#e8343e"><path d="M7.6 3.3 3.2 7.7l4.4 4.4 1.6-1.6-1.7-1.7h9.2V6.6H7.5l1.7-1.7z"/><path d="m16.4 20.7 4.4-4.4-4.4-4.4-1.6 1.6 1.7 1.7H7.3v2.2h9.2l-1.7 1.7z"/></svg>
+        </div>
+        <div class="entry-info">
+          <div class="entry-title">Convert to Float</div>
+          <div class="entry-desc">10.00 Br credited &middot; Ref #LP7K42XB09</div>
+        </div>
+        <div class="entry-right">
+          <div class="entry-points pt-red">-1,000 <span>PTS</span></div>
+          <div class="entry-time">11:15 AM</div>
+        </div>
+      </div>
+
+      <div class="entry" data-type="reward" data-time="today">
+        <div class="entry-icon red">
+          <svg viewBox="0 0 24 24" fill="#e8343e"><path d="M19.9 7h-2.4a3.1 3.1 0 0 0-4.9-3.6l-.6.6-.6-.6A3.1 3.1 0 0 0 6.5 7H4.1c-.9 0-1.6.7-1.6 1.6v2.7c0 .5.4.9.9.9h7.5V7.9h2.2v4.3h7.5c.5 0 .9-.4.9-.9V8.6c0-.9-.7-1.6-1.6-1.6zM8.7 4.7c.6 0 1.1.5 1.1 1.1V7H8.7a1.15 1.15 0 0 1 0-2.3zm6.6 2.3h-1.1V5.8a1.15 1.15 0 1 1 1.1 1.2z"/><path d="M3.9 13.9v5.9c0 .9.7 1.6 1.6 1.6h5.4v-7.5H3.9zM13.1 21.4h5.4c.9 0 1.6-.7 1.6-1.6v-5.9h-7v7.5z"/></svg>
+        </div>
+        <div class="entry-info">
+          <div class="entry-title">Data Bundle 1GB</div>
+          <div class="entry-desc">Reward item &middot; Ref #RD776501</div>
+        </div>
+        <div class="entry-right">
+          <div class="entry-points pt-red">-200 <span>PTS</span></div>
+          <div class="entry-time">10:30 AM</div>
+        </div>
+      </div>
+
+      <div class="day-group">YESTERDAY</div>
+
+      <div class="entry" data-type="reward" data-time="yesterday">
+        <div class="entry-icon red">
+          <svg viewBox="0 0 24 24" fill="#e8343e"><path d="M17 1.01 7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z"/></svg>
+        </div>
+        <div class="entry-info">
+          <div class="entry-title">Smart Phone</div>
+          <div class="entry-desc">Reward item &middot; Ref #RD775420</div>
+        </div>
+        <div class="entry-right">
+          <div class="entry-points pt-red">-5,000 <span>PTS</span></div>
+          <div class="entry-time">04:15 PM</div>
+        </div>
+      </div>
+
+      <div class="entry" data-type="float" data-time="yesterday">
+        <div class="entry-icon red">
+          <svg viewBox="0 0 24 24" fill="#e8343e"><path d="M7.6 3.3 3.2 7.7l4.4 4.4 1.6-1.6-1.7-1.7h9.2V6.6H7.5l1.7-1.7z"/><path d="m16.4 20.7 4.4-4.4-4.4-4.4-1.6 1.6 1.7 1.7H7.3v2.2h9.2l-1.7 1.7z"/></svg>
+        </div>
+        <div class="entry-info">
+          <div class="entry-title">Convert to Float</div>
+          <div class="entry-desc">5.00 Br credited &middot; Ref #LP7K40AA11</div>
+        </div>
+        <div class="entry-right">
+          <div class="entry-points pt-red">-500 <span>PTS</span></div>
+          <div class="entry-time">01:20 PM</div>
+        </div>
+      </div>
+
+      <div class="day-group">THIS WEEK</div>
+
+      <div class="entry" data-type="float" data-time="week">
+        <div class="entry-icon red">
+          <svg viewBox="0 0 24 24" fill="#e8343e"><ellipse cx="12" cy="6.6" rx="6.6" ry="2.8"/><path d="M5.4 6.6v4.2c0 1.5 3 2.8 6.6 2.8s6.6-1.3 6.6-2.8V6.6"/><path d="M5.4 10.8V15c0 1.6 3 2.8 6.6 2.8s6.6-1.2 6.6-2.8v-4.2"/></svg>
+        </div>
+        <div class="entry-info">
+          <div class="entry-title">Float Top-Up 500</div>
+          <div class="entry-desc">500.00 ETB float &middot; Ref #LP7K38KA02</div>
+        </div>
+        <div class="entry-right">
+          <div class="entry-points pt-red">-500 <span>PTS</span></div>
+          <div class="entry-time">02:05 PM</div>
+        </div>
+      </div>
+
+      <div class="entry" data-type="reward" data-time="week">
+        <div class="entry-icon red">
+          <svg viewBox="0 0 24 24" fill="#e8343e"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+        </div>
+        <div class="entry-info">
+          <div class="entry-title">Airtime Top-Up 100</div>
+          <div class="entry-desc">100.00 ETB Airtime &middot; Ref #AT991204</div>
+        </div>
+        <div class="entry-right">
+          <div class="entry-points pt-red">-100 <span>PTS</span></div>
+          <div class="entry-time">10:50 AM</div>
+        </div>
+      </div>
+
+      <div class="day-group">AUGUST</div>
+
+      <div class="entry" data-type="float" data-time="month">
+        <div class="entry-icon red">
+          <svg viewBox="0 0 24 24" fill="#e8343e"><path d="M7.6 3.3 3.2 7.7l4.4 4.4 1.6-1.6-1.7-1.7h9.2V6.6H7.5l1.7-1.7z"/><path d="m16.4 20.7 4.4-4.4-4.4-4.4-1.6 1.6 1.7 1.7H7.3v2.2h9.2l-1.7 1.7z"/></svg>
+        </div>
+        <div class="entry-info">
+          <div class="entry-title">Convert to Float</div>
+          <div class="entry-desc">20.00 Br credited &middot; Ref #LP7K30ZZ88</div>
+        </div>
+        <div class="entry-right">
+          <div class="entry-points pt-red">-2,000 <span>PTS</span></div>
+          <div class="entry-time">28 AUG</div>
+        </div>
+      </div>
+
+      <div class="entry" data-type="reward" data-time="month">
+        <div class="entry-icon red">
+          <svg viewBox="0 0 24 24" fill="#e8343e"><path d="M12 4C7.31 4 3.07 5.9 0 8.98L12 21 24 8.98A16.88 16.88 0 0 0 12 4zm0 4.5c2.9 0 5.56 1.18 7.5 3.1l-7.5 7.53L4.5 11.6A10.37 10.37 0 0 1 12 8.5z"/></svg>
+        </div>
+        <div class="entry-info">
+          <div class="entry-title">MiFi Modem</div>
+          <div class="entry-desc">Reward item &middot; Ref #RD771902</div>
+        </div>
+        <div class="entry-right">
+          <div class="entry-points pt-red">-6,667 <span>PTS</span></div>
+          <div class="entry-time">22 AUG</div>
+        </div>
+      </div>
+
+      <div class="entry" data-type="reward" data-time="month">
+        <div class="entry-icon red">
+          <svg viewBox="0 0 24 24" fill="#e8343e"><path d="M20 15.5c-1.25 0-2.45-.2-3.57-.57a1.02 1.02 0 0 0-1.02.24l-2.2 2.2a15.045 15.045 0 0 1-6.59-6.59l2.2-2.21a.96.96 0 0 0 .25-1A11.36 11.36 0 0 1 8.5 4c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1 0 9.39 7.61 17 17 17 .55 0 1-.45 1-1v-3.5c0-.55-.45-1-1-1z"/></svg>
+        </div>
+        <div class="entry-info">
+          <div class="entry-title">Voice Bundle 100 Min</div>
+          <div class="entry-desc">Reward item &middot; Ref #RD769011</div>
+        </div>
+        <div class="entry-right">
+          <div class="entry-points pt-red">-150 <span>PTS</span></div>
+          <div class="entry-time">18 AUG</div>
+        </div>
+      </div>
+
+      <div class="entry" data-type="float" data-time="month">
+        <div class="entry-icon red">
+          <svg viewBox="0 0 24 24" fill="#e8343e"><ellipse cx="12" cy="6.6" rx="6.6" ry="2.8"/><path d="M5.4 6.6v4.2c0 1.5 3 2.8 6.6 2.8s6.6-1.3 6.6-2.8V6.6"/><path d="M5.4 10.8V15c0 1.6 3 2.8 6.6 2.8s6.6-1.2 6.6-2.8v-4.2"/></svg>
+        </div>
+        <div class="entry-info">
+          <div class="entry-title">Float Top-Up 700</div>
+          <div class="entry-desc">700.00 ETB float &middot; Ref #LP7K25BB33</div>
+        </div>
+        <div class="entry-right">
+          <div class="entry-points pt-red">-700 <span>PTS</span></div>
+          <div class="entry-time">12 AUG</div>
+        </div>
+      </div>
+    </div>
+    <div class="empty-state" id="empty-redemption">No redemption history found</div>
+  </div>
+
+  <!-- ==================== PANE: ORDER ==================== -->
+  <div class="tab-pane" id="pane-order">
+    <div class="list-container" id="list-order">
+      <div class="day-group">SEP 8</div>
+
+      <div class="entry" data-status="transit" data-time="month" onclick="window.location.href='18.html'" role="link" tabindex="0" style="cursor:pointer">
+        <div class="entry-icon red">
+          <svg viewBox="0 0 24 24" fill="#e8343e"><path d="M12 4C7.31 4 3.07 5.9 0 8.98L12 21 24 8.98A16.88 16.88 0 0 0 12 4zm0 4.5c2.9 0 5.56 1.18 7.5 3.1l-7.5 7.53L4.5 11.6A10.37 10.37 0 0 1 12 8.5z"/></svg>
+        </div>
+        <div class="entry-info">
+          <div class="entry-title">MiFi Modem</div>
+          <div class="entry-desc">Order #ORD-87410 &middot; <span class="order-badge badge-transit">In Transit</span></div>
+        </div>
+        <div class="entry-right">
+          <div class="entry-points pt-red">-6,667 <span>PTS</span></div>
+          <div class="entry-time">2:00 PM</div>
+        </div>
+      </div>
+
+      <div class="day-group">SEP 3</div>
+
+      <div class="entry" data-status="delivered" data-time="month" onclick="window.location.href='18.html'" role="link" tabindex="0" style="cursor:pointer">
+        <div class="entry-icon red">
+          <svg viewBox="0 0 24 24" fill="#e8343e"><path d="M19.9 7h-2.4a3.1 3.1 0 0 0-4.9-3.6l-.6.6-.6-.6A3.1 3.1 0 0 0 6.5 7H4.1c-.9 0-1.6.7-1.6 1.6v2.7c0 .5.4.9.9.9h7.5V7.9h2.2v4.3h7.5c.5 0 .9-.4.9-.9V8.6c0-.9-.7-1.6-1.6-1.6zM8.7 4.7c.6 0 1.1.5 1.1 1.1V7H8.7a1.15 1.15 0 0 1 0-2.3zm6.6 2.3h-1.1V5.8a1.15 1.15 0 1 1 1.1 1.2z"/><path d="M3.9 13.9v5.9c0 .9.7 1.6 1.6 1.6h5.4v-7.5H3.9zM13.1 21.4h5.4c.9 0 1.6-.7 1.6-1.6v-5.9h-7v7.5z"/></svg>
+        </div>
+        <div class="entry-info">
+          <div class="entry-title">Data Bundle 1GB</div>
+          <div class="entry-desc">Order #ORD-86902 &middot; <span class="order-badge badge-delivered">Delivered</span></div>
+        </div>
+        <div class="entry-right">
+          <div class="entry-points pt-red">-200 <span>PTS</span></div>
+          <div class="entry-time">10:30 AM</div>
+        </div>
+      </div>
+
+      <div class="day-group">AUGUST</div>
+
+      <div class="entry" data-status="delivered" data-time="month" onclick="window.location.href='18.html'" role="link" tabindex="0" style="cursor:pointer">
+        <div class="entry-icon red">
+          <svg viewBox="0 0 24 24" fill="#e8343e"><path d="M17 1.01 7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z"/></svg>
+        </div>
+        <div class="entry-info">
+          <div class="entry-title">Smart Phone</div>
+          <div class="entry-desc">Order #ORD-85114 &middot; <span class="order-badge badge-delivered">Delivered</span></div>
+        </div>
+        <div class="entry-right">
+          <div class="entry-points pt-red">-5,000 <span>PTS</span></div>
+          <div class="entry-time">26 AUG</div>
+        </div>
+      </div>
+
+      <div class="entry" data-status="delivered" data-time="month" onclick="window.location.href='18.html'" role="link" tabindex="0" style="cursor:pointer">
+        <div class="entry-icon red">
+          <svg viewBox="0 0 24 24" fill="#e8343e"><path d="M16 4h-1V2h-2v2H7V2H5v2H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h12c1.1 0-2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H4V8h12v12z"/></svg>
+        </div>
+        <div class="entry-info">
+          <div class="entry-title">Power Bank 10,000mAh</div>
+          <div class="entry-desc">Order #ORD-84092 &middot; <span class="order-badge badge-delivered">Delivered</span></div>
+        </div>
+        <div class="entry-right">
+          <div class="entry-points pt-red">-1,200 <span>PTS</span></div>
+          <div class="entry-time">19 AUG</div>
+        </div>
+      </div>
+
+      <div class="entry" data-status="processing" data-time="month" onclick="window.location.href='18.html'" role="link" tabindex="0" style="cursor:pointer">
+        <div class="entry-icon red">
+          <svg viewBox="0 0 24 24" fill="#e8343e"><path d="M12 3v9.28a4.39 4.39 0 0 0-1.5-.28 4.5 4.5 0 1 0 4.5 4.5V6h4V3h-7z"/></svg>
+        </div>
+        <div class="entry-info">
+          <div class="entry-title">Wireless Earbuds</div>
+          <div class="entry-desc">Order #ORD-83210 &middot; <span class="order-badge badge-processing">Processing</span></div>
+        </div>
+        <div class="entry-right">
+          <div class="entry-points pt-red">-2,500 <span>PTS</span></div>
+          <div class="entry-time">10 AUG</div>
+        </div>
+      </div>
+    </div>
+    <div class="empty-state" id="empty-order">No order history found</div>
+  </div>
+
+</div>
+</div>
+
+<div class="gesture-bar"></div>
+
+<!-- Filter Sheet Overlay & Bottom Drawer -->
+<div class="filter-overlay" id="filterOverlay" onclick="closeFilter()"></div>
+<div class="filter-sheet" id="filterSheet">
+  <div class="sheet-handle"></div>
+  <div class="sheet-title">Filter History</div>
+
+  <!-- Time filter -->
+  <div class="sheet-group">
+    <div class="sheet-group-title">TIME PERIOD</div>
+    <div class="sheet-chips" id="timeChipGroup">
+      <button type="button" class="filter-chip active" data-time="all" onclick="selectFilter('time', 'all')">ALL</button>
+      <button type="button" class="filter-chip" data-time="today" onclick="selectFilter('time', 'today')">TODAY</button>
+      <button type="button" class="filter-chip" data-time="yesterday" onclick="selectFilter('time', 'yesterday')">YESTERDAY</button>
+      <button type="button" class="filter-chip" data-time="week" onclick="selectFilter('time', 'week')">THIS WEEK</button>
+      <button type="button" class="filter-chip" data-time="month" onclick="selectFilter('time', 'month')">THIS MONTH</button>
+    </div>
+  </div>
+
+  <!-- Type filter (dynamic per tab) -->
+  <div class="sheet-group" id="typeGroupWrapper">
+    <div class="sheet-group-title" id="typeGroupTitle">TRANSACTION TYPE</div>
+    <div class="sheet-chips" id="typeChipGroup">
+      <!-- Generated via JS per active tab -->
+    </div>
+  </div>
+
+  <div class="sheet-actions">
+    <button type="button" class="sheet-btn reset" onclick="resetFilters()">Reset</button>
+    <button type="button" class="sheet-btn done" onclick="applyAndClose()">Apply Filters</button>
+  </div>
+</div>
+
+<script>
+function goBack(f){
+  if(history.length > 1){
+    history.back();
+  } else {
+    window.location.href = f;
+  }
+}
+
+var currentTab = 'accumulation';
+var filterState = {
+  accumulation: { time: 'all', type: 'all' },
+  redemption: { time: 'all', type: 'all' },
+  order: { time: 'all', status: 'all' }
+};
+
+var typeOptions = {
+  accumulation: [
+    { id: 'all', label: 'ALL' },
+    { id: 'airtime', label: 'AIRTIME' },
+    { id: 'payment', label: 'MERCHANT PAYMENT' },
+    { id: 'package', label: 'PACKAGES' }
+  ],
+  redemption: [
+    { id: 'all', label: 'ALL' },
+    { id: 'float', label: 'CONVERT FLOAT' },
+    { id: 'reward', label: 'REWARDS' }
+  ],
+  order: [
+    { id: 'all', label: 'ALL' },
+    { id: 'transit', label: 'IN TRANSIT' },
+    { id: 'delivered', label: 'DELIVERED' },
+    { id: 'processing', label: 'PROCESSING' }
+  ]
+};
+
+function selectTab(tab, updateUrl) {
+  if (updateUrl === undefined) updateUrl = true;
+  currentTab = tab;
+
+  var tabs = ['accumulation', 'redemption', 'order'];
+  tabs.forEach(function(t) {
+    var btn = document.getElementById('tabBtn-' + t);
+    var pane = document.getElementById('pane-' + t);
+    if (t === tab) {
+      btn.classList.add('active');
+      btn.setAttribute('aria-selected', 'true');
+      pane.classList.add('active');
+    } else {
+      btn.classList.remove('active');
+      btn.setAttribute('aria-selected', 'false');
+      pane.classList.remove('active');
+    }
+  });
+
+  if (updateUrl && window.history.replaceState) {
+    window.history.replaceState(null, '', '?tab=' + tab);
+  }
+
+  renderTypeChips();
+  updateTopFilterBadge();
+  filterEntries();
+}
+
+function openFilter() {
+  renderTypeChips();
+  syncChipsWithState();
+  document.getElementById('filterSheet').classList.add('show');
+  document.getElementById('filterOverlay').classList.add('show');
+  document.body.classList.add('sheet-open');
+}
+
+function closeFilter() {
+  document.getElementById('filterSheet').classList.remove('show');
+  document.getElementById('filterOverlay').classList.remove('show');
+  document.body.classList.remove('sheet-open');
+}
+
+function renderTypeChips() {
+  var container = document.getElementById('typeChipGroup');
+  var title = document.getElementById('typeGroupTitle');
+  container.innerHTML = '';
+
+  if (currentTab === 'order') {
+    title.textContent = 'ORDER STATUS';
+  } else {
+    title.textContent = 'TRANSACTION TYPE';
+  }
+
+  var options = typeOptions[currentTab] || [];
+  var currentVal = (currentTab === 'order') ? filterState.order.status : filterState[currentTab].type;
+
+  options.forEach(function(opt) {
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'filter-chip' + (opt.id === currentVal ? ' active' : '');
+    btn.setAttribute('data-val', opt.id);
+    btn.textContent = opt.label;
+    btn.onclick = function() {
+      selectFilter('type', opt.id);
+    };
+    container.appendChild(btn);
+  });
+}
+
+function syncChipsWithState() {
+  var tState = filterState[currentTab];
+  var timeVal = tState.time;
+  var typeVal = (currentTab === 'order') ? tState.status : tState.type;
+
+  var timeChips = document.querySelectorAll('#timeChipGroup .filter-chip');
+  timeChips.forEach(function(c) {
+    if (c.getAttribute('data-time') === timeVal) {
+      c.classList.add('active');
+    } else {
+      c.classList.remove('active');
+    }
+  });
+
+  var typeChips = document.querySelectorAll('#typeChipGroup .filter-chip');
+  typeChips.forEach(function(c) {
+    if (c.getAttribute('data-val') === typeVal) {
+      c.classList.add('active');
+    } else {
+      c.classList.remove('active');
+    }
+  });
+}
+
+function selectFilter(category, val) {
+  if (category === 'time') {
+    filterState[currentTab].time = val;
+    var timeChips = document.querySelectorAll('#timeChipGroup .filter-chip');
+    timeChips.forEach(function(c) {
+      c.classList.toggle('active', c.getAttribute('data-time') === val);
+    });
+  } else {
+    if (currentTab === 'order') {
+      filterState.order.status = val;
+    } else {
+      filterState[currentTab].type = val;
+    }
+    var typeChips = document.querySelectorAll('#typeChipGroup .filter-chip');
+    typeChips.forEach(function(c) {
+      c.classList.toggle('active', c.getAttribute('data-val') === val);
+    });
+  }
+}
+
+function resetFilters() {
+  filterState[currentTab].time = 'all';
+  if (currentTab === 'order') {
+    filterState.order.status = 'all';
+  } else {
+    filterState[currentTab].type = 'all';
+  }
+  syncChipsWithState();
+  closeFilter();
+  updateTopFilterBadge();
+  filterEntries();
+}
+
+function applyAndClose() {
+  closeFilter();
+  updateTopFilterBadge();
+  filterEntries();
+}
+
+function isFilterActive() {
+  var s = filterState[currentTab];
+  var timeActive = s.time !== 'all';
+  var typeActive = (currentTab === 'order') ? s.status !== 'all' : s.type !== 'all';
+  return timeActive || typeActive;
+}
+
+function updateTopFilterBadge() {
+  var btn = document.getElementById('topFilterBtn');
+  var bar = document.getElementById('activeFilterBar');
+  var barText = document.getElementById('activeFilterText');
+  var active = isFilterActive();
+
+  if (active) {
+    btn.classList.add('active');
+    bar.classList.add('show');
+    var s = filterState[currentTab];
+    var parts = [];
+    if (s.time !== 'all') parts.push(s.time.toUpperCase());
+    var typeVal = (currentTab === 'order') ? s.status : s.type;
+    if (typeVal !== 'all') parts.push(typeVal.toUpperCase());
+    barText.textContent = 'Filtered by: ' + parts.join(' • ');
+  } else {
+    btn.classList.remove('active');
+    bar.classList.remove('show');
+  }
+}
+
+function filterEntries() {
+  var pane = document.getElementById('pane-' + currentTab);
+  if (!pane) return;
+
+  var s = filterState[currentTab];
+  var entries = pane.querySelectorAll('.entry');
+  var groups = pane.querySelectorAll('.day-group');
+  var visibleCount = 0;
+
+  entries.forEach(function(entry) {
+    var match = true;
+    var entryTime = entry.getAttribute('data-time') || 'older';
+    var entryType = entry.getAttribute('data-type');
+    var entryStatus = entry.getAttribute('data-status');
+
+    // Time matching
+    if (s.time === 'today' && entryTime !== 'today') match = false;
+    if (s.time === 'yesterday' && entryTime !== 'yesterday') match = false;
+    if (s.time === 'week' && entryTime !== 'today' && entryTime !== 'yesterday' && entryTime !== 'week') match = false;
+
+    // Type or Status matching
+    if (currentTab === 'order') {
+      if (s.status !== 'all' && entryStatus !== s.status) match = false;
+    } else {
+      if (s.type !== 'all' && entryType !== s.type) match = false;
+    }
+
+    entry.style.display = match ? 'flex' : 'none';
+    if (match) visibleCount++;
+  });
+
+  // Hide empty day-groups
+  groups.forEach(function(g) {
+    var sib = g.nextElementSibling;
+    var hasVisible = false;
+    while (sib && !sib.classList.contains('day-group')) {
+      if (sib.classList.contains('entry') && sib.style.display !== 'none') {
+        hasVisible = true;
+        break;
+      }
+      sib = sib.nextElementSibling;
+    }
+    g.style.display = hasVisible ? 'block' : 'none';
+  });
+
+  var empty = document.getElementById('empty-' + currentTab);
+  if (empty) {
+    empty.style.display = visibleCount === 0 ? 'block' : 'none';
+  }
+}
+
+// Initialize based on URL ?tab=
+(function init() {
+  var params = new URLSearchParams(window.location.search);
+  var tabParam = params.get('tab') || 'accumulation';
+  if (['accumulation', 'redemption', 'order'].indexOf(tabParam) > -1) {
+    selectTab(tabParam, false);
+  } else {
+    selectTab('accumulation', false);
+  }
+})();
+</script>
+
+</body>
+</html>

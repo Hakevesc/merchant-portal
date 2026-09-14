@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Loyalty Point</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+  @font-face{font-family:'Switzer';src:url('assets/fonts/switzer-300.woff2') format('woff2');font-weight:300;font-style:normal;font-display:swap}
+  @font-face{font-family:'Switzer';src:url('assets/fonts/switzer-400.woff2') format('woff2');font-weight:400;font-style:normal;font-display:swap}
+  @font-face{font-family:'Switzer';src:url('assets/fonts/switzer-500.woff2') format('woff2');font-weight:500;font-style:normal;font-display:swap}
+  @font-face{font-family:'Switzer';src:url('assets/fonts/switzer-600.woff2') format('woff2');font-weight:600;font-style:normal;font-display:swap}
+  @font-face{font-family:'Switzer';src:url('assets/fonts/switzer-700.woff2') format('woff2');font-weight:700;font-style:normal;font-display:swap}
+  @font-face{font-family:'Switzer';src:url('assets/fonts/switzer-800.woff2') format('woff2');font-weight:800;font-style:normal;font-display:swap}
+  @font-face{font-family:'Switzer';src:url('assets/fonts/switzer-900.woff2') format('woff2');font-weight:900;font-style:normal;font-display:swap}
+
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+
+  html{
+    background:linear-gradient(45deg,#1c9b52 0%,#c41e2a 58%,#e8343e 100%);
+    min-height:100vh;
+    display:flex;align-items:center;justify-content:center;
+  }
+
+  body{
+    font-family:'Switzer','Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+    background:#fff;
+    width:390px;max-width:100%;
+    height:844px;max-height:100vh;
+    margin:0 auto;
+    overflow:hidden;
+    position:relative;
+    transform:translateZ(0);
+    box-shadow:0 18px 50px rgba(0,0,0,.32);
+    -webkit-font-smoothing:antialiased;
+  }
+
+  .phone-scroll{
+    height:calc(100% - 24px);
+    overflow-y:auto;
+    overflow-x:hidden;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+  }
+  .phone-scroll::-webkit-scrollbar{display:none}
+  body.sheet-open .phone-scroll{overflow:hidden}
+
+  /* ---------- Header ---------- */
+  .header{
+    display:grid;grid-template-columns:auto 1fr auto;align-items:center;
+    background:#fff;position:sticky;top:0;z-index:50;
+    padding:10px 16px 34px;
+  }
+  .back-btn{
+    grid-column:1;grid-row:1;
+    width:28px;height:28px;margin-left:-4px;
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;background:none;border:none;padding:0;
+  }
+  .back-btn svg{width:20px;height:20px;fill:#1a1a1a}
+  .info-btn{
+    grid-column:3;grid-row:1;
+    width:28px;height:28px;
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;background:none;border:none;padding:0;
+  }
+  .info-btn svg{width:20px;height:20px;fill:#1a1a1a}
+  .header-title{
+    grid-column:1/-1;grid-row:2;
+    text-align:center;margin-top:11px;line-height:1.15;
+    font-size:22px;font-weight:500;color:#000;
+    letter-spacing:.5px;white-space:nowrap;
+    overflow:hidden;text-overflow:ellipsis;
+  }
+  .header-spacer{display:none}
+
+  /* ---------- Page ---------- */
+  .page{padding:14px 16px 20px}
+
+  /* ---------- Hero card (Top Points) ---------- */
+  .hero-card{
+    position:relative;
+    background:linear-gradient(135deg,#e8343e 0%,#c41e2a 45%,#a81520 100%);
+    border-radius:18px;
+    padding:18px 20px 16px;
+    margin-bottom:14px;
+    overflow:hidden;
+    box-shadow:0 4px 16px rgba(168,21,32,.26);
+  }
+
+  /* Decorative light glare */
+  .hero-card::before{
+    content:'';position:absolute;top:-40px;left:-20px;
+    width:220px;height:150px;
+    background:linear-gradient(120deg,rgba(255,255,255,.16),rgba(255,255,255,0) 70%);
+    transform:rotate(-12deg);pointer-events:none;
+  }
+
+  .rb-illustration{
+    position:absolute;right:-15px;bottom:-32px;
+    width:160px;height:132px;pointer-events:none;
+    display:flex;align-items:flex-end;justify-content:center;
+  }
+  .rb-confetti-svg{
+    position:absolute;inset:0;width:100%;height:100%;
+    pointer-events:none;z-index:1;
+    mix-blend-mode:overlay;
+    transform:translate(14px, -6px) scale(1.08);
+  }
+  .rb-gift-img{
+    position:relative;width:125px;height:125px;object-fit:contain;
+    filter:drop-shadow(0 4px 16px rgba(0,0,0,.24));
+    z-index:2;mix-blend-mode:soft-light;
+    opacity:0.35;
+    animation:giftFloat 3.2s ease-in-out infinite alternate;
+  }
+  @keyframes giftFloat{
+    0%{transform:translateY(0) rotate(0deg)}
+    100%{transform:translateY(-3.5px) rotate(1.5deg)}
+  }
+
+  .hero-inner{display:flex;align-items:stretch;gap:16px;position:relative;}
+  .hero-side{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:4px;}
+  .hero-vbar{width:1px;align-self:stretch;background:rgba(255,255,255,.22);flex-shrink:0;}
+  .hero-label{font-size:10px;font-weight:600;color:rgba(255,255,255,.78);letter-spacing:.5px;text-transform:uppercase;position:relative;}
+  .hero-pts{display:flex;align-items:baseline;gap:4px;position:relative;}
+  .hero-pts b{font-size:27px;font-weight:800;color:#fff;letter-spacing:-.8px;line-height:1;font-family:'Switzer','Inter',sans-serif;}
+  .hero-pts span{font-size:12px;font-weight:700;color:rgba(255,255,255,.85);}
+  .hero-pill{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:4px;text-decoration:none;cursor:pointer;}
+  .hero-pill-label{font-size:10px;font-weight:600;color:rgba(255,255,255,.78);letter-spacing:.5px;text-transform:uppercase}
+  .hero-pill-value{font-size:27px;font-weight:800;color:#fff;letter-spacing:-.8px;line-height:1;font-family:'Switzer','Inter',sans-serif;}
+
+  /* ---------- Stats Grid ---------- */
+  .stats-grid{
+    display:grid;grid-template-columns:1fr 1fr;
+    gap:10px;margin-bottom:14px;
+  }
+  .stat-cell{
+    display:flex;align-items:center;gap:10px;
+    height:66px;
+    background:#fff;border:1px solid #ececf0;
+    border-radius:14px;padding:0 12px;
+    box-shadow:0 1px 3px rgba(0,0,0,.04);
+  }
+  .stat-icon{
+    width:34px;height:34px;border-radius:50%;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .si-green{background:#fde8ea}
+  .si-blue{background:#fde8ea}
+  .si-purple{background:#fde8ea}
+  .si-amber{background:#fde8ea}
+  .stat-icon svg{width:17px;height:17px}
+  .stat-text{flex:1;min-width:0}
+  .stat-label{
+    font-size:10px;font-weight:500;color:#5b6169;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    margin-bottom:2px;
+  }
+  .stat-value{
+    font-size:15px;font-weight:800;color:#16181d;
+    letter-spacing:-.3px;line-height:1.2;
+  }
+  .stat-value span{font-size:10px;font-weight:700;color:#8a9099;margin-left:2px}
+
+  /* ---------- Check Rewards Banner ---------- */
+  .rewards-banner{
+    position:relative;
+    background:linear-gradient(145deg,#2dba65 0%,#1fa856 40%,#0f7c3e 100%);
+    border-radius:18px;
+    padding:13px 16px 13px;
+    margin-bottom:12px;
+    overflow:hidden;
+    box-shadow:0 5px 18px rgba(15,124,62,.24);
+    cursor:pointer;
+  }
+  .rewards-banner::before{
+    content:'';position:absolute;top:-30px;left:-20px;
+    width:200px;height:140px;
+    background:linear-gradient(120deg,rgba(255,255,255,.15),rgba(255,255,255,0) 70%);
+    transform:rotate(-10deg);pointer-events:none;
+  }
+
+
+
+  /* White card on banner (vertical style like How It Works) */
+  .rb-card{
+    position:relative;
+    display:flex;flex-direction:column;justify-content:space-between;
+    background:#fff;border:1.5px solid rgba(255,255,255,.35);
+    border-radius:13px;
+    padding:10px 11px 9px;
+    min-height:62px;max-width:144px;
+    cursor:pointer;text-decoration:none;
+    box-shadow:0 2px 10px rgba(0,0,0,.12);
+    transition:transform .15s ease,box-shadow .15s ease;
+  }
+  .rb-card:active{transform:scale(.97)}
+  .rb-card:hover{box-shadow:0 4px 14px rgba(0,0,0,.18)}
+  .rb-card-label{
+    font-size:13px;font-weight:700;color:#121417;
+    line-height:1.2;font-family:'Switzer','Inter',sans-serif;
+  }
+  .rb-card-footer{display:flex;justify-content:flex-end}
+  .rb-card-circle{
+    width:28px;height:28px;border-radius:50%;
+    background:#35c46e;
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 2px 6px rgba(34,165,91,.28);
+  }
+  .rb-card-circle svg{width:15px;height:15px;fill:#fff}
+
+  /* ---------- Bottom 2 cards row ---------- */
+  .bottom-cards{
+    display:grid;grid-template-columns:1fr 1fr;
+    gap:10px;margin-bottom:16px;
+  }
+  .bot-card{
+    display:flex;flex-direction:column;justify-content:space-between;
+    background:#fff;border:1.5px solid #4fd07f;
+    border-radius:13px;
+    padding:10px 11px 9px;
+    min-height:62px;
+    cursor:pointer;
+    text-decoration:none;
+    box-shadow:0 1px 4px rgba(0,0,0,.04);
+    transition:transform .15s ease,box-shadow .15s ease;
+  }
+  .bot-card:active{transform:scale(.97)}
+  .bot-card:hover{transform:translateY(-2px);box-shadow:0 4px 10px rgba(34,165,91,.14)}
+  .bot-card-label{
+    font-size:13px;font-weight:700;color:#121417;
+    line-height:1.2;font-family:'Switzer','Inter',sans-serif;
+  }
+  .bot-card-footer{
+    display:flex;justify-content:flex-end;
+  }
+  .bot-card-circle{
+    width:28px;height:28px;border-radius:50%;flex-shrink:0;
+    background:#35c46e;
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 2px 6px rgba(34,165,91,.28);
+  }
+  .bot-card-circle svg{width:15px;height:15px;fill:#fff}
+
+  /* ---------- Recent History ---------- */
+  .section-label{
+    font-size:16pt;font-weight:800;color:#16181d;
+    letter-spacing:.4px;
+    margin-bottom:12px;
+    font-family:'Switzer','Inter',sans-serif;
+    border-left:none;
+  }
+  .history-item{
+    display:flex;align-items:center;gap:12px;
+    padding:12px 14px;
+    background:#fff;border:1px solid #ececf0;
+    border-radius:12px;margin-bottom:8px;
+    box-shadow:0 1px 3px rgba(0,0,0,.04);
+  }
+  .h-icon{
+    width:38px;height:38px;border-radius:50%;flex-shrink:0;
+    background:#e4f9ed;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .h-icon svg{width:19px;height:19px;fill:#1fa856}
+  .h-info{flex:1;min-width:0}
+  .h-title{font-size:12.5px;font-weight:700;color:#16181d}
+  .h-desc{font-size:11px;color:#8a9099;margin-top:2px}
+  .h-time{text-align:right;flex-shrink:0}
+  .h-day{font-size:11px;font-weight:700;color:#16181d}
+  .h-hr{font-size:10.5px;color:#8a9099;margin-top:1px}
+
+  /* ---------- Bottom Nav ---------- */
+  .gesture-bar{
+    position:fixed;
+    left:0;right:0;bottom:0;
+    height:24px;
+    background:#fff;
+    display:flex;align-items:center;justify-content:center;
+    z-index:400;
+    pointer-events:none;
+  }
+  .gesture-bar::after{
+    content:'';
+    width:134px;height:5px;
+    border-radius:3px;
+    background:#1a1a1a;
+  }
+</style>
+</head>
+<body>
+<div class="phone-scroll">
+
+<!-- Header -->
+<div class="header">
+  <button class="back-btn" onclick="goBack('index.html')" aria-label="Go back">
+    <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+  </button>
+  <div class="header-title">LOYALTY POINT</div>
+  <div class="header-spacer"></div>
+</div>
+
+<div class="page">
+
+  <!-- Hero Points Card -->
+  <div class="hero-card">
+    <div class="hero-inner">
+      <div class="hero-side">
+        <div class="hero-label">CURRENT POINTS</div>
+        <div class="hero-pts"><b>1,750</b><span>PTS</span></div>
+      </div>
+      <div class="hero-vbar"></div>
+      <a class="hero-pill" href="12.html">
+        <div class="hero-pill-label">CURRENT REDEEMABLE</div>
+        <div class="hero-pill-value">10.00 Br</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- Stats 2×2 -->
+  <div class="stats-grid">
+    <div class="stat-cell">
+      <div class="stat-icon si-green">
+        <svg viewBox="0 0 24 24" fill="#e8343e"><path d="m12 2.6 3 6 6.7.9-4.8 4.7 1.1 6.6-6-3.1-6 3.1 1.1-6.6L2.3 9.5l6.7-.9 3-6z"/></svg>
+      </div>
+      <div class="stat-text">
+        <div class="stat-label">Total Points Earned</div>
+        <div class="stat-value">2,000 <span>PTS</span></div>
+      </div>
+    </div>
+
+    <div class="stat-cell">
+      <div class="stat-icon si-blue">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#e8343e" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20.4 12a8.4 8.4 0 1 1-2.6-6.1"/><path d="M18.6 3.4v4.7h-4.7"/><circle cx="12" cy="12" r="1.7" fill="#e8343e" stroke="none"/></svg>
+      </div>
+      <div class="stat-text">
+        <div class="stat-label">Total Points Redeemed</div>
+        <div class="stat-value">10.00 <span>Br</span></div>
+      </div>
+    </div>
+
+    <div class="stat-cell">
+      <div class="stat-icon si-purple">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#e8343e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="6.6" rx="6.6" ry="2.8"/><path d="M5.4 6.6v4.2c0 1.5 3 2.8 6.6 2.8s6.6-1.3 6.6-2.8V6.6"/><path d="M5.4 10.8V15c0 1.6 3 2.8 6.6 2.8s6.6-1.2 6.6-2.8v-4.2"/></svg>
+      </div>
+      <div class="stat-text">
+        <div class="stat-label">Total Float Converted</div>
+        <div class="stat-value">4 <span>PTS</span></div>
+      </div>
+    </div>
+
+    <div class="stat-cell">
+      <div class="stat-icon si-amber">
+        <svg viewBox="0 0 24 24" fill="#e8343e"><path d="M7.2 18.4a2 2 0 1 0 0 4 2 2 0 0 0 0-4zM17.2 18.4a2 2 0 1 0 0 4 2 2 0 0 0 0-4zM1.7 2.4a1 1 0 1 0 0 2h1.6l3 12.3c.1.5.5.8 1 .8h11a1 1 0 1 0 0-2H8.1l-.4-1.8h9.9c.5 0 .9-.3 1-.8l1.7-7.3a1 1 0 0 0-1-1.2H5.7l-.6-2.4a1 1 0 0 0-1-.6H1.7z"/></svg>
+      </div>
+      <div class="stat-text">
+        <div class="stat-label">Total Redeemed Orders</div>
+        <div class="stat-value">1 <span>ORDER</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Check Rewards Banner -->
+  <div class="rewards-banner" onclick="window.location.href='9.html'">
+    <!-- Gift box & confetti illustration -->
+    <div class="rb-illustration">
+      <svg class="rb-confetti-svg" viewBox="0 0 175 145" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Top-left pill \ -->
+        <rect x="28" y="16" width="6.5" height="18" rx="3.25" fill="#ffffff" opacity="0.9" transform="rotate(-38 28 16)"/>
+        <!-- Mid-left pill / -->
+        <rect x="12" y="42" width="6.5" height="17" rx="3.25" fill="#ffffff" opacity="0.85" transform="rotate(-65 12 42)"/>
+        <!-- Upper-left diamond ◆ -->
+        <rect x="16" y="68" width="9" height="9" rx="1.8" fill="#ffe359" opacity="0.95" transform="rotate(45 16 68)"/>
+        <!-- Top-center vertical pill | -->
+        <rect x="80" y="2" width="6.5" height="18" rx="3.25" fill="#ffffff" opacity="0.9" transform="rotate(6 80 2)"/>
+        <!-- Top-right yellow sparkle star ✦ -->
+        <path d="M136 12 C136 18 139 21 145 21 C139 21 136 24 136 30 C136 24 133 21 127 21 C133 21 136 18 136 12 Z" fill="#ffe359" opacity="0.95"/>
+        <!-- Secondary white sparkle star ✦ -->
+        <path d="M158 6 C158 10 160 12 164 12 C160 12 158 14 158 18 C158 14 156 12 152 12 C156 12 158 10 158 6 Z" fill="#ffffff" opacity="0.9"/>
+        <!-- Far-right pill / -->
+        <rect x="160" y="38" width="6.5" height="17" rx="3.25" fill="#ffffff" opacity="0.85" transform="rotate(42 160 38)"/>
+        <!-- Upper-right diamond ◆ -->
+        <rect x="154" y="66" width="8.5" height="8.5" rx="1.5" fill="#ffe359" opacity="0.85" transform="rotate(25 154 66)"/>
+      </svg>
+      <img class="rb-gift-img" src="assets/gift-box.png" alt="Rewards Gift">
+    </div>
+
+    <!-- Check Rewards card (vertical style) -->
+    <a class="rb-card" href="9.html" onclick="event.stopPropagation()">
+      <div class="rb-card-label">Check<br>Rewards</div>
+      <div class="rb-card-footer">
+        <div class="rb-card-circle">
+          <svg viewBox="0 0 24 24"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg>
+        </div>
+      </div>
+    </a>
+  </div>
+
+  <!-- Bottom 2 Cards: How It Works + History -->
+  <div class="bottom-cards">
+    <a class="bot-card" href="14.html">
+      <div class="bot-card-label">How It<br>Works</div>
+      <div class="bot-card-footer">
+        <div class="bot-card-circle">
+          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+        </div>
+      </div>
+    </a>
+
+    <a class="bot-card" href="20.html">
+      <div class="bot-card-label">Activity<br>History</div>
+      <div class="bot-card-footer">
+        <div class="bot-card-circle">
+          <svg viewBox="0 0 24 24"><path d="M12.6 3a9 9 0 0 0-9 9H.7l3.9 3.9.1.1L8.6 12H5.7a6.9 6.9 0 1 1 2 4.9l-1.4 1.4A8.9 8.9 0 1 0 12.6 3z"/><path d="M11.6 7.7v5.1l4.4 2.6.7-1.2-3.7-2.2V7.7h-1.4z"/></svg>
+        </div>
+      </div>
+    </a>
+  </div>
+
+  <!-- Recent History -->
+  <div class="section-label">REDEEMED HISTORY</div>
+
+  <div class="history-item">
+    <div class="h-icon" style="background:#e8f7ee">
+      <svg viewBox="0 0 24 24" fill="#22a55b"><path d="M7.6 3.3 3.2 7.7l4.4 4.4 1.6-1.6-1.7-1.7h9.2V6.6H7.5l1.7-1.7z"/><path d="m16.4 20.7 4.4-4.4-4.4-4.4-1.6 1.6 1.7 1.7H7.3v2.2h9.2l-1.7 1.7z"/></svg>
+    </div>
+    <div class="h-info">
+      <div class="h-title">Convert to Float</div>
+      <div class="h-desc">10.00 Br credited &middot; Ref #LP7K42XB09</div>
+    </div>
+    <div class="h-time">
+      <div class="h-day">TODAY</div>
+      <div class="h-hr">11:15 AM</div>
+    </div>
+  </div>
+
+  <div class="history-item">
+    <div class="h-icon" style="background:#fde8ea">
+      <svg viewBox="0 0 24 24" fill="#e8343e"><path d="M19.9 7h-2.4a3.1 3.1 0 0 0-4.9-3.6l-.6.6-.6-.6A3.1 3.1 0 0 0 6.5 7H4.1c-.9 0-1.6.7-1.6 1.6v2.7c0 .5.4.9.9.9h7.5V7.9h2.2v4.3h7.5c.5 0 .9-.4.9-.9V8.6c0-.9-.7-1.6-1.6-1.6zM8.7 4.7c.6 0 1.1.5 1.1 1.1V7H8.7a1.15 1.15 0 0 1 0-2.3zm6.6 2.3h-1.1V5.8a1.15 1.15 0 1 1 1.1 1.2z"/><path d="M3.9 13.9v5.9c0 .9.7 1.6 1.6 1.6h5.4v-7.5H3.9zM13.1 21.4h5.4c.9 0 1.6-.7 1.6-1.6v-5.9h-7v7.5z"/></svg>
+    </div>
+    <div class="h-info">
+      <div class="h-title">DATA BUNDLE 1GB</div>
+      <div class="h-desc">Reward item &middot; Ref #RD776501</div>
+    </div>
+    <div class="h-time">
+      <div class="h-day">TODAY</div>
+      <div class="h-hr">10:30 AM</div>
+    </div>
+  </div>
+
+  <div class="history-item">
+    <div class="h-icon" style="background:#fde8ea">
+      <svg viewBox="0 0 24 24" fill="#e8343e"><path d="M17 1.01 7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z"/></svg>
+    </div>
+    <div class="h-info">
+      <div class="h-title">SMART PHONE</div>
+      <div class="h-desc">Reward item &middot; Ref #RD775420</div>
+    </div>
+    <div class="h-time">
+      <div class="h-day">YESTERDAY</div>
+      <div class="h-hr">4:15 PM</div>
+    </div>
+  </div>
+
+  <div class="history-item">
+    <div class="h-icon" style="background:#e8f7ee">
+      <svg viewBox="0 0 24 24" fill="#22a55b"><ellipse cx="12" cy="6.6" rx="6.6" ry="2.8"/><path d="M5.4 6.6v4.2c0 1.5 3 2.8 6.6 2.8s6.6-1.3 6.6-2.8V6.6"/><path d="M5.4 10.8V15c0 1.6 3 2.8 6.6 2.8s6.6-1.2 6.6-2.8v-4.2"/></svg>
+    </div>
+    <div class="h-info">
+      <div class="h-title">FLOAT TOP-UP</div>
+      <div class="h-desc">500.00 ETB float &middot; Ref #LP7K38KA02</div>
+    </div>
+    <div class="h-time">
+      <div class="h-day">06 SEP</div>
+      <div class="h-hr">2:05 PM</div>
+    </div>
+  </div>
+
+  <div class="history-item">
+    <div class="h-icon" style="background:#e8f7ee">
+      <svg viewBox="0 0 24 24" fill="#22a55b"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+    </div>
+    <div class="h-info">
+      <div class="h-title">AIRTIME TOP-UP 100</div>
+      <div class="h-desc">100.00 ETB Airtime &middot; Ref #AT991204</div>
+    </div>
+    <div class="h-time">
+      <div class="h-day">28 AUG</div>
+      <div class="h-hr">09:40 AM</div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<div class="gesture-bar"></div>
+
+<script>
+function goBack(f){if(history.length>1){history.back()}else{window.location.href=f}}
+</script>
+</body>
+</html>

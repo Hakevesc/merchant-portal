@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Smart Phone Reward</title>
+<style>
+  /* ---------- Switzer (local, same as Home / 12-15) ---------- */
+  @font-face{font-family:'Switzer';src:url('assets/fonts/switzer-300.woff2') format('woff2');font-weight:300;font-style:normal;font-display:swap}
+  @font-face{font-family:'Switzer';src:url('assets/fonts/switzer-400.woff2') format('woff2');font-weight:400;font-style:normal;font-display:swap}
+  @font-face{font-family:'Switzer';src:url('assets/fonts/switzer-500.woff2') format('woff2');font-weight:500;font-style:normal;font-display:swap}
+  @font-face{font-family:'Switzer';src:url('assets/fonts/switzer-600.woff2') format('woff2');font-weight:600;font-style:normal;font-display:swap}
+  @font-face{font-family:'Switzer';src:url('assets/fonts/switzer-700.woff2') format('woff2');font-weight:700;font-style:normal;font-display:swap}
+  @font-face{font-family:'Switzer';src:url('assets/fonts/switzer-800.woff2') format('woff2');font-weight:800;font-style:normal;font-display:swap}
+  @font-face{font-family:'Switzer';src:url('assets/fonts/switzer-900.woff2') format('woff2');font-weight:900;font-style:normal;font-display:swap}
+
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+
+  html{
+    background:linear-gradient(45deg,#1c9b52 0%,#c41e2a 58%,#e8343e 100%);
+    min-height:100vh;
+    display:flex;align-items:center;justify-content:center;
+  }
+
+  body{
+    font-family:'Switzer','Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+    background:#fff;
+    max-width:390px;
+    -webkit-font-smoothing:antialiased;
+    /* real phone screen: 390 x 844, scrolls inside the frame */
+    width:390px;max-width:100%;
+    height:844px;max-height:100vh;
+    margin:0 auto;
+    overflow:hidden;
+    position:relative;
+    /* contains position:fixed children inside the phone */
+    transform:translateZ(0);
+    box-shadow:0 18px 50px rgba(0,0,0,.32);
+  }
+
+  /* ---------- Header ---------- */
+  /* ---------- Header ---------- */
+  .header{
+    display:grid;grid-template-columns:auto 1fr auto;align-items:center;
+    background:#fff;position:sticky;top:0;z-index:50;
+    padding:10px 16px 34px;
+  }
+  .back-btn{
+    grid-column:1;grid-row:1;
+    width:28px;height:28px;margin-left:-4px;
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;background:none;border:none;padding:0;
+  }
+  .back-btn svg{width:20px;height:20px;fill:#1a1a1a}
+  .info-btn{
+    grid-column:3;grid-row:1;
+    width:28px;height:28px;
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;background:none;border:none;padding:0;
+  }
+  .info-btn svg{width:20px;height:20px;fill:#1a1a1a}
+  .header-title{
+    grid-column:1/-1;grid-row:2;
+    text-align:center;margin-top:11px;line-height:1.15;
+    font-size:22px;font-weight:500;color:#000;
+    letter-spacing:.5px;white-space:nowrap;
+    overflow:hidden;text-overflow:ellipsis;
+  }
+  .header-spacer{display:none}
+
+  /* ---------- Layout ---------- */
+  .page{padding:14px 16px 20px}
+  /* room for the fixed CTA footer */
+  .page{padding-bottom:170px}
+
+  /* ---------- Hero summary card ---------- */
+  .hero-card{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    background:#fff;
+    border:1px solid #eceef1;
+    border-radius:16px;
+    padding:14px;
+    box-shadow:0 1px 3px rgba(0,0,0,.05);
+  }
+
+  .hero-thumb{
+    width:118px;
+    height:118px;
+    flex-shrink:0;
+    border-radius:13px;
+    overflow:hidden;
+    background:#f4f5f7;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+
+  .hero-thumb img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+  }
+
+  .hero-body{flex:1;min-width:0}
+
+  .hero-title{
+    font-size:18px;
+    font-weight:800;
+    color:#16181d;
+    letter-spacing:-.3px;
+    line-height:1.2;
+  }
+
+  .hero-value{
+    margin-top:7px;
+    font-size:13.5px;
+    font-weight:500;
+    color:#6b7079;
+    letter-spacing:-.1px;
+  }
+
+  .hero-points{
+    margin-top:8px;
+    font-size:14px;
+    font-weight:800;
+    color:#1c9b52;
+    letter-spacing:-.2px;
+  }
+
+  /* ---------- Progress card ---------- */
+  .progress-card{
+    margin-top:16px;
+    background:#fff;
+    border:1px solid #eceef1;
+    border-radius:16px;
+    padding:14px 16px;
+    box-shadow:0 1px 3px rgba(0,0,0,.05);
+  }
+  .pc-head{display:flex;align-items:center;justify-content:space-between}
+  .pc-col{flex:1;min-width:0}
+  .pc-col.right{text-align:right}
+  .pc-label{font-size:10.5px;font-weight:500;color:#8a9099;letter-spacing:.1px}
+  .pc-value{
+    margin-top:3px;
+    font-size:19px;font-weight:800;color:#16181d;
+    letter-spacing:-.4px;line-height:1.15;
+  }
+  .pc-need{color:#1c9b52}
+  .pc-vs{
+    flex-shrink:0;
+    width:30px;height:30px;border-radius:50%;
+    background:#eef0f3;
+    display:flex;align-items:center;justify-content:center;
+    font-size:9.5px;font-weight:700;color:#8a9099;
+  }
+  .pc-track{
+    height:9px;
+    margin-top:12px;
+    border-radius:5px;
+    background:#eef0f3;
+    overflow:hidden;
+  }
+  .pc-fill{
+    height:100%;width:100%;
+    border-radius:5px;
+    background:linear-gradient(90deg,#33ca73,#1f9e52);
+  }
+  .pc-note{
+    margin-top:10px;
+    font-size:12px;font-weight:500;color:#5b6169;
+    line-height:1.45;
+  }
+  .pc-note b{color:#c2410c;font-weight:700}
+
+  /* ---------- Section titles ---------- */
+  .section-title{
+    display:flex;align-items:center;gap:7px;
+    margin:20px 0 10px;
+    font-size:16px;font-weight:800;color:#16181d;
+    letter-spacing:.7px;
+  }
+
+  .card{
+    background:#fff;
+    border:1px solid #ececf0;
+    border-radius:14px;
+    box-shadow:0 1px 3px rgba(0,0,0,.04);
+    overflow:hidden;
+  }
+  .card-body{padding:14px 16px}
+
+  /* ---------- Redemption info rows ---------- */
+  .info-row{display:flex;align-items:center;gap:12px;padding:11px 14px}
+  .info-row + .info-row{border-top:1px solid #f0f1f4}
+  .info-icon{
+    width:36px;height:36px;flex-shrink:0;
+    border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .icon-green{background:#e4f9ed}
+  .icon-blue{background:#e4f9ed}
+  .info-icon svg{width:18px;height:18px}
+  .info-text{flex:1;min-width:0}
+  .info-title{font-size:12.5px;font-weight:700;color:#16181d}
+  .info-desc{margin-top:2px;font-size:11.5px;color:#8a9099;line-height:1.45}
+
+  /* ---------- CTA ---------- */
+  .redeem-footer{
+    position:fixed;left:50%;transform:translateX(-50%);
+    bottom:24px;width:100%;max-width:390px;
+    background:#fff;
+    padding:12px 16px calc(12px + env(safe-area-inset-bottom));
+    z-index:60;
+  }
+  .redeem-btn{
+    display:flex;align-items:center;justify-content:center;gap:9px;
+    width:100%;height:54px;margin-top:10px;
+    background:linear-gradient(135deg,#33ca73,#1f9e52);
+    color:#fff;border:none;border-radius:27px;
+    font-family:'Switzer','Inter',sans-serif;
+    font-size:15.5px;font-weight:700;letter-spacing:.2px;
+    cursor:pointer;
+    box-shadow:0 6px 16px rgba(46,197,109,.30);
+    transition:transform .15s ease,box-shadow .15s ease;
+  }
+  .redeem-btn:active{transform:translateY(1px);box-shadow:0 3px 10px rgba(46,197,109,.26)}
+  .redeem-btn svg.rd-gift{width:20px;height:20px;fill:#fff;flex-shrink:0}
+  .redeem-btn svg.rd-chev{width:8px;height:13px;flex-shrink:0}
+  .redeem-hint{
+    margin-top:0;
+    font-size:11.5px;font-weight:500;color:#8a9099;
+    text-align:center;
+  }
+
+  .tc-link{
+    display:flex;align-items:center;justify-content:center;gap:5px;
+    width:100%;
+    margin-top:2px;
+    font-size:11.5px;font-weight:600;color:#1c9b52;
+    cursor:pointer;background:none;border:none;padding:6px 0;
+    text-align:center;
+  }
+  .tc-link svg{width:13px;height:13px;fill:#1c9b52;flex-shrink:0}
+
+  /* ---------- Toast ---------- */
+  .toast{
+    position:fixed;
+    bottom:80px;
+    left:50%;
+    transform:translateX(-50%) translateY(0);
+    width:100%;max-width:390px;
+    margin:0 auto;
+    padding:13px 15px;
+    background:#1f2429;
+    color:#fff;
+    border-radius:14px;
+    display:flex;align-items:flex-start;gap:9px;
+    font-size:12.5px;line-height:1.5;
+    box-shadow:0 10px 24px rgba(0,0,0,.18);
+    opacity:0;pointer-events:none;
+    z-index:120;
+    transition:opacity .25s ease,transform .25s ease;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(-5px)}
+  .toast svg{width:19px;height:19px;flex-shrink:0;fill:#ffb648;margin-top:1px}
+  .toast b{color:#7ee2a8;font-weight:700}
+
+  /* ---------- Header (consistent) ---------- */
+
+
+  .phone-scroll{
+    height:calc(100% - 24px);
+    overflow-y:auto;
+    overflow-x:hidden;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+  }
+  .phone-scroll::-webkit-scrollbar{display:none}
+  body.sheet-open .phone-scroll{overflow:hidden}
+
+  .gesture-bar{
+    position:fixed;
+    left:0;right:0;bottom:0;
+    height:24px;
+    background:#fff;
+    display:flex;align-items:center;justify-content:center;
+    z-index:400;
+    pointer-events:none;
+  }
+  .gesture-bar::after{
+    content:'';
+    width:134px;height:5px;
+    border-radius:3px;
+    background:#1a1a1a;
+  }
+</style>
+</head>
+<body>
+<div class="phone-scroll">
+<!-- Header -->
+<div class="header">
+  <button class="back-btn" onclick="goBack('9.html')" aria-label="Go back">
+    <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+  </button>
+  <div class="header-title">REWARD DETAILS</div>
+  <button class="info-btn" onclick="window.location.href='14.html'" aria-label="How the loyalty program works">
+    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+  </button>
+</div>
+
+<div class="page">
+
+  <!-- Hero summary -->
+  <div class="hero-card">
+    <div class="hero-thumb">
+      <img id="heroImg" src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&h=400&fit=crop" alt="Smartphone">
+    </div>
+    <div class="hero-body">
+      <div class="hero-title" id="heroTitle">Smartphone</div>
+      <div class="hero-value" id="heroValue">5,000 ETB Value</div>
+      <div class="hero-points" id="heroPoints">6,667 Points Required</div>
+    </div>
+  </div>
+
+  <!-- Progress card -->
+  <div class="progress-card">
+    <div class="pc-head">
+      <div class="pc-col">
+        <div class="pc-label">Your Points</div>
+        <div class="pc-value" id="pcHave">12,450</div>
+      </div>
+      <div class="pc-vs">vs</div>
+      <div class="pc-col right">
+        <div class="pc-label">Points Required</div>
+        <div class="pc-value pc-need" id="pcNeed">6,667</div>
+      </div>
+    </div>
+    <div class="pc-track"><div class="pc-fill" id="pcFill"></div></div>
+    <div class="pc-note" id="pcNote">You have enough points. <b>5,783 points</b> will remain.</div>
+  </div>
+
+  <!-- Redemption info -->
+  <div class="section-title">REDEMPTION INFO</div>
+  <div class="card">
+    <div class="info-row">
+      <div class="info-icon icon-green">
+        <svg viewBox="0 0 24 24" fill="#2ec56d"><path d="M19.9 7h-2.4a3.1 3.1 0 0 0-4.9-3.6l-.6.6-.6-.6A3.1 3.1 0 0 0 6.5 7H4.1c-.9 0-1.6.7-1.6 1.6v2.7c0 .5.4.9.9.9h7.5V7.9h2.2v4.3h7.5c.5 0 .9-.4.9-.9V8.6c0-.9-.7-1.6-1.6-1.6zM8.7 4.7c.6 0 1.1.5 1.1 1.1V7H8.7a1.15 1.15 0 0 1 0-2.3zm6.6 2.3h-1.1V5.8a1.15 1.15 0 1 1 1.1 1.2z"/></svg>
+      </div>
+      <div class="info-text">
+        <div class="info-title">Item Delivery</div>
+        <div class="info-desc">Delivered to your registered address once approved.</div>
+      </div>
+    </div>
+    <div class="info-row">
+      <div class="info-icon icon-blue">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#2ec56d" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M17.3 1.6H6.7c-1.2 0-2.2 1-2.2 2.2v16.4c0 1.2 1 2.2 2.2 2.2h10.6c1.2 0 2.2-1 2.2-2.2V3.8c0-1.2-1-2.2-2.2-2.2zM9 19.7H6.8v-2.2H9v2.2zm0-4H6.8v-2.2H9v2.2zm4.1 4h-2.2v-2.2h2.2v2.2zm0-4h-2.2v-2.2h2.2v2.2zm4.1 4H15v-2.2h2.2v2.2zm0-4H15v-2.2h2.2v2.2zm0-4.4H6.8V4.8h10.4v6.5z"/></svg>
+      </div>
+      <div class="info-text">
+        <div class="info-title">Processing Time</div>
+        <div class="info-desc">Redemptions are processed within 24 hours.</div>
+      </div>
+    </div>
+    <div class="info-row">
+      <div class="info-icon icon-green">
+        <svg viewBox="0 0 24 24" fill="#2ec56d"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4.2-8 4.6-8-4.6V6l8 4.6L20 6v2.2z"/></svg>
+      </div>
+      <div class="info-text">
+        <div class="info-title">SMS Confirmation</div>
+        <div class="info-desc">A confirmation SMS with your reference number is sent.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- CTA pinned to the bottom edge -->
+<div class="redeem-footer">
+  <div class="redeem-hint" id="redeemHint">6,667 points will be deducted when you confirm.</div>
+  <button class="tc-link" onclick="window.location.href='14.html'">
+  <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+  Terms &amp; conditions apply
+  </button>
+  <button class="redeem-btn" id="redeemBtn">
+  <svg class="rd-gift" viewBox="0 0 24 24"><path d="M19.9 7h-2.4a3.1 3.1 0 0 0-4.9-3.6l-.6.6-.6-.6A3.1 3.1 0 0 0 6.5 7H4.1c-.9 0-1.6.7-1.6 1.6v2.7c0 .5.4.9.9.9h7.5V7.9h2.2v4.3h7.5c.5 0 .9-.4.9-.9V8.6c0-.9-.7-1.6-1.6-1.6zM8.7 4.7c.6 0 1.1.5 1.1 1.1V7H8.7a1.15 1.15 0 0 1 0-2.3zm6.6 2.3h-1.1V5.8a1.15 1.15 0 1 1 1.1 1.2z"/></svg>
+  REDEEM NOW
+  <svg class="rd-chev" viewBox="0 0 8 13" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m1.6 1.6 5 4.9-5 4.9"/></svg>
+  </button>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">
+  <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+  <span id="toastText"><b>Not enough points.</b> You need 14,217 more points to redeem this reward.</span>
+</div>
+
+
+<script>
+  (function () {
+    var q = new URLSearchParams(location.search);
+
+    /* Reward data comes from the catalogue via query params. */
+    var HAVE  = parseInt(q.get('have')  || '12450', 10);
+    var NEED  = parseInt(q.get('pts')   || '6667',  10);
+    var VALUE = parseInt(q.get('value') || '5000',  10);
+    var NAME  = q.get('name') || 'Smartphone';
+    var IMG   = q.get('img')  || 'photo-1511707171634-5f897ff02aa9';
+    if (!/^https?:/i.test(IMG)) {
+      IMG = 'https://images.unsplash.com/' + IMG.replace(/^\/+/, '') + '?w=400&h=400&fit=crop';
+    }
+
+    var n = function (v) { return v.toLocaleString('en-US'); };
+    var shortfall = Math.max(0, NEED - HAVE);
+
+    document.getElementById('heroImg').src = IMG;
+    document.getElementById('heroImg').alt = NAME;
+    document.getElementById('heroTitle').textContent   = NAME;
+    document.getElementById('heroValue').textContent   = n(VALUE) + ' ETB Value';
+    document.getElementById('heroPoints').textContent  = n(NEED) + ' Points Required';
+    document.getElementById('pcHave').textContent      = n(HAVE);
+    document.getElementById('pcNeed').textContent      = n(NEED);
+
+    var pct = Math.min(100, Math.round(HAVE * 100 / NEED));
+    document.getElementById('pcFill').style.width = pct + '%';
+
+    var note = document.getElementById('pcNote');
+    if (HAVE >= NEED) {
+      note.innerHTML = 'You have enough points. <b>' + n(HAVE - NEED) + ' points</b> will remain.';
+      document.getElementById('redeemHint').textContent = n(NEED) + ' points will be deducted when you confirm.';
+    } else {
+      note.innerHTML = 'You need <b>' + n(shortfall) + ' more points</b> to redeem this reward.';
+      document.getElementById('redeemHint').textContent = 'Redemption unlocks once you reach ' + n(NEED) + ' points.';
+    }
+
+    var btn  = document.getElementById('redeemBtn');
+    var toast = document.getElementById('toast');
+    var toastText = document.getElementById('toastText');
+    var timer = null;
+
+    function showToast() {
+      toast.classList.remove('show');
+      void toast.offsetWidth; /* restart the transition */
+      toast.classList.add('show');
+      clearTimeout(timer);
+      timer = setTimeout(function () { toast.classList.remove('show'); }, 2800);
+    }
+
+    btn.addEventListener('click', function () {
+      if (HAVE < NEED) {
+        toastText.innerHTML = '';
+        var b = document.createElement('b');
+        b.textContent = 'Not enough points.';
+        toastText.appendChild(b);
+        toastText.appendChild(document.createTextNode(' You need ' + n(shortfall) + ' more points to redeem this reward.'));
+        showToast();
+        return;
+      }
+
+      var p = new URLSearchParams({
+        item: NAME,
+        value: String(VALUE),
+        pts: String(NEED),
+        have: String(HAVE),
+        img: IMG
+      });
+      window.location.href = '17.html?' + p.toString();
+    });
+  })();
+</script>
+
+<script>
+function goBack(f){if(history.length>1){history.back()}else{window.location.href=f}}
+</script>
+</div>
+
+<div class="gesture-bar"></div>
+
+</body>
+</html>

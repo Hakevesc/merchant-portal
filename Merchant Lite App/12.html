@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Convert Float</title>
+<style>
+  /* ---------- Switzer (local, same as Home) ---------- */
+  @font-face{font-family:'Switzer';src:url('assets/fonts/switzer-300.woff2') format('woff2');font-weight:300;font-style:normal;font-display:swap}
+  @font-face{font-family:'Switzer';src:url('assets/fonts/switzer-400.woff2') format('woff2');font-weight:400;font-style:normal;font-display:swap}
+  @font-face{font-family:'Switzer';src:url('assets/fonts/switzer-500.woff2') format('woff2');font-weight:500;font-style:normal;font-display:swap}
+  @font-face{font-family:'Switzer';src:url('assets/fonts/switzer-600.woff2') format('woff2');font-weight:600;font-style:normal;font-display:swap}
+  @font-face{font-family:'Switzer';src:url('assets/fonts/switzer-700.woff2') format('woff2');font-weight:700;font-style:normal;font-display:swap}
+  @font-face{font-family:'Switzer';src:url('assets/fonts/switzer-800.woff2') format('woff2');font-weight:800;font-style:normal;font-display:swap}
+  @font-face{font-family:'Switzer';src:url('assets/fonts/switzer-900.woff2') format('woff2');font-weight:900;font-style:normal;font-display:swap}
+
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+
+  html{
+    background:linear-gradient(45deg,#1c9b52 0%,#c41e2a 58%,#e8343e 100%);
+    min-height:100vh;
+    display:flex;align-items:center;justify-content:center;
+  }
+
+  body{
+    font-family:'Switzer','Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+    background:#fff;
+    max-width:390px;
+    position:relative;
+    -webkit-font-smoothing:antialiased;
+    /* real phone screen: 390 x 844, scrolls inside the frame */
+    width:390px;max-width:100%;
+    height:844px;max-height:100vh;
+    margin:0 auto;
+    overflow:hidden;
+    position:relative;
+    /* contains position:fixed children inside the phone */
+    transform:translateZ(0);
+    box-shadow:0 18px 50px rgba(0,0,0,.32);
+  }
+
+  /* ---------- Header ---------- */
+  /* ---------- Header ---------- */
+  .header{
+    display:grid;grid-template-columns:auto 1fr auto;align-items:center;
+    background:#fff;position:sticky;top:0;z-index:50;
+    padding:10px 16px 34px;
+  }
+  .back-btn{
+    grid-column:1;grid-row:1;
+    width:28px;height:28px;margin-left:-4px;
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;background:none;border:none;padding:0;
+  }
+  .back-btn svg{width:20px;height:20px;fill:#1a1a1a}
+  .info-btn{
+    grid-column:3;grid-row:1;
+    width:28px;height:28px;
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;background:none;border:none;padding:0;
+  }
+  .info-btn svg{width:20px;height:20px;fill:#1a1a1a}
+  .header-title{
+    grid-column:1/-1;grid-row:2;
+    text-align:center;margin-top:11px;line-height:1.15;
+    font-size:22px;font-weight:500;color:#000;
+    letter-spacing:.5px;white-space:nowrap;
+    overflow:hidden;text-overflow:ellipsis;
+  }
+  .header-spacer{display:none}
+
+  .content{padding:14px 16px 0}
+
+  /* ---------- Conversion rate card ---------- */
+  .conversion-card{
+    display:flex;
+    align-items:center;
+    gap:16px;
+    background:#f2faf5;
+    border:1px solid #e2f1e8;
+    border-radius:16px;
+    padding:16px;
+    margin-bottom:18px;
+  }
+  .conversion-icon{
+    width:56px;height:56px;flex-shrink:0;
+    border-radius:17px;
+    background:linear-gradient(150deg,#37cf76,#1f9e52);
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 4px 10px rgba(34,165,91,.28);
+  }
+  .conversion-icon svg{width:30px;height:30px}
+  .conversion-divider{
+    width:1px;
+    align-self:stretch;
+    margin:4px 0;
+    background:#d3e9dc;
+    flex-shrink:0;
+  }
+  .conversion-text{flex:1;min-width:0}
+  .conversion-rate{
+    font-size:16.5px;
+    font-weight:700;
+    color:#16181d;
+    letter-spacing:-.2px;
+    line-height:1.25;
+  }
+  .conversion-min{
+    margin-top:4px;
+    font-size:12.5px;
+    font-weight:400;
+    color:#8a9099;
+    letter-spacing:-.1px;
+  }
+
+  /* ---------- Points to redeem ---------- */
+  .redeem-card{
+    background:#fff;
+    border:1px solid #ededf1;
+    border-radius:16px;
+    padding:16px;
+    margin-bottom:18px;
+    box-shadow:0 1px 3px rgba(0,0,0,.04);
+  }
+  .redeem-label{
+    font-size:13.5px;
+    font-weight:800;
+    color:#16181d;
+    letter-spacing:.4px;
+    margin-bottom:12px;
+  }
+  .input-container{
+    display:flex;
+    align-items:stretch;
+    background:#f4f5f7;
+    border:1px solid #ececf0;
+    border-radius:11px;
+    overflow:hidden;
+    transition:border-color .15s ease, box-shadow .15s ease;
+  }
+  .input-container:focus-within{
+    border-color:#7bd4a2;
+    box-shadow:0 0 0 3px rgba(46,197,109,.14);
+  }
+  .input-field{
+    flex:1;min-width:0;
+    height:46px;
+    padding:0 15px;
+    border:none;
+    background:transparent;
+    font-family:inherit;
+    font-size:14.5px;
+    font-weight:500;
+    color:#16181d;
+    outline:none;
+  }
+  .input-field::placeholder{color:#a6abb3;font-weight:400}
+  .input-suffix{
+    display:flex;align-items:center;
+    padding:0 17px;
+    font-size:13.5px;
+    font-weight:600;
+    color:#6b7280;
+    background:#eceef1;
+    border-left:1px solid #e2e4e9;
+  }
+  .redeem-hint{
+    margin-top:11px;
+    font-size:12px;
+    font-weight:400;
+    color:#9aa0a6;
+  }
+
+  /* ---------- Red hero card (Current Available + Redemption value) ---------- */
+  .float-hero{
+    position:relative;
+    display:flex;
+    align-items:center;
+    gap:13px;
+    margin-bottom:16px;
+    padding:15px 16px;
+    background:linear-gradient(135deg,#e8343e 0%,#c41e2a 45%,#a81520 100%);
+    border-radius:16px;
+    overflow:hidden;
+    box-shadow:0 4px 14px rgba(168,21,32,.24);
+  }
+  .float-hero::before{
+    content:'';
+    position:absolute;
+    top:-46px;left:-30px;
+    width:240px;height:160px;
+    background:linear-gradient(120deg,rgba(255,255,255,.14),rgba(255,255,255,0) 70%);
+    transform:rotate(-8deg);
+    pointer-events:none;
+  }
+  .fh-left{
+    position:relative;
+    flex:1;
+    min-width:0;
+  }
+  .fh-label{
+    font-size:11.5px;
+    font-weight:500;
+    color:rgba(255,255,255,.88);
+    letter-spacing:.1px;
+  }
+  .fh-value{
+    font-size:24px;
+    font-weight:800;
+    color:#fff;
+    letter-spacing:-.5px;
+    line-height:1.05;
+    margin-top:2px;
+  }
+  .fh-value span{
+    font-size:13px;
+    font-weight:600;
+    color:rgba(255,255,255,.85);
+  }
+  .fh-divider{
+    width:1px;
+    align-self:stretch;
+    margin:2px 8px;
+    background:rgba(255,255,255,.22);
+    flex-shrink:0;
+  }
+  .fh-right{
+    position:relative;
+    flex:1;
+    min-width:0;
+    text-align:right;
+  }
+
+  /* ---------- Summary stat cards ---------- */
+  .summary-row{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:13px;
+    margin-bottom:18px;
+  }
+  .stat-card{
+    background:#f4faf6;
+    border:1px solid #e6f1ea;
+    border-radius:14px;
+    padding:14px;
+  }
+  .stat-icon{
+    width:38px;height:38px;
+    border-radius:50%;
+    background:#e2f4e9;
+    display:flex;align-items:center;justify-content:center;
+    margin-bottom:12px;
+  }
+  .stat-icon svg{width:20px;height:20px}
+  .stat-label{
+    font-size:13.5px;
+    font-weight:700;
+    color:#16181d;
+    letter-spacing:-.2px;
+    margin-bottom:5px;
+  }
+  .stat-value{
+    font-size:22px;
+    font-weight:800;
+    color:#22a55b;
+    letter-spacing:-.3px;
+    line-height:1.1;
+  }
+
+  /* ---------- Convert button ---------- */
+  .convert-btn{
+    display:block;
+    width:calc(100% - 40px);
+    margin:auto 20px 20px;
+    height:52px;
+    background:linear-gradient(135deg,#33ca73,#1f9e52);
+    color:#fff;
+    border:none;
+    border-radius:26px;
+    font-family:inherit;
+    font-size:15.5px;
+    font-weight:700;
+    letter-spacing:1.5px;
+    cursor:pointer;
+    box-shadow:0 8px 20px rgba(46,197,109,.32);
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .convert-btn:active{
+    transform:translateY(1px);
+    box-shadow:0 4px 12px rgba(46,197,109,.28);
+  }
+
+
+  /* ---------- Confirm bottom sheet ---------- */
+  .sheet-backdrop{
+    position:fixed;
+    inset:0;
+    background:rgba(16,20,24,.45);
+    opacity:0;
+    visibility:hidden;
+    transition:opacity .25s ease, visibility .25s ease;
+    z-index:200;
+  }
+  .sheet-backdrop.open{opacity:1;visibility:visible}
+
+    .sheet{visibility:hidden;transition:visibility .32s ease}
+  .sheet.open{visibility:visible}
+.sheet{
+    position:fixed;
+    left:50%;
+    bottom:24px;
+    transform:translate(-50%,100%);
+    width:100%;
+    max-width:390px;
+    background:#fff;
+    border-radius:24px 24px 0 0;
+    padding:10px 20px 24px;
+    z-index:201;
+    box-shadow:0 -8px 30px rgba(0,0,0,.16);
+    transition:transform .32s cubic-bezier(.22,1,.36,1);
+  }
+  .sheet.open{transform:translate(-50%,0)}
+
+  .sheet-handle{
+    width:40px;
+    height:4px;
+    border-radius:2px;
+    background:#dfe2e6;
+    margin:0 auto 18px;
+  }
+
+  .sheet-icon{
+    width:54px;
+    height:54px;
+    margin:0 auto 14px;
+    border-radius:50%;
+    background:#eef8f2;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .sheet-icon svg{width:26px;height:26px;fill:#1c9b52}
+
+  .sheet-title{
+    text-align:center;
+    font-size:18px;
+    font-weight:800;
+    color:#16181d;
+    letter-spacing:-.3px;
+    margin-bottom:6px;
+  }
+
+  .sheet-sub{
+    text-align:center;
+    font-size:12.5px;
+    font-weight:400;
+    color:#6b7079;
+    line-height:1.5;
+    margin-bottom:18px;
+  }
+
+  .sheet-summary{
+    background:#fafbfc;
+    border:1px solid #eceef1;
+    border-radius:14px;
+    padding:2px 14px;
+    margin-bottom:18px;
+  }
+
+  .sheet-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    padding:12px 0;
+    border-bottom:1px solid #f0f1f4;
+  }
+  .sheet-row:last-child{border-bottom:none}
+
+  .sheet-row .lbl{font-size:12.5px;font-weight:500;color:#6b7079}
+  .sheet-row .val{font-size:13.5px;font-weight:700;color:#16181d;letter-spacing:-.1px}
+  .sheet-row .val.green{color:#1c9b52;font-size:15px;font-weight:800}
+
+  .sheet-actions{display:flex;gap:11px}
+
+  .sheet-btn{
+    flex:1;
+    height:52px;
+    border-radius:26px;
+    font-family:inherit;
+    font-size:14.5px;
+    font-weight:700;
+    letter-spacing:.5px;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition:transform .15s ease;
+  }
+  .sheet-btn:active{transform:translateY(1px)}
+
+  .sheet-cancel{
+    background:#fff;
+    color:#5b6169;
+    border:1.5px solid #e2e5e9;
+  }
+
+  .sheet-confirm{
+    background:linear-gradient(135deg,#33ca73,#1f9e52);
+    color:#fff;
+    border:none;
+    box-shadow:0 6px 16px rgba(46,197,109,.30);
+  }
+
+  body.sheet-open{overflow:hidden}
+
+  /* ---------- Bottom nav ---------- */
+
+  .page-wrapper{
+    display:flex;
+    flex-direction:column;
+    min-height:100%;
+  }
+  /* ---------- Header (consistent) ---------- */
+
+
+  .phone-scroll{
+    height:calc(100% - 24px);
+    overflow-y:auto;
+    overflow-x:hidden;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+  }
+  .phone-scroll::-webkit-scrollbar{display:none}
+  body.sheet-open .phone-scroll{overflow:hidden}
+
+  .gesture-bar{
+    position:fixed;
+    left:0;right:0;bottom:0;
+    height:24px;
+    background:#fff;
+    display:flex;align-items:center;justify-content:center;
+    z-index:400;
+    pointer-events:none;
+  }
+  .gesture-bar::after{
+    content:'';
+    width:134px;height:5px;
+    border-radius:3px;
+    background:#1a1a1a;
+  }
+</style>
+</head>
+<body>
+<div class="phone-scroll">
+<div class="page-wrapper">
+
+  <!-- Header -->
+  <div class="header">
+    <button class="back-btn" onclick="goBack('8.html')" aria-label="Go back">
+      <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+    </button>
+    <div class="header-title">CONVERT FLOAT</div>
+    <div class="header-spacer"></div>
+  </div>
+
+  <div class="content">
+
+    <!-- Conversion rate -->
+    <div class="conversion-card">
+      <div class="conversion-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6.5 8.3h11c.6 0 1.1.5 1.1 1.1v1.1a1.6 1.6 0 0 0 0 3.2v1.1c0 .6-.5 1.1-1.1 1.1h-11c-.6 0-1.1-.5-1.1-1.1v-1.1a1.6 1.6 0 0 0 0-3.2V9.4c0-.6.5-1.1 1.1-1.1z"/>
+          <text x="12" y="14.5" text-anchor="middle" font-size="6.6" font-weight="700" fill="#fff" stroke="none" font-family="Switzer, sans-serif">B</text>
+          <path d="M2.9 10.1l1.2.5M2.9 13.9l1.2-.5M2.2 12h1.4"/>
+          <path d="M21.1 10.1l-1.2.5M21.1 13.9l-1.2-.5M21.8 12h-1.4"/>
+        </svg>
+      </div>
+      <div class="conversion-divider"></div>
+      <div class="conversion-text">
+        <div class="conversion-rate">100 Points = 1 Br Float</div>
+        <div class="conversion-min">Minimum to convert is 100 pts</div>
+      </div>
+    </div>
+
+    <!-- Red hero card: current available + redemption value -->
+    <div class="float-hero">
+      <div class="fh-left">
+        <div class="fh-label">Current Available Points</div>
+        <div class="fh-value" id="fhHave">12,450 <span>PTS</span></div>
+      </div>
+      <div class="fh-divider"></div>
+      <div class="fh-right">
+        <div class="fh-label">Redemption Value</div>
+        <div class="fh-value" id="fhFloat">0.00 <span>Br</span></div>
+      </div>
+    </div>
+
+    <!-- Points to redeem -->
+    <div class="redeem-card">
+      <div class="redeem-label">POINTS TO REDEEM</div>
+      <div class="input-container">
+        <input type="text" inputmode="numeric" class="input-field" id="pointsInput" placeholder="Enter point to redeem">
+        <div class="input-suffix">PT</div>
+      </div>
+      <div class="redeem-hint">You can redeem your points in multiples of 100.</div>
+    </div>
+
+    <!-- Summary -->
+    <div class="summary-row">
+      <div class="stat-card">
+        <div class="stat-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#22a55b" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+            <ellipse cx="12" cy="6.6" rx="6.6" ry="2.8"/>
+            <path d="M5.4 6.6v4.2c0 1.5 3 2.8 6.6 2.8s6.6-1.3 6.6-2.8V6.6"/>
+            <path d="M5.4 10.8V15c0 1.6 3 2.8 6.6 2.8s6.6-1.2 6.6-2.8v-4.2"/>
+          </svg>
+        </div>
+        <div class="stat-label">Equivalent Float</div>
+        <div class="stat-value" id="floatValue">10.00 Br</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#22a55b" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m12 3.6 2.6 5.2 5.8.9-4.2 4.1 1 5.7-5.2-2.7-5.2 2.7 1-5.7-4.2-4.1 5.8-.9L12 3.6z"/>
+          </svg>
+        </div>
+        <div class="stat-label">Remaining Points</div>
+        <div class="stat-value" id="remainingValue">4 Points</div>
+      </div>
+    </div>
+
+  </div>
+
+  <button class="convert-btn" id="convertBtn">CONVERT</button>
+</div>
+
+<!-- Bottom navigation -->
+
+
+
+<!-- Confirm conversion bottom sheet -->
+<div class="sheet-backdrop" id="sheetBackdrop"></div>
+<div class="sheet" id="confirmSheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+  <div class="sheet-handle"></div>
+
+  <div class="sheet-icon">
+    <svg viewBox="0 0 24 24"><path d="M7.6 3.3 3.2 7.7l4.4 4.4 1.6-1.6-1.7-1.7h9.2V6.6H7.5l1.7-1.7z"/><path d="m16.4 20.7 4.4-4.4-4.4-4.4-1.6 1.6 1.7 1.7H7.3v2.2h9.2l-1.7 1.7z"/></svg>
+  </div>
+
+  <div class="sheet-title" id="sheetTitle">Are you sure you want to convert?</div>
+  <div class="sheet-sub">Please review the details below.<br>This action cannot be undone.</div>
+
+  <div class="sheet-summary">
+    <div class="sheet-row">
+      <span class="lbl">Points to convert</span>
+      <span class="val" id="sheetPoints">1,000 PTS</span>
+    </div>
+    <div class="sheet-row">
+      <span class="lbl">You will receive</span>
+      <span class="val green" id="sheetFloat">10.00 Br</span>
+    </div>
+    <div class="sheet-row">
+      <span class="lbl">Remaining points</span>
+      <span class="val" id="sheetRemaining">4 PTS</span>
+    </div>
+  </div>
+
+  <div class="sheet-actions">
+    <button class="sheet-btn sheet-cancel" id="sheetCancel">CANCEL</button>
+    <button class="sheet-btn sheet-confirm" id="sheetConfirm">CONFIRM</button>
+  </div>
+</div>
+
+<script>
+  (function () {
+    var q = new URLSearchParams(location.search);
+    var HAVE = parseInt(q.get('have') || '12450', 10);
+    var PRE  = parseInt(q.get('pts')  || '0', 10);
+
+    var input = document.getElementById('pointsInput');
+    var floatEl = document.getElementById('floatValue');
+    var remainingEl = document.getElementById('remainingValue');
+    var fhHaveEl = document.getElementById('fhHave');
+    var fhFloatEl = document.getElementById('fhFloat');
+
+    var backdrop = document.getElementById('sheetBackdrop');
+    var sheet = document.getElementById('confirmSheet');
+    var pending = 0;
+
+    var n = function (v) { return v.toLocaleString('en-US'); };
+
+    function sync(points) {
+      var convertible = Math.floor(points / 100) * 100;
+      var leftover = points - convertible;
+      var floatTxt = (convertible / 100).toFixed(2);
+
+      fhHaveEl.innerHTML = n(HAVE) + ' <span>PTS</span>';
+      fhFloatEl.innerHTML = floatTxt + ' <span>Br</span>';
+      floatEl.textContent = floatTxt + ' Br';
+      remainingEl.textContent = leftover + (leftover === 1 ? ' Point' : ' Points');
+    }
+
+    function openSheet(points) {
+      var convertible = Math.floor(points / 100) * 100;
+      var leftover = points - convertible;
+
+      document.getElementById('sheetPoints').textContent = convertible.toLocaleString('en-US') + ' PTS';
+      document.getElementById('sheetFloat').textContent = (convertible / 100).toFixed(2) + ' Br';
+      document.getElementById('sheetRemaining').textContent = leftover.toLocaleString('en-US') + ' PTS';
+
+      pending = points;
+      backdrop.classList.add('open');
+      sheet.classList.add('open');
+      document.body.classList.add('sheet-open');
+    }
+
+    function closeSheet() {
+      backdrop.classList.remove('open');
+      sheet.classList.remove('open');
+      document.body.classList.remove('sheet-open');
+    }
+
+    document.getElementById('convertBtn').addEventListener('click', function () {
+      var points = parseInt((input.value || '').replace(/[^0-9]/g, '') || '0', 10);
+      if (points < 100) {
+        input.focus();
+        return;
+      }
+      openSheet(points);
+    });
+
+    document.getElementById('sheetCancel').addEventListener('click', closeSheet);
+    backdrop.addEventListener('click', closeSheet);
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeSheet();
+    });
+
+    document.getElementById('sheetConfirm').addEventListener('click', function () {
+      window.location.href = '15.html?pts=' + pending;
+    });
+
+    input.addEventListener('input', function () {
+      var digits = input.value.replace(/[^0-9]/g, '');
+      if (digits !== input.value) input.value = digits;
+      sync(parseInt(digits || '0', 10));
+    });
+
+    if (PRE > 0) {
+      input.value = String(PRE);
+      sync(PRE);
+    } else {
+      sync(0);
+    }
+  })();
+</script>
+
+<script>
+function goBack(f){if(history.length>1){history.back()}else{window.location.href=f}}
+</script>
+</div>
+
+<div class="gesture-bar"></div>
+
+</body>
+</html>

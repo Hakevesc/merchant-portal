@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Delivery Details</title>
+<style>
+  @font-face{font-family:'Switzer';src:url('assets/fonts/switzer-300.woff2') format('woff2');font-weight:300;font-style:normal;font-display:swap}
+  @font-face{font-family:'Switzer';src:url('assets/fonts/switzer-400.woff2') format('woff2');font-weight:400;font-style:normal;font-display:swap}
+  @font-face{font-family:'Switzer';src:url('assets/fonts/switzer-500.woff2') format('woff2');font-weight:500;font-style:normal;font-display:swap}
+  @font-face{font-family:'Switzer';src:url('assets/fonts/switzer-600.woff2') format('woff2');font-weight:600;font-style:normal;font-display:swap}
+  @font-face{font-family:'Switzer';src:url('assets/fonts/switzer-700.woff2') format('woff2');font-weight:700;font-style:normal;font-display:swap}
+  @font-face{font-family:'Switzer';src:url('assets/fonts/switzer-800.woff2') format('woff2');font-weight:800;font-style:normal;font-display:swap}
+  @font-face{font-family:'Switzer';src:url('assets/fonts/switzer-900.woff2') format('woff2');font-weight:900;font-style:normal;font-display:swap}
+
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+
+  html{
+    background:linear-gradient(45deg,#1c9b52 0%,#c41e2a 58%,#e8343e 100%);
+    min-height:100vh;
+    display:flex;align-items:center;justify-content:center;
+  }
+
+  body{
+    font-family:'Switzer','Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+    background:#fff;
+    max-width:390px;
+    position:relative;
+    -webkit-font-smoothing:antialiased;
+    /* real phone screen: 390 x 844, scrolls inside the frame */
+    width:390px;max-width:100%;
+    height:844px;max-height:100vh;
+    margin:0 auto;
+    overflow:hidden;
+    position:relative;
+    /* contains position:fixed children inside the phone */
+    transform:translateZ(0);
+    box-shadow:0 18px 50px rgba(0,0,0,.32);
+  }
+
+  /* ---------- Header ---------- */
+  /* ---------- Header ---------- */
+  .header{
+    display:grid;grid-template-columns:auto 1fr auto;align-items:center;
+    background:#fff;position:sticky;top:0;z-index:50;
+    padding:10px 16px 34px;
+  }
+  .back-btn{
+    grid-column:1;grid-row:1;
+    width:28px;height:28px;margin-left:-4px;
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;background:none;border:none;padding:0;
+  }
+  .back-btn svg{width:20px;height:20px;fill:#1a1a1a}
+  .info-btn{
+    grid-column:3;grid-row:1;
+    width:28px;height:28px;
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;background:none;border:none;padding:0;
+  }
+  .info-btn svg{width:20px;height:20px;fill:#1a1a1a}
+  .header-title{
+    grid-column:1/-1;grid-row:2;
+    text-align:center;margin-top:11px;line-height:1.15;
+    font-size:22px;font-weight:500;color:#000;
+    letter-spacing:.5px;white-space:nowrap;
+    overflow:hidden;text-overflow:ellipsis;
+  }
+  .header-spacer{display:none}
+
+  .page{padding:14px 16px 96px}
+
+  /* ---------- Section label ---------- */
+  .sec-label{
+    font-size:16px;
+    font-weight:800;
+    color:#16181d;
+    letter-spacing:.8px;
+    margin-bottom:9px;
+  }
+
+  .sec-label.spaced{margin-top:20px}
+
+  .req{color:#e0342a}
+
+  .notes.invalid{border-color:#f0b4b0;background:#fffafa}
+
+  .field-error{
+    margin-top:7px;
+    font-size:11.5px;
+    font-weight:600;
+    color:#e0342a;
+    display:none;
+  }
+  .field-error.show{display:block}
+
+  /* ---------- Address card ---------- */
+  .addr-card{
+    display:flex;
+    align-items:flex-start;
+    gap:11px;
+    background:#fff;
+    border:1px solid #e6e8ec;
+    border-radius:13px;
+    padding:14px 13px;
+    margin-bottom:14px;
+  }
+
+  .addr-pin{flex-shrink:0;padding-top:1px}
+  .addr-pin svg{width:19px;height:19px;fill:#e0342a;display:block}
+
+  .addr-text{
+    flex:1;
+    min-width:0;
+    font-size:12.5px;
+    font-weight:600;
+    color:#16181d;
+    line-height:1.55;
+  }
+
+  .change-link{
+    flex-shrink:0;
+    align-self:center;
+    font-size:11.5px;
+    font-weight:800;
+    color:#e0342a;
+    letter-spacing:.5px;
+    background:none;
+    border:none;
+    cursor:pointer;
+    font-family:inherit;
+    padding:0;
+  }
+
+  /* ---------- Fields ---------- */
+  .field{
+    background:#fff;
+    border:1px solid #e6e8ec;
+    border-radius:12px;
+    padding:9px 13px 11px;
+    margin-bottom:10px;
+    transition:border-color .15s ease;
+  }
+  .field:focus-within{border-color:#b9c0c8}
+
+  .field label{
+    display:block;
+    font-size:10.5px;
+    font-weight:500;
+    color:#8a9099;
+    margin-bottom:2px;
+  }
+
+  .field input{
+    width:100%;
+    border:none;
+    outline:none;
+    background:transparent;
+    font-family:inherit;
+    font-size:13.5px;
+    font-weight:700;
+    color:#16181d;
+    letter-spacing:-.1px;
+  }
+  .field input::placeholder{color:#c2c6cc;font-weight:600}
+
+  /* ---------- Notes ---------- */
+  .notes{
+    background:#fff;
+    border:1px solid #e6e8ec;
+    border-radius:12px;
+    padding:12px 13px 8px;
+    transition:border-color .15s ease;
+  }
+  .notes:focus-within{border-color:#b9c0c8}
+
+  .notes textarea{
+    width:100%;
+    height:54px;
+    border:none;
+    outline:none;
+    resize:none;
+    background:transparent;
+    font-family:inherit;
+    font-size:13px;
+    font-weight:500;
+    color:#16181d;
+    line-height:1.5;
+  }
+  .notes textarea::placeholder{color:#b6bbc2;font-weight:400}
+
+  .counter{
+    text-align:right;
+    font-size:11px;
+    font-weight:500;
+    color:#9aa0a6;
+  }
+
+  /* ---------- Notice ---------- */
+  .notice{
+    display:flex;
+    gap:10px;
+    background:#f4f7fb;
+    border:1px solid #e2e9f2;
+    border-radius:12px;
+    padding:12px 13px;
+    margin-top:16px;
+  }
+
+  .notice svg{width:17px;height:17px;flex-shrink:0;margin-top:1px;fill:#5b7fb3}
+
+  .notice p{
+    font-size:11.5px;
+    font-weight:500;
+    color:#4d5c70;
+    line-height:1.5;
+  }
+
+  /* ---------- CTA ---------- */
+  .cta-wrap{
+    position:fixed;left:50%;transform:translateX(-50%);
+    bottom:24px;width:100%;max-width:390px;
+    background:#fff;
+    padding:12px 16px calc(12px + env(safe-area-inset-bottom));
+    z-index:60;
+  }
+
+  .continue-btn{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width:100%;
+    height:52px;
+    background:linear-gradient(135deg,#33ca73,#1f9e52);
+    color:#fff;
+    border:none;
+    border-radius:26px;
+    font-family:inherit;
+    font-size:14.5px;
+    font-weight:800;
+    letter-spacing:1px;
+    cursor:pointer;
+    box-shadow:0 6px 18px rgba(46,197,109,.30);
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .continue-btn:active{
+    transform:translateY(1px);
+    box-shadow:0 3px 10px rgba(46,197,109,.24);
+  }
+  .continue-btn[disabled]{
+    background:#dfe3e8;
+    color:#9aa0a6;
+    box-shadow:none;
+    cursor:not-allowed;
+  }
+
+
+  /* ---------- Header (consistent) ---------- */
+
+
+  .phone-scroll{
+    height:calc(100% - 24px);
+    overflow-y:auto;
+    overflow-x:hidden;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+  }
+  .phone-scroll::-webkit-scrollbar{display:none}
+  body.sheet-open .phone-scroll{overflow:hidden}
+
+  .gesture-bar{
+    position:fixed;
+    left:0;right:0;bottom:0;
+    height:24px;
+    background:#fff;
+    display:flex;align-items:center;justify-content:center;
+    z-index:400;
+    pointer-events:none;
+  }
+  .gesture-bar::after{
+    content:'';
+    width:134px;height:5px;
+    border-radius:3px;
+    background:#1a1a1a;
+  }
+</style>
+</head>
+<body>
+<div class="phone-scroll">
+<!-- Header -->
+<div class="header">
+  <button class="back-btn" onclick="goBack('17.html')" aria-label="Go back">
+    <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+  </button>
+  <div class="header-title">DELIVERY DETAILS</div>
+  <div class="header-spacer"></div>
+</div>
+
+<div class="page">
+
+  <div class="sec-label">DELIVERY ADDRESS</div>
+
+  <div class="addr-card">
+    <div class="addr-pin">
+      <svg viewBox="0 0 24 24"><path d="M12 2C8.1 2 5 5.1 5 9c0 5.2 7 13 7 13s7-7.8 7-13c0-3.9-3.1-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>
+    </div>
+    <div class="addr-text" id="addrText">
+      Bole Road, Bole Sub City,<br>
+      Woreda 03, House No. 123<br>
+      Addis Ababa, Ethiopia
+    </div>
+    <button class="change-link" id="changeAddr">CHANGE</button>
+  </div>
+
+  <div class="field">
+    <label for="recipient">Recipient Name</label>
+    <input type="text" id="recipient" value="Abebe K." autocomplete="name">
+  </div>
+
+  <div class="field">
+    <label for="phone">Phone Number</label>
+    <input type="tel" id="phone" value="0712 345678" inputmode="tel" autocomplete="tel" maxlength="12">
+  </div>
+
+  <div class="field">
+    <label for="altphone">Alternative Phone (Optional)</label>
+    <input type="tel" id="altphone" placeholder="07XX XXX XXX" inputmode="tel" maxlength="12">
+  </div>
+
+  <div class="sec-label spaced">LOCATION INFORMATION <span class="req">*</span></div>
+
+  <div class="notes">
+    <textarea id="notes" maxlength="100" placeholder="Nearest landmark, building name, floor or directions..." required></textarea>
+    <div class="counter"><span id="count">0</span>/100</div>
+  </div>
+  <div class="field-error" id="notesError">Please describe your delivery location.</div>
+
+  <div class="notice">
+    <svg viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+    <p>Please ensure the address and phone number are correct. Changes may not be possible after placing the order.</p>
+  </div>
+
+</div>
+
+<div class="cta-wrap">
+  <button class="continue-btn" id="continueBtn">CONTINUE TO REVIEW</button>
+</div>
+
+
+<script>
+  (function () {
+    var notes  = document.getElementById('notes');
+    var count  = document.getElementById('count');
+    var recip  = document.getElementById('recipient');
+    var phone  = document.getElementById('phone');
+    var alt    = document.getElementById('altphone');
+
+    // Restore anything saved on a previous visit.
+    try {
+      var saved = JSON.parse(sessionStorage.getItem('deliveryDetails') || '{}');
+      if (saved.recipient) recip.value = saved.recipient;
+      if (saved.phone)     phone.value = saved.phone;
+      if (saved.alt)       alt.value   = saved.alt;
+      if (saved.notes)     notes.value = saved.notes;
+    } catch (e) { /* storage unavailable */ }
+
+    var cont    = document.getElementById('continueBtn');
+    var errorEl = document.getElementById('notesError');
+    var box     = notes.closest('.notes');
+
+    /* Location information is required before the order can be reviewed. */
+    function sync() {
+      count.textContent = notes.value.length;
+      var ok = notes.value.trim().length > 0;
+      cont.disabled = !ok;
+      if (ok) {
+        box.classList.remove('invalid');
+        errorEl.classList.remove('show');
+      }
+    }
+    notes.addEventListener('input', sync);
+    notes.addEventListener('blur', function () {
+      if (!notes.value.trim()) {
+        box.classList.add('invalid');
+        errorEl.classList.add('show');
+      }
+    });
+
+    sync();
+
+    document.getElementById('changeAddr').addEventListener('click', function () {
+      recip.focus();
+    });
+
+    cont.addEventListener('click', function () {
+      if (!notes.value.trim()) {
+        box.classList.add('invalid');
+        errorEl.classList.add('show');
+        notes.focus();
+        return;
+      }
+
+      try {
+        sessionStorage.setItem('deliveryDetails', JSON.stringify({
+          recipient: recip.value.trim(),
+          phone: phone.value.trim(),
+          alt: alt.value.trim(),
+          notes: notes.value.trim()
+        }));
+      } catch (e) { /* storage unavailable — carry on */ }
+
+      // Back to the order review this screen was opened from.
+      if (history.length > 1) history.back();
+      else window.location.href = '17.html';
+    });
+  })();
+</script>
+
+<script>
+function goBack(f){if(history.length>1){history.back()}else{window.location.href=f}}
+</script>
+</div>
+
+<div class="gesture-bar"></div>
+
+</body>
+</html>
