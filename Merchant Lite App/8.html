@@ -97,6 +97,17 @@
     transform:rotate(-12deg);pointer-events:none;
   }
 
+  /* M-PESA pattern watermark, fading in from the left */
+  .hero-card::after{
+    content:'';position:absolute;inset:0;z-index:0;
+    background:url('assets/mpesa-pattern.png') no-repeat right center;
+    background-size:auto 128%;
+    opacity:.42;
+    -webkit-mask-image:linear-gradient(100deg,transparent 12%,rgba(0,0,0,.35) 42%,#000 82%);
+    mask-image:linear-gradient(100deg,transparent 12%,rgba(0,0,0,.35) 42%,#000 82%);
+    pointer-events:none;
+  }
+
   .rb-illustration{
     position:absolute;right:-15px;bottom:-32px;
     width:160px;height:132px;pointer-events:none;
@@ -119,20 +130,53 @@
     100%{transform:translateY(-3.5px) rotate(1.5deg)}
   }
 
-  .hero-inner{display:flex;align-items:stretch;gap:16px;position:relative;}
-  .hero-side{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:4px;}
-  .hero-vbar{width:1px;align-self:stretch;background:rgba(255,255,255,.22);flex-shrink:0;}
-  .hero-label{font-size:10px;font-weight:600;color:rgba(255,255,255,.78);letter-spacing:.5px;text-transform:uppercase;position:relative;}
-  .hero-pts{display:flex;align-items:baseline;gap:4px;position:relative;}
-  .hero-pts b{font-size:27px;font-weight:800;color:#fff;letter-spacing:-.8px;line-height:1;font-family:'Switzer','Inter',sans-serif;}
+  /* Content sits above the glare and the pattern watermark */
+  .hero-card > *{position:relative;z-index:1;}
+
+  /* Header: label + balance-hide toggle */
+  .hero-top{display:flex;align-items:center;gap:7px;margin-bottom:8px;}
+  .hero-label{font-size:10px;font-weight:600;color:rgba(255,255,255,.78);letter-spacing:.5px;text-transform:uppercase;}
+  .hero-eye{
+    appearance:none;-webkit-appearance:none;
+    background:none;border:0;padding:0;margin:0;
+    width:17px;height:17px;flex-shrink:0;cursor:pointer;
+    color:rgba(255,255,255,.72);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .hero-eye:active{color:#fff}
+  .hero-eye svg{width:17px;height:17px;display:block}
+  .hero-eye .eye-open{display:none}
+  .hero-eye.is-hidden .eye-open{display:block}
+  .hero-eye.is-hidden .eye-off{display:none}
+
+  /* Headline points */
+  .hero-pts{display:flex;align-items:baseline;gap:5px;}
+  .hero-pts b{font-size:29px;font-weight:800;color:#fff;letter-spacing:-.9px;line-height:1;font-family:'Switzer','Inter',sans-serif;}
   .hero-pts span{font-size:12px;font-weight:700;color:rgba(255,255,255,.85);}
-  .hero-pill{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:4px;text-decoration:none;cursor:pointer;}
-  .hero-pill-label{font-size:10px;font-weight:600;color:rgba(255,255,255,.78);letter-spacing:.5px;text-transform:uppercase}
-  .hero-pill-value{font-size:27px;font-weight:800;color:#fff;letter-spacing:-.8px;line-height:1;font-family:'Switzer','Inter',sans-serif;}
+
+  /* Equivalent float — the headline restated as money, and the way in to converting it */
+  .hero-conv{
+    display:inline-flex;align-items:center;gap:6px;
+    margin-top:8px;text-decoration:none;cursor:pointer;
+  }
+  .hero-conv-label{font-size:10.5px;font-weight:500;color:rgba(255,255,255,.74);}
+  .hero-conv-value{font-size:13px;font-weight:800;color:#fff;letter-spacing:-.2px;}
+  .hero-conv svg{width:13px;height:13px;color:rgba(255,255,255,.8);flex-shrink:0}
+
+  /* Split totals row */
+  .hero-split{display:flex;align-items:stretch;gap:14px;margin-top:15px;}
+  .hero-cell{flex:1;min-width:0;}
+  .hero-cell-label{
+    font-size:10.5px;font-weight:500;color:rgba(255,255,255,.74);margin-bottom:3px;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .hero-cell-value{font-size:15px;font-weight:800;color:#fff;letter-spacing:-.3px;line-height:1.15;}
+  .hero-cell-value em{font-style:normal;font-size:10px;font-weight:700;color:rgba(255,255,255,.8);margin-left:4px;}
+  .hero-vbar{width:1px;align-self:stretch;background:rgba(255,255,255,.22);flex-shrink:0;}
 
   /* ---------- Stats Grid ---------- */
   .stats-grid{
-    display:grid;grid-template-columns:1fr 1fr;
+    display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
     gap:10px;margin-bottom:14px;
   }
   .stat-cell{
@@ -154,8 +198,7 @@
   .stat-text{flex:1;min-width:0}
   .stat-label{
     font-size:10px;font-weight:500;color:#5b6169;
-    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-    margin-bottom:2px;
+    line-height:1.25;margin-bottom:2px;
   }
   .stat-value{
     font-size:15px;font-weight:800;color:#16181d;
@@ -212,7 +255,7 @@
 
   /* ---------- Bottom 2 cards row ---------- */
   .bottom-cards{
-    display:grid;grid-template-columns:1fr 1fr;
+    display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
     gap:10px;margin-bottom:16px;
   }
   .bot-card{
@@ -305,31 +348,37 @@
 
   <!-- Hero Points Card -->
   <div class="hero-card">
-    <div class="hero-inner">
-      <div class="hero-side">
-        <div class="hero-label">CURRENT POINTS</div>
-        <div class="hero-pts"><b>1,750</b><span>PTS</span></div>
+    <div class="hero-top">
+      <div class="hero-label">CURRENT POINTS</div>
+      <button class="hero-eye" type="button" id="heroEye" aria-pressed="false" aria-label="Hide balances">
+        <svg class="eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 12S6 5.6 12 5.6 21.5 12 21.5 12 18 18.4 12 18.4 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.9"/><path d="M3.4 3.4l17.2 17.2"/></svg>
+        <svg class="eye-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 12S6 5.6 12 5.6 21.5 12 21.5 12 18 18.4 12 18.4 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.9"/></svg>
+      </button>
+    </div>
+
+    <div class="hero-pts"><b class="hb">1,750</b><span>PTS</span></div>
+
+    <a class="hero-conv" href="12.html">
+      <span class="hero-conv-label">Equivalent Float</span>
+      <span class="hero-conv-value hb">10.00 Br</span>
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9.4 6 8 7.4l4.6 4.6L8 16.6 9.4 18l6-6z"/></svg>
+    </a>
+
+    <div class="hero-split">
+      <div class="hero-cell">
+        <div class="hero-cell-label">Total Points Earned</div>
+        <div class="hero-cell-value"><span class="hb">2,000</span><em>PTS</em></div>
       </div>
       <div class="hero-vbar"></div>
-      <a class="hero-pill" href="12.html">
-        <div class="hero-pill-label">CURRENT REDEEMABLE</div>
-        <div class="hero-pill-value">10.00 Br</div>
-      </a>
+      <div class="hero-cell">
+        <div class="hero-cell-label">Total Float Converted</div>
+        <div class="hero-cell-value"><span class="hb">4</span><em>PTS</em></div>
+      </div>
     </div>
   </div>
 
   <!-- Stats 2×2 -->
   <div class="stats-grid">
-    <div class="stat-cell">
-      <div class="stat-icon si-green">
-        <svg viewBox="0 0 24 24" fill="#e8343e"><path d="m12 2.6 3 6 6.7.9-4.8 4.7 1.1 6.6-6-3.1-6 3.1 1.1-6.6L2.3 9.5l6.7-.9 3-6z"/></svg>
-      </div>
-      <div class="stat-text">
-        <div class="stat-label">Total Points Earned</div>
-        <div class="stat-value">2,000 <span>PTS</span></div>
-      </div>
-    </div>
-
     <div class="stat-cell">
       <div class="stat-icon si-blue">
         <svg viewBox="0 0 24 24" fill="none" stroke="#e8343e" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20.4 12a8.4 8.4 0 1 1-2.6-6.1"/><path d="M18.6 3.4v4.7h-4.7"/><circle cx="12" cy="12" r="1.7" fill="#e8343e" stroke="none"/></svg>
@@ -337,16 +386,6 @@
       <div class="stat-text">
         <div class="stat-label">Total Points Redeemed</div>
         <div class="stat-value">10.00 <span>Br</span></div>
-      </div>
-    </div>
-
-    <div class="stat-cell">
-      <div class="stat-icon si-purple">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#e8343e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="6.6" rx="6.6" ry="2.8"/><path d="M5.4 6.6v4.2c0 1.5 3 2.8 6.6 2.8s6.6-1.3 6.6-2.8V6.6"/><path d="M5.4 10.8V15c0 1.6 3 2.8 6.6 2.8s6.6-1.2 6.6-2.8v-4.2"/></svg>
-      </div>
-      <div class="stat-text">
-        <div class="stat-label">Total Float Converted</div>
-        <div class="stat-value">4 <span>PTS</span></div>
       </div>
     </div>
 
@@ -498,6 +537,36 @@
 
 <script>
 function goBack(f){if(history.length>1){history.back()}else{window.location.href=f}}
+
+/* Balance-hide toggle on the points card. The choice is remembered so it
+   survives the full page loads between screens. */
+(function(){
+  var btn = document.getElementById('heroEye');
+  if(!btn) return;
+  var KEY = 'mlHideBalances';
+  var figures = document.querySelectorAll('.hero-card .hb');
+  var hidden = false;
+  try { hidden = localStorage.getItem(KEY) === '1'; } catch(e){}
+
+  function apply(){
+    for (var i = 0; i < figures.length; i++){
+      var el = figures[i];
+      if (!el.dataset.real) el.dataset.real = el.textContent;
+      el.textContent = hidden ? '••••' : el.dataset.real;
+    }
+    btn.classList.toggle('is-hidden', hidden);
+    btn.setAttribute('aria-pressed', hidden ? 'true' : 'false');
+    btn.setAttribute('aria-label', hidden ? 'Show balances' : 'Hide balances');
+  }
+
+  btn.addEventListener('click', function(){
+    hidden = !hidden;
+    try { localStorage.setItem(KEY, hidden ? '1' : '0'); } catch(e){}
+    apply();
+  });
+
+  apply();
+})();
 </script>
 </body>
 </html>
