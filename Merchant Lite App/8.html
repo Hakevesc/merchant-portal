@@ -133,78 +133,53 @@
   /* Content sits above the glare and the pattern watermark */
   .hero-card > *{position:relative;z-index:1;}
 
-  /* Header: label + balance-hide toggle */
-  .hero-top{display:flex;align-items:center;gap:7px;margin-bottom:8px;}
-  .hero-label{font-size:10px;font-weight:600;color:rgba(255,255,255,.78);letter-spacing:.5px;text-transform:uppercase;}
+  /* Two matched headline columns: points, and the same amount as float */
+  .hero-main{display:flex;align-items:stretch;gap:16px;}
+  .hero-col{flex:1;min-width:0;text-decoration:none;}
+  .hero-col-link{cursor:pointer;}
+  /* Both labels stay on one line so the two figures below them always
+     share a baseline — truncate rather than wrap on narrow screens. */
+  .hero-label{
+    display:flex;align-items:center;gap:5px;
+    height:15px;/* the eye button's height, so both label rows match */
+    font-size:10px;font-weight:600;color:rgba(255,255,255,.78);
+    letter-spacing:.4px;text-transform:uppercase;margin-bottom:4px;
+  }
+  .hero-label > span{
+    min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
   .hero-eye{
     appearance:none;-webkit-appearance:none;
     background:none;border:0;padding:0;margin:0;
-    width:17px;height:17px;flex-shrink:0;cursor:pointer;
+    width:15px;height:15px;flex-shrink:0;cursor:pointer;
     color:rgba(255,255,255,.72);
     display:flex;align-items:center;justify-content:center;
   }
   .hero-eye:active{color:#fff}
-  .hero-eye svg{width:17px;height:17px;display:block}
+  .hero-eye svg{width:15px;height:15px;display:block}
   .hero-eye .eye-open{display:none}
   .hero-eye.is-hidden .eye-open{display:block}
   .hero-eye.is-hidden .eye-off{display:none}
 
-  /* Headline points */
-  .hero-pts{display:flex;align-items:baseline;gap:5px;}
-  .hero-pts b{font-size:29px;font-weight:800;color:#fff;letter-spacing:-.9px;line-height:1;font-family:'Switzer','Inter',sans-serif;}
+  /* Headline figures — same treatment in both columns */
+  .hero-pts{display:flex;align-items:baseline;gap:4px;}
+  .hero-pts b{font-size:27px;font-weight:800;color:#fff;letter-spacing:-.9px;line-height:1;font-family:'Switzer','Inter',sans-serif;}
   .hero-pts span{font-size:12px;font-weight:700;color:rgba(255,255,255,.85);}
-
-  /* Equivalent float — the headline restated as money, and the way in to converting it */
-  .hero-conv{
-    display:inline-flex;align-items:center;gap:6px;
-    margin-top:8px;text-decoration:none;cursor:pointer;
+  .hero-chev{
+    width:13px;height:13px;flex-shrink:0;align-self:center;
+    color:rgba(255,255,255,.8);margin-left:1px;
   }
-  .hero-conv-label{font-size:10.5px;font-weight:500;color:rgba(255,255,255,.74);}
-  .hero-conv-value{font-size:13px;font-weight:800;color:#fff;letter-spacing:-.2px;}
-  .hero-conv svg{width:13px;height:13px;color:rgba(255,255,255,.8);flex-shrink:0}
 
   /* Split totals row */
-  .hero-split{display:flex;align-items:stretch;gap:14px;margin-top:15px;}
+  .hero-split{display:flex;align-items:stretch;gap:16px;margin-top:16px;}
   .hero-cell{flex:1;min-width:0;}
   .hero-cell-label{
-    font-size:10.5px;font-weight:500;color:rgba(255,255,255,.74);margin-bottom:3px;
+    font-size:10.5px;font-weight:500;color:rgba(255,255,255,.74);margin-bottom:2px;
     white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
   }
   .hero-cell-value{font-size:15px;font-weight:800;color:#fff;letter-spacing:-.3px;line-height:1.15;}
   .hero-cell-value em{font-style:normal;font-size:10px;font-weight:700;color:rgba(255,255,255,.8);margin-left:4px;}
   .hero-vbar{width:1px;align-self:stretch;background:rgba(255,255,255,.22);flex-shrink:0;}
-
-  /* ---------- Stats Grid ---------- */
-  .stats-grid{
-    display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
-    gap:10px;margin-bottom:14px;
-  }
-  .stat-cell{
-    display:flex;align-items:center;gap:10px;
-    height:66px;
-    background:#fff;border:1px solid #ececf0;
-    border-radius:14px;padding:0 12px;
-    box-shadow:0 1px 3px rgba(0,0,0,.04);
-  }
-  .stat-icon{
-    width:34px;height:34px;border-radius:50%;flex-shrink:0;
-    display:flex;align-items:center;justify-content:center;
-  }
-  .si-green{background:#fde8ea}
-  .si-blue{background:#fde8ea}
-  .si-purple{background:#fde8ea}
-  .si-amber{background:#fde8ea}
-  .stat-icon svg{width:17px;height:17px}
-  .stat-text{flex:1;min-width:0}
-  .stat-label{
-    font-size:10px;font-weight:500;color:#5b6169;
-    line-height:1.25;margin-bottom:2px;
-  }
-  .stat-value{
-    font-size:15px;font-weight:800;color:#16181d;
-    letter-spacing:-.3px;line-height:1.2;
-  }
-  .stat-value span{font-size:10px;font-weight:700;color:#8a9099;margin-left:2px}
 
   /* ---------- Check Rewards Banner ---------- */
   .rewards-banner{
@@ -348,21 +323,25 @@
 
   <!-- Hero Points Card -->
   <div class="hero-card">
-    <div class="hero-top">
-      <div class="hero-label">CURRENT POINTS</div>
-      <button class="hero-eye" type="button" id="heroEye" aria-pressed="false" aria-label="Hide balances">
-        <svg class="eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 12S6 5.6 12 5.6 21.5 12 21.5 12 18 18.4 12 18.4 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.9"/><path d="M3.4 3.4l17.2 17.2"/></svg>
-        <svg class="eye-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 12S6 5.6 12 5.6 21.5 12 21.5 12 18 18.4 12 18.4 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.9"/></svg>
-      </button>
+    <div class="hero-main">
+      <div class="hero-col">
+        <div class="hero-label">
+          <span>CURRENT POINTS</span>
+          <button class="hero-eye" type="button" id="heroEye" aria-pressed="false" aria-label="Hide balances">
+            <svg class="eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 12S6 5.6 12 5.6 21.5 12 21.5 12 18 18.4 12 18.4 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.9"/><path d="M3.4 3.4l17.2 17.2"/></svg>
+            <svg class="eye-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 12S6 5.6 12 5.6 21.5 12 21.5 12 18 18.4 12 18.4 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.9"/></svg>
+          </button>
+        </div>
+        <div class="hero-pts"><b class="hb">1,750</b><span>PTS</span></div>
+      </div>
+
+      <div class="hero-vbar"></div>
+
+      <a class="hero-col hero-col-link" href="12.html">
+        <div class="hero-label"><span>EQUIVALENT FLOAT</span></div>
+        <div class="hero-pts"><b class="hb">10.00</b><span>Br</span><svg class="hero-chev" viewBox="0 0 24 24" fill="currentColor"><path d="M9.4 6 8 7.4l4.6 4.6L8 16.6 9.4 18l6-6z"/></svg></div>
+      </a>
     </div>
-
-    <div class="hero-pts"><b class="hb">1,750</b><span>PTS</span></div>
-
-    <a class="hero-conv" href="12.html">
-      <span class="hero-conv-label">Equivalent Float</span>
-      <span class="hero-conv-value hb">10.00 Br</span>
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9.4 6 8 7.4l4.6 4.6L8 16.6 9.4 18l6-6z"/></svg>
-    </a>
 
     <div class="hero-split">
       <div class="hero-cell">
@@ -373,29 +352,6 @@
       <div class="hero-cell">
         <div class="hero-cell-label">Total Float Converted</div>
         <div class="hero-cell-value"><span class="hb">4</span><em>PTS</em></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Stats 2×2 -->
-  <div class="stats-grid">
-    <div class="stat-cell">
-      <div class="stat-icon si-blue">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#e8343e" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20.4 12a8.4 8.4 0 1 1-2.6-6.1"/><path d="M18.6 3.4v4.7h-4.7"/><circle cx="12" cy="12" r="1.7" fill="#e8343e" stroke="none"/></svg>
-      </div>
-      <div class="stat-text">
-        <div class="stat-label">Total Points Redeemed</div>
-        <div class="stat-value">10.00 <span>Br</span></div>
-      </div>
-    </div>
-
-    <div class="stat-cell">
-      <div class="stat-icon si-amber">
-        <svg viewBox="0 0 24 24" fill="#e8343e"><path d="M7.2 18.4a2 2 0 1 0 0 4 2 2 0 0 0 0-4zM17.2 18.4a2 2 0 1 0 0 4 2 2 0 0 0 0-4zM1.7 2.4a1 1 0 1 0 0 2h1.6l3 12.3c.1.5.5.8 1 .8h11a1 1 0 1 0 0-2H8.1l-.4-1.8h9.9c.5 0 .9-.3 1-.8l1.7-7.3a1 1 0 0 0-1-1.2H5.7l-.6-2.4a1 1 0 0 0-1-.6H1.7z"/></svg>
-      </div>
-      <div class="stat-text">
-        <div class="stat-label">Total Redeemed Orders</div>
-        <div class="stat-value">1 <span>ORDER</span></div>
       </div>
     </div>
   </div>
