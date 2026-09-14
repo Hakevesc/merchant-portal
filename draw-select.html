@@ -50,6 +50,7 @@
       border-radius: 32px; padding: 32px 28px; text-align: center;
       box-shadow: 0 15px 35px rgba(35, 145, 80, 0.25);
       position: relative; overflow: hidden; transition: transform 0.2s ease;
+      width: 900px;
     }
     .p-banner .banner-deco { position: absolute; pointer-events: none; opacity: 0.08; }
     .p-banner .banner-deco.right { bottom: -20px; right: -10px; }
@@ -89,6 +90,7 @@
       background: #ffffff;
       border-radius: 24px;
       border: 1px solid rgba(226,232,240,0.8);
+      width: 900px;
     }
     .no-schedule-card .ns-icon {
       width: 64px; height: 64px;
@@ -216,13 +218,7 @@
         <div class="prize-label" id="drawBanner">Customer's Weekly Draw</div>
         <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 18px;">
           <span style="background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(4px); padding: 7px 16px; border-radius: 50px; font-weight: 700; font-size: 0.82rem; color: #fff; border: 1px solid rgba(255,255,255,0.35); display: inline-flex; align-items: center; gap: 6px;">
-            <i data-lucide="calendar" style="width:14px;height:14px;"></i> <span id="scheduleLabel">Scheduled Today</span>
-          </span>
-          <span style="background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(4px); padding: 7px 16px; border-radius: 50px; font-weight: 700; font-size: 0.82rem; color: #fff; border: 1px solid rgba(255,255,255,0.35); display: inline-flex; align-items: center; gap: 6px;">
-            <i data-lucide="award" style="width:14px;height:14px;"></i> Regional Prize
-          </span>
-          <span style="background: #ffffff; padding: 7px 18px; border-radius: 50px; font-weight: 900; font-size: 0.82rem; color: #1b7341; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 14px rgba(0,0,0,0.12);">
-            <i data-lucide="trophy" style="width:15px;height:15px;color:#1b7341;"></i> <span id="winnersLabel">Total Winners: 10</span>
+            <i data-lucide="calendar" style="width:14px;height:14px;"></i> Mega Prize Draw — July 14, 2026
           </span>
         </div>
       </div>
@@ -241,9 +237,9 @@
       <div class="no-schedule-card">
         <div class="ns-icon"><i data-lucide="calendar"></i></div>
         <h3>No Draw Scheduled for Today</h3>
-        <p>Regional Schedule Draw — July 14, 2026<br>No draw is scheduled for today.</p>
-        <p style="margin-top:10px;">Regional schedule across all regions — <strong>100,000 ETB</strong> per winner</p>
-        <div class="ns-amount"><i data-lucide="trophy"></i> 100,000 ETB per Regional Winner</div>
+        <p>MEGA PRIZE Draw — 500K ETB<br>No draw is scheduled for today.</p>
+        <p style="margin-top:10px;">MEGA PRIZE — <strong>500,000 ETB</strong> per winner</p>
+        <div class="ns-amount"><i data-lucide="trophy"></i> 500,000 ETB per Winner</div>
       </div>
     </div>
   </div>
@@ -282,8 +278,6 @@
       if (isMegaPrize) {
         document.getElementById('drawBanner').innerHTML = `<i data-lucide="calendar" style="width:32px;height:32px;display:inline;vertical-align:middle;margin-right:6px;color:#fff;"></i> MEGA PRIZE — 500K ETB`;
         document.getElementById('breadcrumb').innerHTML = 'MEGA PRIZE';
-        document.getElementById('scheduleLabel').textContent = 'Regional Schedule - July 14, 2026';
-        document.getElementById('winnersLabel').textContent = '100,000 ETB per Winner';
         document.getElementById('mainContent').style.display = 'none';
         document.getElementById('noScheduleContent').style.display = 'block';
         document.getElementById('floatBar').style.display = 'none';
