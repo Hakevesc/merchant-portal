@@ -68,7 +68,7 @@
     <!-- ══ PANEL: Fulfilment pipeline ══ -->
     <div class="tab-panel active" id="panel-fulfilment">
       <div id="flScopeNote"></div>
-      <div class="lp-kpi-row cols-6" id="flKpis"></div>
+      <div class="lp-pipe" id="flKpis"></div>
 
       <div class="el-card">
         <div class="lp-card-bar">
@@ -76,7 +76,6 @@
             <h2 class="card-title">Reward Fulfilment</h2>
             <p class="card-subtitle">Track every reward from allocation through OTP-verified merchant handover.</p>
           </div>
-          <span class="records-badge" id="flCount">0 records</span>
         </div>
 
         <div class="lp-filter-row cols-5">
@@ -88,14 +87,19 @@
           <select class="form-select" id="flRsm" onchange="onRsmFilterChange()"></select>
           <select class="form-select" id="flTdr" onchange="renderFulfilment()"></select>
           <select class="form-select" id="flType" onchange="renderFulfilment()"></select>
+          <div class="lp-filter-tail">
+            <span class="records-badge" id="flCount">0 records</span>
+            <button class="lp-filter-reset-inline" onclick="resetFilters()">
+              <i data-lucide="rotate-ccw"></i> Reset</button>
+          </div>
         </div>
-        <button class="lp-filter-reset" onclick="resetFilters()"><i data-lucide="rotate-ccw"></i> Reset filters</button>
+        <div class="lp-chips" id="flChips"></div>
 
         <div class="table-responsive">
           <table class="premium-table">
             <thead><tr>
-              <th>Reward ID</th><th>Merchant</th><th>Short Code</th><th>Reward / Item</th>
-              <th>Redemption Ref</th><th>Assigned RSM</th><th>Assigned TDR</th>
+              <th>Reward ID</th><th>Merchant</th><th>Reward / Item</th>
+              <th>Assigned RSM</th><th>Assigned TDR</th>
               <th>Status</th><th class="text-right">Action</th>
             </tr></thead>
             <tbody id="flBody"></tbody>
@@ -596,22 +600,78 @@
     /* ── KPI strip ──────────────────────────────────── */
     function renderKpis() {
       var c = LP.statusCounts();
-      var tiles = [
-        ['allocated', 'Allocated', 'user-check', ''],
-        ['dispatched', 'Dispatched', 'truck', ''],
-        ['received', 'Received', 'package-check', ''],
-        ['pending', 'Pending Handover', 'clock', 'tone-amber'],
-        ['fulfilled', 'Fulfilled', 'check-circle', 'tone-green'],
-        ['exception', 'Exceptions', 'alert-triangle', 'tone-red']
+      /* In lifecycle order, with a caption saying what the stage means for
+         whoever is reading. Exception is not a stage, so it sits past a
+         divider rather than at the end of the flow. */
+      var stages = [
+        ['allocated',  'Allocated',        'package',       'Ready for dispatch', ''],
+        ['dispatched', 'Dispatched',       'truck',         'On the way',         ''],
+        ['received',   'Received',         'package-check', 'At merchant',        ''],
+        ['pending',    'Pending Handover', 'hand-coins',    'Requires action',    'tone-amber'],
+        ['fulfilled',  'Fulfilled',        'check-circle',  'Completed',          'tone-green']
       ];
-      document.getElementById('flKpis').innerHTML = tiles.map(function (t) {
-        var isActive = activeStatusFilter === t[0];
-        return '<button class="lp-kpi ' + t[3] + (isActive ? ' active' : '') + '" onclick="filterByStatus(\'' + t[0] + '\')">' +
-          '<div class="lp-kpi-icon"><i data-lucide="' + t[2] + '"></i></div>' +
-          '<div class="lp-kpi-val">' + c[t[0]] + '</div>' +
-          '<div class="lp-kpi-lbl">' + t[1] + '</div>' +
-        '</button>';
-      }).join('');
+      var exception = ['exception', 'Exception', 'alert-triangle', 'Review required', 'tone-red'];
+
+      function card(t) {
+        return '<button class="lp-pipe-card ' + t[4] +
+                 (activeStatusFilter === t[0] ? ' active' : '') + '" ' +
+                 'onclick="filterByStatus(\'' + t[0] + '\')" ' +
+                 'data-tip="Filter by ' + LP.esc(t[1]) + '">' +
+                 '<span class="lp-pipe-ico"><i data-lucide="' + t[2] + '"></i></span>' +
+                 '<span class="lp-pipe-txt">' +
+                   '<span class="lp-pipe-val">' + c[t[0]] + '</span>' +
+                   '<span class="lp-pipe-lbl">' + LP.esc(t[1]) + '</span>' +
+                   '<span class="lp-pipe-sub">' + LP.esc(t[3]) + '</span>' +
+                 '</span>' +
+               '</button>';
+      }
+
+      var arrow = '<span class="lp-pipe-arrow"><i data-lucide="arrow-right"></i></span>';
+      document.getElementById('flKpis').innerHTML =
+        stages.map(card).join(arrow) +
+        '<span class="lp-pipe-split"></span>' + card(exception);
+    }
+
+    /* \u2500\u2500 Active filter chips \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */
+    /* A select still holding a value it was given three clicks ago is the
+       usual reason a table looks empty for no reason, so every filter the
+       table is applying is named here and can be dropped on its own. */
+    function renderChips() {
+      var bits = [];
+      var q = document.getElementById('flSearch').value.trim();
+      if (q) bits.push(['Search', q, "clearFilter('flSearch')"]);
+
+      function sel(id, label) {
+        var el = document.getElementById(id);
+        if (!el || el.disabled || !el.value) return;
+        bits.push([label, el.options[el.selectedIndex].text, "clearFilter('" + id + "')"]);
+      }
+      sel('flStatus', 'Status');
+      sel('flRsm', 'RSM');
+      sel('flTdr', 'TDR');
+      sel('flType', 'Reward');
+
+      var box = document.getElementById('flChips');
+      if (!bits.length) { box.innerHTML = ''; box.style.display = 'none'; return; }
+      box.style.display = 'flex';
+      box.innerHTML =
+        '<span class="lp-chips-lbl"><i data-lucide="filter"></i> Active filters:</span>' +
+        bits.map(function (b) {
+          return '<span class="lp-chip-filter"><b>' + LP.esc(b[0]) + ':</b> ' + LP.esc(b[1]) +
+                 '<button onclick="' + b[2] + '" data-tip="Remove filter" aria-label="Remove ' +
+                 LP.esc(b[0]) + ' filter"><i data-lucide="x"></i></button></span>';
+        }).join('') +
+        (bits.length > 1 ? '<button class="lp-chips-clear" onclick="resetFilters()">Clear all</button>' : '');
+    }
+
+    function clearFilter(id) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      el.value = '';
+      if (id === 'flStatus') activeStatusFilter = '';
+      if (id === 'flRsm') buildTdrFilter();
+      flPage = 1;
+      renderFulfilment();
     }
 
     /* ── Fulfilment table ───────────────────────────── */
@@ -643,6 +703,7 @@
       });
 
       document.getElementById('flCount').textContent = rows.length + (rows.length === 1 ? ' record' : ' records');
+      renderChips();
 
       var pages = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
       if (flPage > pages) flPage = pages;
@@ -660,14 +721,15 @@
         wrap.style.display = 'block';
         empty.style.display = 'none';
         tbody.innerHTML = slice.map(function (r) {
+          var inv = LP.inventoryItem(r.rewardItemId);
           return '<tr class="fade-in-row clickable" onclick="openDetail(\'' + r.id + '\')">' +
-            '<td><strong>' + LP.esc(r.id) + '</strong></td>' +
-            '<td>' + LP.esc(LP.merchantName(r.shortCode)) + '</td>' +
-            '<td>' + LP.esc(r.shortCode) + '</td>' +
-            '<td>' + LP.esc(r.item) + '</td>' +
-            '<td><span class="lp-mono">' + LP.esc(r.redemptionRef) + '</span></td>' +
-            '<td class="lp-muted">' + LP.esc(LP.rsmName(r.rsm)) + '</td>' +
-            '<td class="lp-muted">' + LP.esc(LP.tdrName(r.tdr)) + '</td>' +
+            '<td>' + cell(null, r.id, r.redemptionRef, 'mono') + '</td>' +
+            '<td>' + cell(tile(merchantIcon(r.shortCode)),
+                          LP.merchantName(r.shortCode), r.shortCode) + '</td>' +
+            '<td>' + cell(tile(rewardIcon(r.item), 'green'),
+                          r.item, inv ? inv.category : '\u2014') + '</td>' +
+            '<td>' + person(LP.rsm(r.rsm), r.rsm) + '</td>' +
+            '<td>' + person(LP.tdr(r.tdr), r.tdr) + '</td>' +
             '<td>' + LP.chip(r.status) + '</td>' +
             '<td class="text-right" onclick="event.stopPropagation()">' + rowActions(r) + '</td>' +
           '</tr>';
@@ -678,34 +740,114 @@
       LP.icons();
     }
 
-    /* Row actions, decided by the record's status and the viewer's role. */
-    function rowActions(r) {
-      var btns = [];
-      if (r.status === 'allocated' && IS_ADMIN)
-        btns.push(btn('Dispatch', 'truck', "openDispatch('" + r.id + "')", ''));
-      if (r.status === 'dispatched' && IS_TDR)
-        btns.push(btn('Confirm Receipt', 'package-check', "openReceipt('" + r.id + "')", ''));
-      if (r.status === 'received' && IS_TDR)
-        btns.push(btn('Start Handover', 'smartphone', "startHandover('" + r.id + "')", ''));
-      if (r.status === 'pending' && IS_TDR)
-        btns.push(btn('Enter OTP', 'key-round', "openOtp('" + r.id + "')", 'amber'));
-      /* Reassignment is open until the reward is off the pipeline: the RSM can
-         move it to another of their TDRs, admin can move it to another RSM. */
-      if (OPEN_FOR_REASSIGN.indexOf(r.status) !== -1) {
-        if (IS_RSM)
-          btns.push(btn('Reassign TDR', 'repeat', "openReassign('" + r.id + "')", 'ghost'));
-        if (IS_ADMIN)
-          btns.push(btn('Reassign RSM', 'user-cog', "openReassignRsm('" + r.id + "')", 'ghost'));
-      }
-      if (IS_ADMIN && ['fulfilled', 'exception', 'cancelled'].indexOf(r.status) === -1)
-        btns.push(btn('Exception', 'alert-triangle', "openException('" + r.id + "')", 'danger'));
-      if (btns.length === 0)
-        btns.push(btn('View', 'eye', "openDetail('" + r.id + "')", 'ghost'));
-      return '<div class="lp-row-actions">' + btns.join('') + '</div>';
+    /* One solid button per row, the same on every table on this page. */
+    function primaryBtn(label, icon, onclick, tone) {
+      return '<div class="lp-act"><button class="lp-btn-primary ' + (tone || '') + '" ' +
+               'onclick="' + onclick + '">' +
+               '<i data-lucide="' + icon + '"></i>' + LP.esc(label) +
+             '</button></div>';
     }
 
-    function btn(label, icon, onclick, tone) {
-      return LP.rowBtn(label, icon, onclick, tone);
+    /* ── Cell builders ─────────────────────── */
+    function cell(media, top, sub, subCls) {
+      return '<div class="lp-cell">' + (media || '') +
+               '<div class="lp-cell-txt">' +
+                 '<div class="lp-cell-top">' + LP.esc(top) + '</div>' +
+                 (sub ? '<div class="lp-cell-sub ' + (subCls || '') + '">' + LP.esc(sub) + '</div>' : '') +
+               '</div>' +
+             '</div>';
+    }
+
+    function tile(icon, tone) {
+      return '<span class="lp-tile ' + (tone || '') + '"><i data-lucide="' + icon + '"></i></span>';
+    }
+
+    function person(rec, id) {
+      if (!rec) return '<span class="lp-muted">\u2014</span>';
+      return '<div class="lp-cell">' + LP.avatar(rec.name, id) +
+               '<div class="lp-cell-txt">' +
+                 '<div class="lp-cell-top">' + LP.esc(rec.name) + '</div>' +
+                 '<div class="lp-cell-sub">' + LP.esc(id) + '</div>' +
+               '</div>' +
+             '</div>';
+    }
+
+    /* Stand-ins for the product and merchant photography a live catalogue
+       would carry — the item name is more specific than its category, so it
+       is what gets read first. */
+    function rewardIcon(item) {
+      var n = String(item || '').toLowerCase();
+      if (n.indexOf('smartphone') !== -1 || n.indexOf('phone') !== -1) return 'smartphone';
+      if (n.indexOf('television') !== -1 || n.indexOf('tv') !== -1) return 'tv';
+      if (n.indexOf('float') !== -1 || n.indexOf('top-up') !== -1) return 'wallet';
+      if (n.indexOf('refrigerator') !== -1 || n.indexOf('fridge') !== -1) return 'refrigerator';
+      return 'gift';
+    }
+
+    function merchantIcon(shortCode) {
+      var m = LP.merchant(shortCode);
+      var c = m ? m.category : '';
+      if (c === 'Hospitality') return 'hotel';
+      if (c === 'Food & Beverage') return 'coffee';
+      if (c === 'Retail') return 'shopping-cart';
+      return 'store';
+    }
+
+    /* ── Row actions ──────────────────────── */
+    /* Everything this viewer may do to this record, most urgent first. The
+       first entry becomes the solid button so the column can be read down to
+       find what is waiting; the rest go behind the ⋯. */
+    function actionsFor(r) {
+      var acts = [];
+      function add(label, icon, onclick, tone) {
+        acts.push({ label: label, icon: icon, onclick: onclick, tone: tone || '' });
+      }
+
+      /* The step that moves the reward along belongs to exactly one role. */
+      if (r.status === 'allocated'  && IS_ADMIN) add('Dispatch', 'truck', "openDispatch('" + r.id + "')");
+      if (r.status === 'dispatched' && IS_TDR)   add('Confirm Receipt', 'package-check', "openReceipt('" + r.id + "')");
+      if (r.status === 'received'   && IS_TDR)   add('Start Handover', 'smartphone', "startHandover('" + r.id + "')");
+      if (r.status === 'pending'    && IS_TDR)   add('Enter OTP', 'key-round', "openOtp('" + r.id + "')", 'amber');
+
+      if (OPEN_FOR_REASSIGN.indexOf(r.status) !== -1) {
+        if (IS_RSM)   add('Reassign TDR', 'repeat', "openReassign('" + r.id + "')");
+        if (IS_ADMIN) add('Reassign RSM', 'user-cog', "openReassignRsm('" + r.id + "')");
+      }
+
+      add('View Details', 'eye', "openDetail('" + r.id + "')");
+
+      if (IS_ADMIN && ['fulfilled', 'exception', 'cancelled'].indexOf(r.status) === -1)
+        add('Raise Exception', 'alert-triangle', "openException('" + r.id + "')", 'danger');
+
+      return acts;
+    }
+
+    function rowActions(r) {
+      var acts = actionsFor(r);
+      var lead = acts[0];
+      /* With nothing to do but look, the button should not read as a call to
+         action — it goes quiet rather than solid. */
+      var quiet = (lead.label === 'View Details');
+      var html = '<button class="lp-btn-primary ' + (quiet ? 'quiet' : lead.tone) + '" ' +
+                   'onclick="' + lead.onclick + '">' +
+                   '<i data-lucide="' + lead.icon + '"></i>' +
+                   (quiet ? 'View' : LP.esc(lead.label)) +
+                 '</button>';
+      if (acts.length > 1)
+        html += '<button class="lp-btn-more" onclick="openRowMenu(this, \'' + r.id + '\')" ' +
+                  'data-tip="More actions" aria-label="More actions">' +
+                  '<i data-lucide="more-horizontal"></i></button>';
+      return '<div class="lp-act">' + html + '</div>';
+    }
+
+    function openRowMenu(anchor, id) {
+      var r = LP.record(id);
+      if (!r) return;
+      var rest = actionsFor(r).slice(1);
+      /* Keep the destructive one away from the pointer's resting place. */
+      var last = rest[rest.length - 1];
+      if (last && last.tone === 'danger') rest.splice(rest.length - 1, 0, null);
+      LP.openMenu(anchor, rest);
     }
 
     function renderPagination(total, pages) {
@@ -740,9 +882,9 @@
           '<td>' + c.dispatched + '</td>' +
           '<td>' + c.fulfilled + '</td>' +
           '<td><span class="lp-chip ' + tone + '">' + LP.esc(status) + '</span></td>' +
-          '<td class="text-right"><div class="lp-row-actions">' +
-            LP.rowBtn('Update', 'pencil', "openInventoryModal('" + i.id + "')", 'ghost') +
-          '</div></td>' +
+          '<td class="text-right">' +
+            primaryBtn('Update', 'pencil', "openInventoryModal('" + i.id + "')", 'quiet') +
+          '</td>' +
         '</tr>';
       }).join('');
       LP.icons();
@@ -817,9 +959,9 @@
           ? LP.chip(ful.status)
           : '<span class="lp-chip lp-chip-available"><i data-lucide="package"></i> Not Allocated</span>';
         var action = ful
-          ? btn('View', 'eye', "openDetail('" + ful.id + "')", 'ghost')
+          ? primaryBtn('View', 'eye', "openDetail('" + ful.id + "')", 'quiet')
           : (IS_RSM
-              ? btn('Allocate', 'user-check', "openAllocate('" + r.ref + "')", '')
+              ? primaryBtn('Allocate', 'user-check', "openAllocate('" + r.ref + "')", '')
               : '<span class="lp-muted">Awaiting RSM</span>');
         return '<tr class="fade-in-row">' +
           '<td><strong>' + LP.esc(r.shortCode) + '</strong></td>' +
@@ -831,7 +973,7 @@
           '<td>' + LP.esc(r.date) + '</td>' +
           '<td>' + LP.esc(r.item) + '</td>' +
           '<td>' + statusCell + '</td>' +
-          '<td class="text-right"><div class="lp-row-actions">' + action + '</div></td>' +
+          '<td class="text-right">' + action + '</td>' +
         '</tr>';
       }).join('');
       LP.icons();

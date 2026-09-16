@@ -689,6 +689,90 @@
   }
   bindTips();
 
+  /* ── INITIALS AVATAR ──────────────────── */
+  /* Colour is derived from the id, not assigned, so the same person keeps the
+     same swatch on every page and across reloads. */
+  var AVATAR_TONES = ['#239150', '#0f766e', '#7c3aed', '#c2410c', '#0369a1', '#be123c'];
+
+  function initials(name) {
+    var parts = String(name || '').trim().split(/\s+/).filter(Boolean);
+    if (!parts.length) return '?';
+    if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  }
+
+  function avatarTone(key) {
+    var k = String(key || ''), sum = 0;
+    for (var i = 0; i < k.length; i++) sum = (sum + k.charCodeAt(i)) % 997;
+    return AVATAR_TONES[sum % AVATAR_TONES.length];
+  }
+
+  function avatar(name, key) {
+    return '<span class="lp-avatar" style="background:' + avatarTone(key || name) + '">' +
+           esc(initials(name)) + '</span>';
+  }
+
+  /* ── OVERFLOW MENU ────────────────────── */
+  /* Parked on <body> and positioned with fixed coordinates, for the same
+     reason as the tooltip: .table-responsive clips both axes, and the last
+     rows are exactly where a row menu gets opened. Items are passed in as
+     objects rather than markup so nothing has to be escaped twice. */
+  var menuEl = null, menuAnchor = null;
+
+  function menuNode() {
+    if (!menuEl) {
+      menuEl = document.createElement('div');
+      menuEl.className = 'lp-menu';
+      document.body.appendChild(menuEl);
+      /* Anywhere outside closes it, and so does Escape. */
+      document.addEventListener('mousedown', function (e) {
+        if (menuEl.contains(e.target)) return;
+        if (menuAnchor && menuAnchor.contains(e.target)) return;
+        closeMenu();
+      });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') closeMenu();
+      });
+      window.addEventListener('scroll', closeMenu, true);
+      window.addEventListener('resize', closeMenu);
+    }
+    return menuEl;
+  }
+
+  function closeMenu() {
+    if (!menuEl) return;
+    menuEl.classList.remove('open');
+    if (menuAnchor) menuAnchor.classList.remove('open');
+    menuAnchor = null;
+  }
+
+  /* items: [{ label, icon, onclick, tone }] — a null entry draws a separator. */
+  function openMenu(anchor, items) {
+    var m = menuNode();
+    if (menuAnchor === anchor && m.classList.contains('open')) { closeMenu(); return; }
+
+    m.innerHTML = items.map(function (it) {
+      if (!it) return '<div class="lp-menu-sep"></div>';
+      return '<button class="' + (it.tone || '') + '" onclick="LP.closeMenu(); ' + it.onclick + '">' +
+               '<i data-lucide="' + esc(it.icon) + '"></i>' + esc(it.label) +
+             '</button>';
+    }).join('');
+    icons();
+
+    m.classList.add('open');
+    anchor.classList.add('open');
+    menuAnchor = anchor;
+
+    var b = anchor.getBoundingClientRect();
+    var w = m.offsetWidth, h = m.offsetHeight;
+    /* Right-aligned to the button, since the action column is the last one. */
+    var left = Math.max(8, Math.min(b.right - w, window.innerWidth - w - 8));
+    var top = b.bottom + 6;
+    if (top + h > window.innerHeight - 8) top = Math.max(8, b.top - h - 6);
+    m.style.left = left + 'px';
+    m.style.top = top + 'px';
+  }
+
   /* ── SHARED UI HELPERS ──────────────────────────────── */
   function icons() {
     if (typeof lucide !== 'undefined' && lucide.createIcons) lucide.createIcons();
@@ -842,6 +926,8 @@
 
     today: today, stamp: stamp, points: points, dash: dash, esc: esc, pad: pad,
     chip: chip, stepper: stepper, rowBtn: rowBtn,
+    avatar: avatar, initials: initials,
+    openMenu: openMenu, closeMenu: closeMenu,
 
     icons: icons, toast: toast, closeToast: closeToast,
     openModal: openModal, closeModal: closeModal,

@@ -206,9 +206,11 @@ textarea.form-input { padding-left: 16px; min-height: 88px; resize: vertical; li
 }
 @media (min-width: 720px) { .lp-filter-row { grid-template-columns: 2fr 1fr 1fr; } }
 @media (min-width: 1000px) { .lp-filter-row { grid-template-columns: 2fr 1fr 1fr 1fr; } }
-/* cols-5 — a filter row that splits RSM and TDR into selects of their own. */
+/* cols-5 — a filter row that splits RSM and TDR into selects of their own,
+   and carries the record count and reset in a tail at the end. */
 @media (min-width: 1000px) { .lp-filter-row.cols-5 { grid-template-columns: 2fr 1fr 1fr 1fr; } }
 @media (min-width: 1240px) { .lp-filter-row.cols-5 { grid-template-columns: 2fr 1fr 1fr 1fr 1fr; } }
+@media (min-width: 1480px) { .lp-filter-row.cols-5 { grid-template-columns: 2fr 1fr 1fr 1fr 1fr auto; } }
 .lp-filter-row .form-select {
   padding: 11px 38px 11px 14px; font-size: 0.85rem; font-weight: 600;
   border-color: #e2e8f0; border-radius: 12px;
@@ -578,3 +580,224 @@ button.lp-kpi:hover { border-color: #cbd5e1; transform: translateY(-2px); box-sh
   .tab-btn { padding: 10px 16px; font-size: 0.82rem; }
   .lp-kpi-val { font-size: 1.3rem; }
 }
+
+/* ══ PIPELINE STRIP ═════════════════════════════════════
+   The six counts are the lifecycle in order, so they read as a flow with
+   arrows between the stages rather than as six unrelated tiles. Exception
+   sits after a divider because it is off the pipeline, not the end of it.
+   Each card still filters the table by its status.                        */
+.lp-pipe {
+  display: flex; align-items: stretch; gap: 8px;
+  margin-bottom: 24px; flex-wrap: wrap;
+}
+.lp-pipe-card {
+  flex: 1 1 200px; min-width: 0;
+  display: flex; align-items: center; gap: 11px;
+  background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px;
+  padding: 13px 14px; text-align: left;
+  font-family: 'Barlow', sans-serif; cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+.lp-pipe-card:hover { border-color: #cbd5e1; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.05); }
+.lp-pipe-ico {
+  flex: 0 0 auto; width: 42px; height: 42px; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: #f1f5f9; color: #64748b;
+}
+.lp-pipe-ico [data-lucide] { width: 20px; height: 20px; stroke-width: 2.2; }
+.lp-pipe-txt { display: block; min-width: 0; }
+.lp-pipe-val { display: block; font-size: 1.45rem; font-weight: 900; color: #0f172a; line-height: 1.05; }
+.lp-pipe-lbl {
+  display: block;
+  font-size: 0.66rem; font-weight: 800; color: #475569;
+  text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px;
+  /* Wraps rather than truncating: the cards stretch to a common height, so a
+     two-line label costs nothing but tells the whole truth. */
+  line-height: 1.25;
+}
+.lp-pipe-sub {
+  display: block;
+  font-size: 0.68rem; font-weight: 600; color: #94a3b8; margin-top: 1px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+/* Stage tones. Green is the brand's, so it marks the finished stage; amber
+   flags the stage that is waiting on somebody, red the off-path one. */
+.lp-pipe-card.tone-green .lp-pipe-ico { background: #e7f6ed; color: #1b7341; }
+.lp-pipe-card.tone-green .lp-pipe-val { color: #1b7341; }
+.lp-pipe-card.tone-amber { border-color: #fcd9a0; background: #fffaf0; }
+.lp-pipe-card.tone-amber .lp-pipe-ico { background: #fbbf24; color: #ffffff; }
+.lp-pipe-card.tone-amber .lp-pipe-val { color: #b45309; }
+.lp-pipe-card.tone-amber .lp-pipe-sub { color: #c2831f; }
+.lp-pipe-card.tone-red { border-color: #fecdd3; background: #fff7f7; }
+.lp-pipe-card.tone-red .lp-pipe-ico { background: #fee2e2; color: #e11d48; }
+.lp-pipe-card.tone-red .lp-pipe-val { color: #b91c1c; }
+.lp-pipe-card.tone-red .lp-pipe-sub { color: #d06767; }
+/* Filtering by a stage is a different thing from the stage's own tone, so it
+   reads as a green ring rather than by recolouring the card. */
+.lp-pipe-card.active {
+  border-color: #239150;
+  box-shadow: 0 0 0 3px rgba(35,145,80,0.16), 0 6px 18px rgba(35,145,80,0.12);
+}
+.lp-pipe-arrow {
+  flex: 0 0 auto; display: flex; align-items: center; color: #cbd5e1;
+}
+.lp-pipe-arrow [data-lucide] { width: 17px; height: 17px; }
+.lp-pipe-split { flex: 0 0 auto; width: 1px; background: #e2e8f0; margin: 6px 6px; }
+/* Below the breakpoint the cards wrap, and a flow arrow pointing at a card on
+   the next line would be a lie. */
+@media (min-width: 1280px) {
+  .lp-pipe { flex-wrap: nowrap; }
+  .lp-pipe-card { flex: 1 1 0; }
+}
+@media (max-width: 1279px) {
+  .lp-pipe-arrow, .lp-pipe-split { display: none; }
+}
+@media (max-width: 1420px) and (min-width: 1280px) {
+  .lp-pipe-card { padding: 12px; gap: 9px; }
+  .lp-pipe-ico { width: 36px; height: 36px; }
+  .lp-pipe-ico [data-lucide] { width: 17px; height: 17px; }
+  .lp-pipe-val { font-size: 1.3rem; }
+}
+
+/* ══ ACTIVE FILTER CHIPS ════════════════════════════════
+   Every filter the table is applying, listed where it is applied, each one
+   removable on its own — a select that has quietly kept a value is the
+   usual reason a table looks empty for no reason.                         */
+.lp-chips {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 8px;
+  margin: 2px 0 16px;
+}
+.lp-chips-lbl {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: 'Barlow', sans-serif; font-size: 0.75rem; font-weight: 700; color: #64748b;
+}
+.lp-chips-lbl [data-lucide] { width: 14px; height: 14px; }
+.lp-chip-filter {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: #eef8f2; border: 1px solid #c3e6d2; color: #1b7341;
+  border-radius: 50px; padding: 5px 7px 5px 12px;
+  font-family: 'Barlow', sans-serif; font-size: 0.74rem; font-weight: 700;
+}
+.lp-chip-filter b { font-weight: 800; }
+.lp-chip-filter button {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 18px; height: 18px; border-radius: 50%; border: none;
+  background: rgba(27,115,65,0.12); color: #1b7341; cursor: pointer; padding: 0;
+  transition: background 0.15s ease;
+}
+.lp-chip-filter button:hover { background: rgba(27,115,65,0.24); }
+.lp-chip-filter button [data-lucide] { width: 11px; height: 11px; stroke-width: 3; }
+.lp-chips-clear {
+  background: none; border: none; cursor: pointer; padding: 0 2px;
+  font-family: 'Barlow', sans-serif; font-size: 0.74rem; font-weight: 700;
+  color: #94a3b8; text-decoration: underline;
+}
+.lp-chips-clear:hover { color: #64748b; }
+
+/* ══ FILTER BAR TAIL ════════════════════════════════════
+   Record count and reset belong with the controls that change them. */
+.lp-filter-tail {
+  display: flex; align-items: center; justify-content: flex-end; gap: 14px;
+  min-width: 0;
+}
+.lp-filter-tail .records-badge { white-space: nowrap; }
+.lp-filter-reset-inline {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: none; border: none; cursor: pointer; padding: 0;
+  font-family: 'Barlow', sans-serif; font-size: 0.78rem; font-weight: 700; color: #64748b;
+  white-space: nowrap;
+}
+.lp-filter-reset-inline:hover { color: #239150; }
+.lp-filter-reset-inline [data-lucide] { width: 14px; height: 14px; }
+
+/* ══ TWO-LINE TABLE CELLS ═══════════════════════════════
+   A record's identifier and the thing it belongs to travel together, so they
+   share a cell: the identifier on top, its context underneath. That folded
+   three columns (short code, redemption ref) back into the cells they
+   qualify and left the table with seven columns instead of nine.          */
+.lp-cell { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.lp-cell-txt { min-width: 0; }
+.lp-cell-top {
+  font-size: 0.83rem; font-weight: 700; color: #1e293b; line-height: 1.25;
+}
+.lp-cell-sub {
+  font-size: 0.72rem; font-weight: 600; color: #94a3b8; line-height: 1.25; margin-top: 1px;
+}
+.lp-cell-sub.mono { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 0.68rem; }
+
+/* Rounded media tile — stands in for the product and merchant photography a
+   live catalogue would carry. */
+.lp-tile {
+  flex: 0 0 auto; width: 36px; height: 36px; border-radius: 10px;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: #f1f5f9; border: 1px solid #e8eef4; color: #64748b;
+}
+.lp-tile [data-lucide] { width: 18px; height: 18px; stroke-width: 2; }
+.lp-tile.green { background: #eef8f2; border-color: #cfeadc; color: #1b7341; }
+
+/* Initials, so a name is recognisable before it is read. */
+.lp-avatar {
+  flex: 0 0 auto; width: 32px; height: 32px; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-family: 'Barlow', sans-serif; font-size: 0.68rem; font-weight: 800;
+  letter-spacing: 0.3px; color: #ffffff;
+}
+
+/* ══ PRIMARY ROW ACTION ═════════════════════════════════
+   One solid button carries the row's next step, so the eye can run down the
+   column and see what is waiting; everything else lives behind the ⋯. */
+.lp-act {
+  display: inline-flex; align-items: center; justify-content: flex-end; gap: 7px;
+  flex-wrap: nowrap;
+}
+.lp-btn-primary {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 8px 14px; border-radius: 10px; border: 1px solid transparent;
+  background: #239150; color: #ffffff;
+  font-family: 'Barlow', sans-serif; font-size: 0.75rem; font-weight: 700;
+  cursor: pointer; white-space: nowrap; transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(35,145,80,0.22);
+}
+.lp-btn-primary:hover { background: #1b7341; box-shadow: 0 4px 12px rgba(35,145,80,0.3); }
+.lp-btn-primary [data-lucide] { width: 14px; height: 14px; }
+.lp-btn-primary.amber { background: #d97706; box-shadow: 0 2px 8px rgba(217,119,6,0.24); }
+.lp-btn-primary.amber:hover { background: #b45309; box-shadow: 0 4px 12px rgba(217,119,6,0.32); }
+.lp-btn-primary.quiet {
+  background: #ffffff; color: #475569; border-color: #e2e8f0; box-shadow: none;
+}
+.lp-btn-primary.quiet:hover { background: #f8fafc; border-color: #cbd5e1; box-shadow: none; }
+.lp-btn-more {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 32px; height: 32px; flex: 0 0 auto;
+  border-radius: 10px; border: 1px solid #e2e8f0; background: #ffffff;
+  color: #64748b; cursor: pointer; transition: all 0.2s ease;
+}
+.lp-btn-more:hover { background: #f8fafc; border-color: #cbd5e1; color: #1e293b; }
+.lp-btn-more.open { background: #f1f5f9; border-color: #cbd5e1; color: #1e293b; }
+.lp-btn-more [data-lucide] { width: 16px; height: 16px; }
+
+/* ══ OVERFLOW MENU ══════════════════════════════════════
+   Fixed to the viewport and parked on <body> for the same reason as the
+   tooltip: the table clips both axes, so a menu inside a row would be cut
+   off exactly on the last rows, where it opens most often.                */
+.lp-menu {
+  position: fixed; left: 0; top: -9999px; z-index: 4100;
+  min-width: 190px; padding: 6px;
+  background: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px;
+  box-shadow: 0 16px 40px rgba(15,23,42,0.16), 0 2px 8px rgba(15,23,42,0.06);
+  opacity: 0; transform: translateY(-4px); pointer-events: none;
+  transition: opacity 0.12s ease, transform 0.12s ease;
+}
+.lp-menu.open { opacity: 1; transform: translateY(0); pointer-events: auto; }
+.lp-menu button {
+  display: flex; align-items: center; gap: 10px; width: 100%;
+  padding: 9px 11px; border-radius: 9px; border: none; background: none;
+  font-family: 'Barlow', sans-serif; font-size: 0.79rem; font-weight: 600;
+  color: #334155; cursor: pointer; text-align: left; transition: background 0.12s ease;
+}
+.lp-menu button:hover { background: #f1f5f9; }
+.lp-menu button [data-lucide] { width: 15px; height: 15px; flex: 0 0 auto; color: #64748b; }
+.lp-menu button.danger { color: #e11d48; }
+.lp-menu button.danger:hover { background: #fff1f2; }
+.lp-menu button.danger [data-lucide] { color: #e11d48; }
+.lp-menu-sep { height: 1px; background: #edf2f7; margin: 5px 4px; }
