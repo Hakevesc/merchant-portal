@@ -478,7 +478,7 @@
       </div>
       <div class="conversion-divider"></div>
       <div class="conversion-text">
-        <div class="conversion-rate">100 Points = 1 Br Float</div>
+        <div class="conversion-rate">100 Points = 1 ETB Float</div>
         <div class="conversion-min">Minimum to convert is 100 pts</div>
       </div>
     </div>
@@ -492,7 +492,7 @@
       <div class="fh-divider"></div>
       <div class="fh-right">
         <div class="fh-label">Redemption Value</div>
-        <div class="fh-value" id="fhFloat">0.00 <span>Br</span></div>
+        <div class="fh-value" id="fhFloat">0.00 <span>ETB</span></div>
       </div>
     </div>
 
@@ -517,7 +517,7 @@
           </svg>
         </div>
         <div class="stat-label">Equivalent Float</div>
-        <div class="stat-value" id="floatValue">10.00 Br</div>
+        <div class="stat-value" id="floatValue">10.00 ETB</div>
       </div>
 
       <div class="stat-card">
@@ -559,7 +559,7 @@
     </div>
     <div class="sheet-row">
       <span class="lbl">You will receive</span>
-      <span class="val green" id="sheetFloat">10.00 Br</span>
+      <span class="val green" id="sheetFloat">10.00 ETB</span>
     </div>
     <div class="sheet-row">
       <span class="lbl">Remaining points</span>
@@ -597,8 +597,8 @@
       var floatTxt = (convertible / 100).toFixed(2);
 
       fhHaveEl.innerHTML = n(HAVE) + ' <span>PTS</span>';
-      fhFloatEl.innerHTML = floatTxt + ' <span>Br</span>';
-      floatEl.textContent = floatTxt + ' Br';
+      fhFloatEl.innerHTML = floatTxt + ' <span>ETB</span>';
+      floatEl.textContent = floatTxt + ' ETB';
       remainingEl.textContent = leftover + (leftover === 1 ? ' Point' : ' Points');
     }
 
@@ -607,7 +607,7 @@
       var leftover = points - convertible;
 
       document.getElementById('sheetPoints').textContent = convertible.toLocaleString('en-US') + ' PTS';
-      document.getElementById('sheetFloat').textContent = (convertible / 100).toFixed(2) + ' Br';
+      document.getElementById('sheetFloat').textContent = (convertible / 100).toFixed(2) + ' ETB';
       document.getElementById('sheetRemaining').textContent = leftover.toLocaleString('en-US') + ' PTS';
 
       pending = points;
