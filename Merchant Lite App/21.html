@@ -36,20 +36,19 @@
     -webkit-font-smoothing:antialiased;
   }
 
+  /* The screen itself doesn't scroll — the header, tabs and filter bar stay put
+     and only .list-container scrolls, so this is a fixed-height flex column. */
   .phone-scroll{
     height:calc(100% - 24px);
-    overflow-y:auto;
-    overflow-x:hidden;
-    -webkit-overflow-scrolling:touch;
-    scrollbar-width:none;
+    display:flex;flex-direction:column;
+    overflow:hidden;
   }
   .phone-scroll::-webkit-scrollbar{display:none}
-  body.sheet-open .phone-scroll{overflow:hidden}
 
   /* ---------- Header ---------- */
   .header{
     display:grid;grid-template-columns:auto 1fr auto;align-items:center;
-    background:#fff;position:sticky;top:0;z-index:50;
+    background:#fff;position:relative;z-index:50;flex-shrink:0;
     padding:10px 16px 20px;
   }
   .back-btn{
@@ -92,11 +91,16 @@
   }
 
   /* ---------- Page ---------- */
-  .page{padding:4px 16px 24px}
+  .page{
+    padding:4px 16px 0;
+    flex:1;min-height:0;
+    display:flex;flex-direction:column;
+  }
 
   /* ---------- Segmented Tabs ---------- */
   .tabs-container{
     margin-bottom:14px;
+    flex-shrink:0;
   }
   .tab-pill-bar{
     display:flex;
@@ -134,14 +138,26 @@
     border-radius:10px;padding:6px 12px;margin-bottom:12px;
     font-size:11.5px;color:#5b6169;font-weight:600;
   }
-  .active-filters-bar.show{display:flex}
+  .active-filters-bar.show{display:flex;flex-shrink:0}
   .clear-filters-link{
     color:#e8343e;text-decoration:none;cursor:pointer;font-weight:700;font-size:11px;
   }
 
   /* ---------- Tab Panes ---------- */
   .tab-pane{display:none}
-  .tab-pane.active{display:block}
+  .tab-pane.active{
+    display:flex;flex-direction:column;
+    flex:1;min-height:0;
+  }
+  .list-container{
+    flex:1;min-height:0;
+    overflow-y:auto;overflow-x:hidden;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+    padding-bottom:24px;
+  }
+  .list-container::-webkit-scrollbar{display:none}
+  body.sheet-open .list-container{overflow:hidden}
 
   /* ---------- Entries ---------- */
   .day-group{
@@ -530,8 +546,8 @@
           <div class="entry-time">15 AUG</div>
         </div>
       </div>
+      <div class="empty-state" id="empty-accumulation">No accumulation history found</div>
     </div>
-    <div class="empty-state" id="empty-accumulation">No accumulation history found</div>
   </div>
 
   <!-- ==================== PANE: REDEMPTION ==================== -->
@@ -684,8 +700,8 @@
           <div class="entry-time">12 AUG</div>
         </div>
       </div>
+      <div class="empty-state" id="empty-redemption">No redemption history found</div>
     </div>
-    <div class="empty-state" id="empty-redemption">No redemption history found</div>
   </div>
 
   <!-- ==================== PANE: ORDER ==================== -->
@@ -766,8 +782,8 @@
           <div class="entry-time">10 AUG</div>
         </div>
       </div>
+      <div class="empty-state" id="empty-order">No order history found</div>
     </div>
-    <div class="empty-state" id="empty-order">No order history found</div>
   </div>
 
 </div>

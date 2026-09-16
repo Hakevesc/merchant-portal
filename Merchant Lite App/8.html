@@ -36,20 +36,19 @@
     -webkit-font-smoothing:antialiased;
   }
 
+  /* The screen itself doesn't scroll — the header and the cards stay put and
+     only .history-list scrolls, so this is a flex column with a fixed height. */
   .phone-scroll{
     height:calc(100% - 24px);
-    overflow-y:auto;
-    overflow-x:hidden;
-    -webkit-overflow-scrolling:touch;
-    scrollbar-width:none;
+    display:flex;flex-direction:column;
+    overflow:hidden;
   }
   .phone-scroll::-webkit-scrollbar{display:none}
-  body.sheet-open .phone-scroll{overflow:hidden}
 
   /* ---------- Header ---------- */
   .header{
     display:grid;grid-template-columns:auto 1fr auto;align-items:center;
-    background:#fff;position:sticky;top:0;z-index:50;
+    background:#fff;position:relative;z-index:50;flex-shrink:0;
     padding:10px 16px 34px;
   }
   .back-btn{
@@ -76,7 +75,11 @@
   .header-spacer{display:none}
 
   /* ---------- Page ---------- */
-  .page{padding:14px 16px 20px}
+  .page{
+    padding:14px 16px 0;
+    flex:1;min-height:0;
+    display:flex;flex-direction:column;
+  }
 
   /* ---------- Hero card (Top Points) ---------- */
   .hero-card{
@@ -112,12 +115,6 @@
     position:absolute;right:-15px;bottom:-32px;
     width:160px;height:132px;pointer-events:none;
     display:flex;align-items:flex-end;justify-content:center;
-  }
-  .rb-confetti-svg{
-    position:absolute;inset:0;width:100%;height:100%;
-    pointer-events:none;z-index:1;
-    mix-blend-mode:overlay;
-    transform:translate(14px, -6px) scale(1.08);
   }
   .rb-gift-img{
     position:relative;width:125px;height:125px;object-fit:contain;
@@ -163,7 +160,7 @@
 
   /* Headline figures — same treatment in both columns */
   .hero-pts{display:flex;align-items:baseline;gap:4px;}
-  .hero-pts b{font-size:27px;font-weight:800;color:#fff;letter-spacing:-.9px;line-height:1;font-family:'Switzer','Inter',sans-serif;}
+  .hero-pts b{font-size:23px;font-weight:800;color:#fff;letter-spacing:-.9px;line-height:1;font-family:'Switzer','Inter',sans-serif;}
   .hero-pts span{font-size:12px;font-weight:700;color:rgba(255,255,255,.85);}
   .hero-chev{
     width:13px;height:13px;flex-shrink:0;align-self:center;
@@ -174,11 +171,14 @@
   .hero-split{display:flex;align-items:stretch;gap:16px;margin-top:16px;}
   .hero-cell{flex:1;min-width:0;}
   .hero-cell-label{
-    font-size:10.5px;font-weight:500;color:rgba(255,255,255,.74);margin-bottom:2px;
+    font-size:10px;font-weight:500;color:rgba(255,255,255,.74);margin-bottom:2px;
     white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
   }
-  .hero-cell-value{font-size:15px;font-weight:800;color:#fff;letter-spacing:-.3px;line-height:1.15;}
-  .hero-cell-value em{font-style:normal;font-size:10px;font-weight:700;color:rgba(255,255,255,.8);margin-left:4px;}
+  .hero-cell-value{
+    font-size:23px;font-weight:800;color:#fff;letter-spacing:-.9px;line-height:1;
+    font-family:'Switzer','Inter',sans-serif;
+  }
+  .hero-cell-value em{font-style:normal;font-size:12px;font-weight:700;color:rgba(255,255,255,.8);margin-left:4px;}
   .hero-vbar{width:1px;align-self:stretch;background:rgba(255,255,255,.22);flex-shrink:0;}
 
   /* ---------- Redeem Rewards Banner ---------- */
@@ -269,6 +269,15 @@
     font-family:'Switzer','Inter',sans-serif;
     border-left:none;
   }
+  .history-list{
+    flex:1;min-height:0;
+    overflow-y:auto;overflow-x:hidden;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+    padding-bottom:20px;
+  }
+  .history-list::-webkit-scrollbar{display:none}
+  body.sheet-open .history-list{overflow:hidden}
   .history-item{
     display:flex;align-items:center;gap:12px;
     padding:12px 14px;
@@ -358,26 +367,8 @@
 
   <!-- Redeem Rewards Banner -->
   <div class="rewards-banner" onclick="window.location.href='9.html'">
-    <!-- Gift box & confetti illustration -->
+    <!-- Gift box illustration -->
     <div class="rb-illustration">
-      <svg class="rb-confetti-svg" viewBox="0 0 175 145" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <!-- Top-left pill \ -->
-        <rect x="28" y="16" width="6.5" height="18" rx="3.25" fill="#ffffff" opacity="0.9" transform="rotate(-38 28 16)"/>
-        <!-- Mid-left pill / -->
-        <rect x="12" y="42" width="6.5" height="17" rx="3.25" fill="#ffffff" opacity="0.85" transform="rotate(-65 12 42)"/>
-        <!-- Upper-left diamond ◆ -->
-        <rect x="16" y="68" width="9" height="9" rx="1.8" fill="#ffe359" opacity="0.95" transform="rotate(45 16 68)"/>
-        <!-- Top-center vertical pill | -->
-        <rect x="80" y="2" width="6.5" height="18" rx="3.25" fill="#ffffff" opacity="0.9" transform="rotate(6 80 2)"/>
-        <!-- Top-right yellow sparkle star ✦ -->
-        <path d="M136 12 C136 18 139 21 145 21 C139 21 136 24 136 30 C136 24 133 21 127 21 C133 21 136 18 136 12 Z" fill="#ffe359" opacity="0.95"/>
-        <!-- Secondary white sparkle star ✦ -->
-        <path d="M158 6 C158 10 160 12 164 12 C160 12 158 14 158 18 C158 14 156 12 152 12 C156 12 158 10 158 6 Z" fill="#ffffff" opacity="0.9"/>
-        <!-- Far-right pill / -->
-        <rect x="160" y="38" width="6.5" height="17" rx="3.25" fill="#ffffff" opacity="0.85" transform="rotate(42 160 38)"/>
-        <!-- Upper-right diamond ◆ -->
-        <rect x="154" y="66" width="8.5" height="8.5" rx="1.5" fill="#ffe359" opacity="0.85" transform="rotate(25 154 66)"/>
-      </svg>
       <img class="rb-gift-img" src="assets/Gift%20Box.png" alt="Rewards Gift">
     </div>
 
@@ -415,6 +406,8 @@
 
   <!-- Recent History -->
   <div class="section-label">REDEEMED HISTORY</div>
+
+  <div class="history-list">
 
   <div class="history-item">
     <div class="h-icon" style="background:#e8f7ee">
@@ -484,6 +477,8 @@
       <div class="h-day">28 AUG</div>
       <div class="h-hr">09:40 AM</div>
     </div>
+  </div>
+
   </div>
 
 </div>

@@ -43,7 +43,7 @@
   /* ---------- Header ---------- */
   .header{
     display:grid;grid-template-columns:auto 1fr auto;align-items:center;
-    background:#fff;position:sticky;top:0;z-index:50;
+    background:#fff;position:relative;z-index:50;flex-shrink:0;
     padding:10px 16px 34px;
   }
   .back-btn{
@@ -69,11 +69,16 @@
   }
   .header-spacer{display:none}
 
-  .page{padding:14px 16px 20px}
+  .page{
+    padding:14px 16px 0;
+    flex:1;min-height:0;
+    display:flex;flex-direction:column;
+  }
 
   /* ---------- Segmented Tabs ---------- */
   .tabs-container{
     margin-bottom:14px;
+    flex-shrink:0;
   }
   .tab-pill-bar{
     display:flex;
@@ -107,7 +112,22 @@
 
   /* Tab Panes */
   .tab-pane{display:none}
-  .tab-pane.active{display:block}
+  .tab-pane.active{
+    display:flex;flex-direction:column;
+    flex:1;min-height:0;
+  }
+  .tab-pane.active > .summary-card,
+  .tab-pane.active > .stats-grid,
+  .tab-pane.active > .section-title{flex-shrink:0}
+  .list-container{
+    flex:1;min-height:0;
+    overflow-y:auto;overflow-x:hidden;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+    padding-bottom:20px;
+  }
+  .list-container::-webkit-scrollbar{display:none}
+  body.sheet-open .list-container{overflow:hidden}
 
   /* ---------- Summary card (Accumulation & Redemption) ---------- */
   .summary-card{
@@ -463,15 +483,14 @@
   /* ---------- Bottom Navigation ---------- */
 
 
+  /* The screen itself doesn't scroll — the header, tabs, summary and stats stay
+     put and only .list-container scrolls, so this is a fixed-height flex column. */
   .phone-scroll{
     height:calc(100% - 24px);
-    overflow-y:auto;
-    overflow-x:hidden;
-    -webkit-overflow-scrolling:touch;
-    scrollbar-width:none;
+    display:flex;flex-direction:column;
+    overflow:hidden;
   }
   .phone-scroll::-webkit-scrollbar{display:none}
-  body.sheet-open .phone-scroll{overflow:hidden}
 
   .gesture-bar{
     position:fixed;
