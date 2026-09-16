@@ -414,12 +414,15 @@
     var ROLE = LP.requireLogin();
     var IS_ADMIN = LP.can(['admin']);
     var IS_TDR   = LP.can(['tdr']);
-    var AUTHORIZED = LP.can(['admin', 'tdr']);
+    /* Assignment is the RSM's job: they allocate a redeemed reward to a TDR and
+       reassign it when something goes wrong. Admin oversees, TDR fulfils. */
+    var IS_RSM   = LP.can(['rsm']);
+    var AUTHORIZED = LP.can(['admin', 'tdr', 'rsm']);
 
     var TAB_DEFS = [
-      { key: 'fulfilment',  label: 'Fulfilment',  icon: 'package-check', roles: ['admin', 'tdr'] },
+      { key: 'fulfilment',  label: 'Fulfilment',  icon: 'package-check', roles: ['admin', 'tdr', 'rsm'] },
       { key: 'inventory',   label: 'Inventory',   icon: 'boxes',         roles: ['admin'] },
-      { key: 'redemptions', label: 'Redemptions', icon: 'gift',          roles: ['admin'] },
+      { key: 'redemptions', label: 'Redemptions', icon: 'gift',          roles: ['admin', 'rsm'] },
       { key: 'audit',       label: 'Audit Trail', icon: 'scroll-text',   roles: ['admin'] }
     ];
     var TAB_LABELS = {
@@ -608,7 +611,7 @@
         btns.push(btn('Start Handover', 'smartphone', "startHandover('" + r.id + "')", ''));
       if (r.status === 'pending' && IS_TDR)
         btns.push(btn('Enter OTP', 'key-round', "openOtp('" + r.id + "')", 'amber'));
-      if (r.status === 'exception' && IS_ADMIN)
+      if (r.status === 'exception' && IS_RSM)
         btns.push(btn('Reassign', 'repeat', "openReassign('" + r.id + "')", 'ghost'));
       if (IS_ADMIN && ['fulfilled', 'exception', 'cancelled'].indexOf(r.status) === -1)
         btns.push(btn('Exception', 'alert-triangle', "openException('" + r.id + "')", 'danger'));
@@ -731,7 +734,9 @@
           : '<span class="lp-chip lp-chip-available"><i data-lucide="package"></i> Not Allocated</span>';
         var action = ful
           ? btn('View', 'eye', "openDetail('" + ful.id + "')", 'ghost')
-          : btn('Allocate', 'user-check', "openAllocate('" + r.ref + "')", '');
+          : (IS_RSM
+              ? btn('Allocate', 'user-check', "openAllocate('" + r.ref + "')", '')
+              : '<span class="lp-muted">Awaiting RSM</span>');
         return '<tr class="fade-in-row">' +
           '<td><strong>' + LP.esc(r.shortCode) + '</strong></td>' +
           '<td>' + LP.esc(LP.merchantName(r.shortCode)) + '</td>' +
@@ -1231,8 +1236,14 @@
       if (IS_TDR) {
         document.getElementById('flScopeNote').innerHTML =
           '<div class="fl-scope-note"><i data-lucide="info"></i> ' +
-          'You are viewing only the fulfilment records assigned to you (' + LP.esc(LP.tdrName(LP.CURRENT_TDR)) + ').</div>';
+          'You are viewing only the fulfilment records assigned to you (' + LP.esc(LP.tdrName(LP.CURRENT_TDR)) + '). ' +
+          'Rewards are assigned to you by an RSM.</div>';
         document.getElementById('flTdr').value = LP.CURRENT_TDR;
+      } else if (IS_RSM) {
+        document.getElementById('flScopeNote').innerHTML =
+          '<div class="fl-scope-note"><i data-lucide="info"></i> ' +
+          'You are signed in as ' + LP.esc(LP.tdrName(LP.CURRENT_RSM)) + '. ' +
+          'Allocate redeemed rewards to a TDR from the Redemptions tab, and reassign them here when a handover fails.</div>';
       }
 
       var hash = (window.location.hash || '').replace('#', '');

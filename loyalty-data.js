@@ -11,9 +11,11 @@
 
   /* ── ROLES ──────────────────────────────────────────── */
   var ROLES = {
-    'care-desk': { label: 'Care Desk',  icon: 'headphones',  email: 'meron.tesfaye@partner.safaricom.et' },
-    'admin':     { label: 'Admin',      icon: 'shield',      email: 'aklilu.tamirat@partner.safaricom.et' },
-    'tdr':       { label: 'TDR / RSM',  icon: 'truck',       email: 'samuel.girma@partner.safaricom.et' }
+    'care-desk': { label: 'Care Desk',  icon: 'headphones',     email: 'meron.tesfaye@partner.safaricom.et' },
+    'admin':     { label: 'Admin',      icon: 'shield',         email: 'aklilu.tamirat@partner.safaricom.et' },
+    /* RSM assigns rewards to field agents; TDR fulfils what they were assigned. */
+    'rsm':       { label: 'RSM',        icon: 'clipboard-list', email: 'dawit.alemu@partner.safaricom.et' },
+    'tdr':       { label: 'TDR',        icon: 'truck',          email: 'samuel.girma@partner.safaricom.et' }
   };
 
   var ROLE_KEY = 'mpesa_loyalty_role';
@@ -27,6 +29,8 @@
   ];
   /* The signed-in TDR for the demo — records assigned here are "mine". */
   var CURRENT_TDR = 'TDR-01';
+  /* The signed-in RSM for the demo — the agent who does the assigning. */
+  var CURRENT_RSM = 'RSM-01';
 
   /* ── CAMPAIGN ───────────────────────────────────────── */
   var CAMPAIGN = 'Merchant Loyalty 2026';
@@ -220,6 +224,120 @@
   /* ── STATE (sessionStorage backed) ──────────────────── */
   var state = null;
 
+  /* ── BLACKLIST ──────────────────────────────────────────
+     The blacklist is admin-editable, so unlike the rest of MERCHANTS it lives
+     in the persisted state rather than in the static seed above. It is seeded
+     from whichever merchants start out blacklisted, then synced back onto
+     MERCHANTS on every load so Care Desk and the blacklist page agree.      */
+  /* Eligibility as seeded, so removing a merchant from the blacklist restores
+     what they had rather than leaving them permanently ineligible. */
+  var LOYALTY_BASELINE = (function () {
+    var out = {};
+    Object.keys(MERCHANTS).forEach(function (code) {
+      var l = MERCHANTS[code].loyalty;
+      if (l) out[code] = { eligible: l.eligible, participating: l.participating };
+    });
+    return out;
+  })();
+
+  function seedBlacklist() {
+    var out = [];
+    Object.keys(MERCHANTS).forEach(function (code) {
+      var m = MERCHANTS[code];
+      if (!m.blacklisted) return;
+      var b = m.blacklist || {};
+      out.push({
+        shortCode: code,
+        reason: (b.reason || 'Suspected fraudulent activity').toLowerCase(),
+        dateAdded: b.dateAdded || today(),
+        validity: b.validity || 'Active — under review',
+        addedBy: b.addedBy || 'aklilu.tamirat@partner.safaricom.et',
+        source: 'seed'
+      });
+    });
+    return out;
+  }
+
+  /* Push the persisted blacklist onto MERCHANTS. MERCHANTS is rebuilt on every
+     page load, so without this a merchant blacklisted on one page would look
+     clean on the next. */
+  function syncBlacklist() {
+    var list = (state && state.blacklist) || [];
+    var byCode = {};
+    list.forEach(function (b) { byCode[b.shortCode] = b; });
+
+    Object.keys(MERCHANTS).forEach(function (code) {
+      var m = MERCHANTS[code];
+      var b = byCode[code];
+      if (b) {
+        m.blacklisted = true;
+        m.blacklist = {
+          reason: b.reason,
+          dateAdded: b.dateAdded,
+          validity: b.validity,
+          addedBy: b.addedBy
+        };
+        /* A blacklisted merchant cannot take part in the campaign. */
+        if (m.loyalty) { m.loyalty.eligible = false; m.loyalty.participating = false; }
+      } else {
+        m.blacklisted = false;
+        delete m.blacklist;
+        var base = LOYALTY_BASELINE[code];
+        if (m.loyalty && base) {
+          m.loyalty.eligible = base.eligible;
+          m.loyalty.participating = base.participating;
+        }
+      }
+    });
+  }
+
+  function blacklistList() { return loadState().blacklist; }
+  function blacklistEntry(code) {
+    var list = blacklistList();
+    for (var i = 0; i < list.length; i++) if (list[i].shortCode === code) return list[i];
+    return null;
+  }
+  function isBlacklisted(code) { return !!blacklistEntry(code); }
+
+  /* Add one merchant. Returns { ok: true } or { ok: false, error: '...' } so the
+     caller can report per-row outcomes during a bulk import. */
+  function addBlacklist(code, reason, source) {
+    code = String(code == null ? '' : code).trim();
+    reason = String(reason == null ? '' : reason).trim().toLowerCase();
+
+    if (!code) return { ok: false, error: 'Missing short code' };
+    if (!/^\d+$/.test(code)) return { ok: false, error: 'Short code must be digits only' };
+    if (!reason) return { ok: false, error: 'Missing reason' };
+    if (!MERCHANTS[code]) return { ok: false, error: 'Not in the loyalty register' };
+    if (isBlacklisted(code)) return { ok: false, error: 'Already blacklisted' };
+
+    var s = loadState();
+    s.blacklist.unshift({
+      shortCode: code,
+      reason: reason,
+      dateAdded: today(),
+      validity: 'Active — under review',
+      addedBy: currentUser(),
+      source: source || 'manual'
+    });
+    saveState();
+    syncBlacklist();
+    return { ok: true };
+  }
+
+  function removeBlacklist(code) {
+    var s = loadState();
+    for (var i = 0; i < s.blacklist.length; i++) {
+      if (s.blacklist[i].shortCode === code) {
+        s.blacklist.splice(i, 1);
+        saveState();
+        syncBlacklist();
+        return true;
+      }
+    }
+    return false;
+  }
+
   function seedState() {
     var now = Date.now();
     var fulfilment = FULFILMENT_SEED.map(function (r) {
@@ -233,6 +351,7 @@
       inventory: JSON.parse(JSON.stringify(INVENTORY_SEED)),
       redemptions: JSON.parse(JSON.stringify(REDEMPTIONS_SEED)),
       fulfilment: fulfilment,
+      blacklist: seedBlacklist(),
       audit: [],
       seq: { ful: 7, dsp: 63, rdm: 94, txn: 88213 }
     };
@@ -242,10 +361,17 @@
     if (state) return state;
     try {
       var raw = sessionStorage.getItem(STATE_KEY);
-      if (raw) { state = JSON.parse(raw); return state; }
+      if (raw) {
+        state = JSON.parse(raw);
+        /* A session stored before the blacklist existed has no such key */
+        if (!state.blacklist) { state.blacklist = seedBlacklist(); saveState(); }
+        syncBlacklist();
+        return state;
+      }
     } catch (e) { /* private mode or blocked storage — fall through to a fresh seed */ }
     state = seedState();
     saveState();
+    syncBlacklist();
     return state;
   }
 
@@ -594,9 +720,14 @@
     window.location.href = 'index.html';
   }
 
+  /* Load once at module init so MERCHANTS carries the persisted blacklist
+     before any page reads it — several pages call LP.merchant() without ever
+     touching LP.state(), and would otherwise see the un-synced seed. */
+  loadState();
+
   /* ── EXPORT ─────────────────────────────────────────── */
   global.LP = {
-    ROLES: ROLES, TDRS: TDRS, CURRENT_TDR: CURRENT_TDR, CAMPAIGN: CAMPAIGN,
+    ROLES: ROLES, TDRS: TDRS, CURRENT_TDR: CURRENT_TDR, CURRENT_RSM: CURRENT_RSM, CAMPAIGN: CAMPAIGN,
     MERCHANTS: MERCHANTS, FAILURE_CODE: FAILURE_CODE,
     LIFECYCLE: LIFECYCLE, STATUS_LABELS: STATUS_LABELS, STATUS_ICONS: STATUS_ICONS,
     EXCEPTION_TYPES: EXCEPTION_TYPES,
@@ -607,6 +738,8 @@
     can: can, currentUser: currentUser, roleLabel: roleLabel,
 
     audit: audit,
+    blacklistList: blacklistList, blacklistEntry: blacklistEntry,
+    isBlacklisted: isBlacklisted, addBlacklist: addBlacklist, removeBlacklist: removeBlacklist,
     merchant: merchant, merchantName: merchantName,
     tdr: tdr, tdrName: tdrName,
     inventoryItem: inventoryItem, inventoryCounts: inventoryCounts, availableStock: availableStock,

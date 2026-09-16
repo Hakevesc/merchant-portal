@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blacklist — Merchant Loyalty</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Optional: only needed to read .xlsx / .xls. CSV parses without it. -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <link rel="stylesheet" href="portal.css" />
+  <link rel="stylesheet" href="loyalty.css" />
+  <style>
+    /* ── Two-column layout: form on the left, register on the right ── */
+    .bl-layout { display: grid; grid-template-columns: 1fr; gap: 26px; }
+    @media (min-width: 1100px) {
+      .bl-layout { grid-template-columns: 390px 1fr; align-items: start; }
+    }
+    .bl-head { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; }
+    .bl-head .icon-wrap-red { margin: 0; width: 48px; height: 48px; border-radius: 14px; }
+    .bl-head .card-title { font-size: 1.12rem; margin-bottom: 2px; }
+    .bl-head .card-subtitle { font-size: 0.83rem; }
+
+    /* Reason select sits next to a small "add reason" button */
+    .bl-reason-row { display: flex; gap: 8px; align-items: stretch; }
+    .bl-reason-row .input-wrapper { flex: 1; min-width: 0; }
+    .bl-add-reason {
+      flex-shrink: 0; display: inline-flex; align-items: center; gap: 5px;
+      padding: 0 13px; border-radius: 11px; cursor: pointer;
+      background: #f8fafc; border: 1.5px solid #e2e8f0; color: #475569;
+      font-family: 'Barlow', sans-serif; font-size: 0.78rem; font-weight: 800;
+      text-transform: uppercase; letter-spacing: 0.3px; transition: all 0.16s;
+    }
+    .bl-add-reason:hover { background: #eaf5ee; border-color: #b7ddc5; color: #1b7341; }
+    .bl-add-reason [data-lucide] { width: 14px; height: 14px; stroke-width: 2.6; }
+
+    .bl-hint {
+      display: flex; gap: 9px; align-items: flex-start;
+      margin-top: 16px; padding: 11px 13px; border-radius: 12px;
+      background: #f8fafc; border: 1px solid #e2e8f0;
+      font-size: 0.78rem; font-weight: 600; color: #64748b; line-height: 1.5;
+    }
+    .bl-hint [data-lucide] { width: 15px; height: 15px; flex-shrink: 0; margin-top: 1px; color: #94a3b8; }
+
+    /* Table card header carries the import action */
+    .bl-table-head {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      gap: 14px; flex-wrap: wrap; margin-bottom: 18px;
+    }
+    .bl-table-actions { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; }
+
+    /* ── Import modal ── */
+    .bl-drop {
+      border: 2px dashed #cbd5e1; border-radius: 16px; background: #f8fafc;
+      padding: 30px 22px; text-align: center; cursor: pointer;
+      transition: border-color 0.16s, background 0.16s;
+    }
+    .bl-drop:hover, .bl-drop.dragover { border-color: #2FC56D; background: #f2fbf5; }
+    .bl-drop [data-lucide] { width: 34px; height: 34px; color: #94a3b8; stroke-width: 1.8; }
+    .bl-drop.dragover [data-lucide] { color: #239150; }
+    .bl-drop-title { font-size: 0.95rem; font-weight: 800; color: #0f172a; margin-top: 10px; }
+    .bl-drop-sub { font-size: 0.79rem; font-weight: 600; color: #64748b; margin-top: 4px; }
+    .bl-drop-formats {
+      display: inline-block; margin-top: 12px; padding: 4px 11px; border-radius: 50px;
+      background: #fff; border: 1px solid #e2e8f0;
+      font-size: 0.7rem; font-weight: 800; color: #64748b;
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+
+    .bl-file-row {
+      display: flex; align-items: center; gap: 10px;
+      margin-top: 14px; padding: 11px 13px;
+      border: 1px solid #e2e8f0; border-radius: 12px; background: #fff;
+    }
+    .bl-file-row [data-lucide] { width: 17px; height: 17px; color: #239150; flex-shrink: 0; }
+    .bl-file-name { font-size: 0.84rem; font-weight: 700; color: #0f172a; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .bl-file-meta { font-size: 0.75rem; font-weight: 600; color: #94a3b8; margin-left: auto; flex-shrink: 0; }
+
+    /* Per-outcome counts above the preview */
+    .bl-summary { display: flex; gap: 9px; flex-wrap: wrap; margin: 18px 0 12px; }
+    .bl-sum {
+      display: flex; align-items: center; gap: 7px;
+      padding: 8px 13px; border-radius: 12px; border: 1px solid transparent;
+      font-size: 0.78rem; font-weight: 800;
+    }
+    .bl-sum b { font-size: 0.95rem; }
+    .bl-sum.ok    { background: #e7f4ec; color: #1b7341; border-color: #b7ddc5; }
+    .bl-sum.skip  { background: #fef3c7; color: #b45309; border-color: #fde68a; }
+    .bl-sum.bad   { background: #fdeaea; color: #aa0000; border-color: #f1c4c4; }
+
+    .bl-preview { max-height: 320px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 14px; }
+    .bl-preview .premium-table { margin: 0; }
+    .bl-preview .premium-table th { position: sticky; top: 0; z-index: 1; }
+    .bl-row-note { font-size: 0.76rem; font-weight: 600; color: #94a3b8; }
+    .bl-preview tr.is-bad td, .bl-preview tr.is-skip td { background: #fcfcfd; }
+
+    .bl-template {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: none; border: none; cursor: pointer; padding: 0;
+      font-family: 'Barlow', sans-serif; font-size: 0.79rem; font-weight: 800;
+      color: #239150; text-decoration: underline; text-underline-offset: 3px;
+    }
+    .bl-template [data-lucide] { width: 14px; height: 14px; stroke-width: 2.6; }
+
+    .bl-modal-foot {
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+      margin-top: 20px; padding-top: 18px; border-top: 1px solid #edf2f7;
+    }
+    .bl-modal-foot .submit-btn { width: auto; margin: 0; }
+    .bl-modal-foot .bl-template { margin-right: auto; }
+
+    .bl-xlsx-warn {
+      display: none; gap: 9px; align-items: flex-start;
+      margin-top: 14px; padding: 11px 13px; border-radius: 12px;
+      background: #fef3c7; border: 1px solid #fde68a;
+      font-size: 0.78rem; font-weight: 700; color: #b45309; line-height: 1.5;
+    }
+    .bl-xlsx-warn.show { display: flex; }
+    .bl-xlsx-warn [data-lucide] { width: 15px; height: 15px; flex-shrink: 0; margin-top: 1px; }
+  </style>
+</head>
+<body class="portal-body">
+
+  <!-- Topbar -->
+  <div class="portal-topbar">
+    <div class="brand" style="display:flex;align-items:center;gap:16px;position:relative;z-index:1;">
+      <div class="logo-wrapper" style="display:flex;align-items:center;justify-content:center;background:#fff;border-radius:14px;padding:9px 18px;box-shadow:0 4px 14px rgba(0,0,0,0.16);">
+        <img src="M-Pesa-Logo.png" alt="M-PESA" style="height:30px;object-fit:contain;display:block;" />
+      </div>
+      <span class="brand-title" style="font-family:'Barlow',sans-serif;font-weight:800;font-size:1.05rem;letter-spacing:.6px;text-transform:uppercase;color:#fff;padding-left:16px;border-left:2px solid rgba(255,255,255,0.28);line-height:1.15;">Merchant Loyalty</span>
+    </div>
+    <div class="topbar-right" id="topbarRight" style="position:relative;z-index:1;">
+      <a href="#" class="logout-btn" onclick="LP.logout();return false;"><i data-lucide="log-out" style="width:16px;height:16px;stroke-width:2.5;"></i> Logout</a>
+    </div>
+  </div>
+
+  <!-- Breadcrumb -->
+  <div class="portal-nav">
+    <a href="home.html"><i data-lucide="home" style="width:16px;height:16px;vertical-align:middle;margin-right:4px;"></i> Home</a>
+    &nbsp;›&nbsp;
+    <span>Merchant Loyalty</span>
+    &nbsp;›&nbsp;
+    <span class="crumb-active">Blacklist</span>
+  </div>
+
+  <div class="portal-wrap" id="portalWrap">
+
+    <div class="bl-layout">
+
+      <!-- ── Left: add one merchant ── -->
+      <div class="el-card">
+        <div class="bl-head">
+          <div class="icon-wrap-red"><i data-lucide="shield-alert"></i></div>
+          <div>
+            <h2 class="card-title">Blacklist a Merchant</h2>
+            <p class="card-subtitle">Block a short code from earning and redeeming loyalty points.</p>
+          </div>
+        </div>
+
+        <form id="blForm" onsubmit="submitBlacklist(event)">
+          <div class="form-group">
+            <label class="form-label" for="blShortCode">Merchant Short Code</label>
+            <div class="input-wrapper">
+              <span class="input-icon"><i data-lucide="hash"></i></span>
+              <input class="form-input" type="text" id="blShortCode" placeholder="e.g. 10072"
+                     autocomplete="off" inputmode="numeric" maxlength="12" required />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="blReason">Blacklist Reason</label>
+            <div class="bl-reason-row">
+              <div class="input-wrapper">
+                <span class="input-icon"><i data-lucide="file-text"></i></span>
+                <select class="form-select" id="blReason" required></select>
+              </div>
+              <button type="button" class="bl-add-reason" onclick="openReasonModal()">
+                <i data-lucide="plus"></i> Reason
+              </button>
+            </div>
+          </div>
+
+          <button type="submit" class="submit-btn"><i data-lucide="ban"></i> Blacklist Merchant</button>
+        </form>
+
+        <div class="bl-hint">
+          <i data-lucide="info"></i>
+          <span>A blacklisted merchant stops earning points immediately and cannot redeem
+                rewards. Existing points are retained but frozen until the block is lifted.</span>
+        </div>
+      </div>
+
+      <!-- ── Right: the register ── -->
+      <div class="el-card">
+        <div class="bl-table-head">
+          <div>
+            <h2 class="card-title">Blacklisted Merchants</h2>
+            <p class="card-subtitle">Short codes currently blocked from Merchant Loyalty.</p>
+          </div>
+          <div class="bl-table-actions">
+            <span class="records-badge" id="blCount">0 records</span>
+            <button type="button" class="submit-btn auto-w" style="width:auto;margin:0;padding:11px 18px;" onclick="openImportModal()">
+              <i data-lucide="upload"></i> Import from File
+            </button>
+          </div>
+        </div>
+
+        <div class="table-search-bar">
+          <div class="search-input-wrapper">
+            <span class="search-icon"><i data-lucide="search"></i></span>
+            <input type="text" id="blSearch" placeholder="Search by short code, merchant or reason..." oninput="renderTable()" />
+          </div>
+        </div>
+
+        <div class="table-responsive" id="blTableWrap">
+          <table class="premium-table">
+            <thead>
+              <tr>
+                <th>Short Code</th>
+                <th>Merchant</th>
+                <th>Reason</th>
+                <th>Date Added</th>
+                <th>Added By</th>
+                <th class="text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody id="blTableBody"></tbody>
+          </table>
+        </div>
+
+        <div class="empty-state" id="blEmpty" style="display:none;">
+          <i data-lucide="shield-check" class="empty-icon"></i>
+          <h3>No Blacklisted Merchants</h3>
+          <p>Every merchant on the loyalty register is currently allowed to earn and redeem.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── Import modal ── -->
+  <div class="modal-overlay" id="importModal">
+    <div class="p-modal xwide">
+      <button class="lp-modal-close" type="button" onclick="closeImportModal()" aria-label="Close"><i data-lucide="x"></i></button>
+      <h3>Import Blacklist from File</h3>
+      <p>Upload a CSV or Excel file with a <b>Short Code</b> column and a <b>Reason</b> column.</p>
+
+      <div class="lp-modal-scroll">
+        <div class="bl-drop" id="blDrop" tabindex="0" role="button" aria-label="Choose a file to import">
+          <i data-lucide="file-spreadsheet"></i>
+          <div class="bl-drop-title">Drop your file here, or click to browse</div>
+          <div class="bl-drop-sub">The first row may be a header — it is detected automatically.</div>
+          <div class="bl-drop-formats">CSV · XLSX · XLS</div>
+        </div>
+        <input type="file" id="blFile" accept=".csv,.xlsx,.xls,text/csv" style="display:none;" />
+
+        <div class="bl-xlsx-warn" id="blXlsxWarn">
+          <i data-lucide="alert-triangle"></i>
+          <span>The Excel reader could not be loaded, so <b>.xlsx</b> and <b>.xls</b> files cannot be
+                read right now. Save the sheet as <b>CSV</b> and upload that instead.</span>
+        </div>
+
+        <div id="blFileRow" style="display:none;" class="bl-file-row">
+          <i data-lucide="file-check-2"></i>
+          <span class="bl-file-name" id="blFileName">—</span>
+          <span class="bl-file-meta" id="blFileMeta">—</span>
+        </div>
+
+        <div id="blResult" style="display:none;">
+          <div class="bl-summary" id="blSummary"></div>
+          <div class="bl-preview">
+            <table class="premium-table">
+              <thead>
+                <tr>
+                  <th>Row</th>
+                  <th>Short Code</th>
+                  <th>Merchant</th>
+                  <th>Reason</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="blPreviewBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="bl-modal-foot">
+        <button type="button" class="bl-template" onclick="downloadTemplate()">
+          <i data-lucide="download"></i> Download CSV template
+        </button>
+        <button type="button" class="lp-row-btn ghost" onclick="closeImportModal()">Cancel</button>
+        <button type="button" class="submit-btn" id="blImportBtn" disabled onclick="commitImport()">
+          <i data-lucide="check"></i> <span id="blImportLabel">Import</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Add reason modal ── -->
+  <div class="modal-overlay" id="reasonModal">
+    <div class="p-modal">
+      <div class="modal-icon-wrap"><i data-lucide="plus-circle"></i></div>
+      <h3>Add Custom Reason</h3>
+      <p>Type a new blacklist reason to add to the dropdown.</p>
+      <div class="input-wrapper" style="margin-top:6px;">
+        <input class="form-input no-icon" type="text" id="blNewReason" placeholder="Enter new reason..." maxlength="60" />
+      </div>
+      <div class="modal-btns">
+        <button class="btn-confirm-delete" style="background:linear-gradient(135deg,#2FC56D 0%,#239150 100%);" onclick="addReason()">Add Reason</button>
+        <button class="btn-cancel" onclick="closeReasonModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Remove confirmation modal ── -->
+  <div class="modal-overlay" id="removeModal">
+    <div class="p-modal">
+      <div class="modal-icon-wrap"><i data-lucide="shield-check"></i></div>
+      <h3>Remove from Blacklist</h3>
+      <p id="blRemoveText">Are you sure?</p>
+      <div class="modal-btns">
+        <button class="btn-confirm-delete" id="blConfirmRemove">Yes, Remove</button>
+        <button class="btn-cancel" onclick="LP.closeModal('removeModal')">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="loyalty-data.js"></script>
+  <script>
+  (function () {
+    'use strict';
+
+    var ROLE = LP.requireLogin();
+    if (!ROLE) return;
+    /* The blacklist changes who can earn and redeem, so it is admin-only. */
+    var IS_ADMIN = LP.can(['admin']);
+
+    var DEFAULT_REASONS = [
+      'fraudulent activity',
+      'suspicious behaviour',
+      'terms violation',
+      'chargeback',
+      'duplicate account',
+      'inactive'
+    ];
+    var CUSTOM_REASONS = [];
+
+    var pendingRemove = null;   /* short code awaiting remove confirmation */
+    var parsedRows = [];        /* last parsed file, one entry per data row  */
+
+    /* ═══════════ THE REGISTER ═══════════ */
+
+    function renderTable() {
+      var q = (document.getElementById('blSearch').value || '').toLowerCase().trim();
+      var rows = LP.blacklistList().filter(function (b) {
+        if (!q) return true;
+        return b.shortCode.toLowerCase().indexOf(q) !== -1 ||
+               b.reason.toLowerCase().indexOf(q) !== -1 ||
+               LP.merchantName(b.shortCode).toLowerCase().indexOf(q) !== -1;
+      });
+
+      var tbody = document.getElementById('blTableBody');
+      document.getElementById('blCount').textContent =
+        rows.length + (rows.length === 1 ? ' record' : ' records');
+
+      document.getElementById('blTableWrap').style.display = rows.length ? '' : 'none';
+      document.getElementById('blEmpty').style.display = rows.length ? 'none' : 'block';
+
+      tbody.innerHTML = rows.map(function (b) {
+        return '<tr class="fade-in-row">' +
+          '<td><strong class="lp-mono">' + LP.esc(b.shortCode) + '</strong></td>' +
+          '<td>' + LP.esc(LP.merchantName(b.shortCode)) + '</td>' +
+          '<td><span class="lp-chip lp-chip-blacklist"><i data-lucide="ban"></i>' + LP.esc(b.reason) + '</span></td>' +
+          '<td class="lp-muted">' + LP.esc(b.dateAdded) + '</td>' +
+          '<td class="lp-muted">' + LP.esc(b.addedBy) + '</td>' +
+          '<td class="text-right">' +
+            (IS_ADMIN
+              ? '<button class="lp-row-btn danger" onclick="askRemove(\'' + LP.esc(b.shortCode) + '\')">' +
+                  '<i data-lucide="shield-check"></i> Remove</button>'
+              : '<span class="lp-muted">—</span>') +
+          '</td>' +
+        '</tr>';
+      }).join('');
+
+      LP.icons();
+    }
+
+    /* ═══════════ ADD ONE ═══════════ */
+
+    function submitBlacklist(e) {
+      e.preventDefault();
+      var codeEl = document.getElementById('blShortCode');
+      var code = codeEl.value.trim();
+      var reason = document.getElementById('blReason').value;
+
+      var res = LP.addBlacklist(code, reason, 'manual');
+      if (!res.ok) {
+        LP.audit('Blacklist add rejected', code || '—', res.error);
+        LP.toast('Not Blacklisted', res.error + ' (' + (code || 'no short code') + ').', 'error');
+        return;
+      }
+
+      LP.audit('Merchant blacklisted', code + ' — ' + reason, 'Success');
+      LP.toast('Merchant Blacklisted', code + ' (' + LP.merchantName(code) + ') can no longer earn or redeem.');
+      codeEl.value = '';
+      renderTable();
+    }
+
+    /* ═══════════ REMOVE ═══════════ */
+
+    function askRemove(code) {
+      pendingRemove = code;
+      document.getElementById('blRemoveText').innerHTML =
+        'Remove <strong>' + LP.esc(code) + '</strong> (' + LP.esc(LP.merchantName(code)) + ') from the blacklist?' +
+        '<br>They will be able to earn and redeem loyalty points again.';
+      LP.openModal('removeModal');
+    }
+
+    document.getElementById('blConfirmRemove').addEventListener('click', function () {
+      if (!pendingRemove) return;
+      var code = pendingRemove;
+      LP.removeBlacklist(code);
+      LP.audit('Blacklist removed', code, 'Success');
+      LP.toast('Merchant Restored', code + ' has been removed from the blacklist.');
+      pendingRemove = null;
+      LP.closeModal('removeModal');
+      renderTable();
+    });
+
+    /* ═══════════ REASONS ═══════════ */
+
+    function buildReasons() {
+      var sel = document.getElementById('blReason');
+      var keep = sel.value;
+      sel.innerHTML = '';
+
+      DEFAULT_REASONS.forEach(function (r) { sel.appendChild(option(r)); });
+
+      if (CUSTOM_REASONS.length) {
+        var div = document.createElement('option');
+        div.disabled = true;
+        div.textContent = '────────── Custom ──────────';
+        sel.appendChild(div);
+        CUSTOM_REASONS.forEach(function (r) { sel.appendChild(option(r)); });
+      }
+
+      if (keep && [].some.call(sel.options, function (o) { return o.value === keep; })) sel.value = keep;
+    }
+
+    function option(value) {
+      var o = document.createElement('option');
+      o.value = value;
+      o.textContent = value.replace(/\b\w/g, function (c) { return c.toUpperCase(); });
+      return o;
+    }
+
+    function openReasonModal() {
+      document.getElementById('blNewReason').value = '';
+      LP.openModal('reasonModal');
+      setTimeout(function () { document.getElementById('blNewReason').focus(); }, 80);
+    }
+    function closeReasonModal() { LP.closeModal('reasonModal'); }
+
+    function addReason() {
+      var input = document.getElementById('blNewReason');
+      var reason = input.value.trim().toLowerCase();
+
+      if (!reason) { LP.toast('Empty Reason', 'Please enter a reason.', 'error'); return; }
+      if (DEFAULT_REASONS.indexOf(reason) !== -1 || CUSTOM_REASONS.indexOf(reason) !== -1) {
+        LP.toast('Duplicate Reason', '"' + reason + '" is already in the list.', 'error');
+        return;
+      }
+
+      CUSTOM_REASONS.push(reason);
+      buildReasons();
+      document.getElementById('blReason').value = reason;
+      closeReasonModal();
+      LP.toast('Reason Added', '"' + reason + '" was added to the dropdown.');
+    }
+
+    /* ═══════════ FILE IMPORT ═══════════ */
+
+    function openImportModal() {
+      resetImport();
+      document.getElementById('blXlsxWarn').classList.toggle('show', typeof XLSX === 'undefined');
+      LP.openModal('importModal');
+    }
+
+    function closeImportModal() { LP.closeModal('importModal'); }
+
+    function resetImport() {
+      parsedRows = [];
+      document.getElementById('blFile').value = '';
+      document.getElementById('blFileRow').style.display = 'none';
+      document.getElementById('blResult').style.display = 'none';
+      document.getElementById('blPreviewBody').innerHTML = '';
+      document.getElementById('blSummary').innerHTML = '';
+      setImportButton(0);
+    }
+
+    function setImportButton(n) {
+      var btn = document.getElementById('blImportBtn');
+      btn.disabled = n === 0;
+      document.getElementById('blImportLabel').textContent =
+        n ? 'Import ' + n + (n === 1 ? ' Merchant' : ' Merchants') : 'Import';
+    }
+
+    /* ── CSV: quoted fields, embedded commas/newlines, CRLF and a BOM ── */
+    function parseCsv(text) {
+      if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
+
+      var rows = [], row = [], field = '', inQuotes = false, i = 0;
+
+      while (i < text.length) {
+        var c = text[i];
+
+        if (inQuotes) {
+          if (c === '"') {
+            if (text[i + 1] === '"') { field += '"'; i += 2; continue; }
+            inQuotes = false; i++; continue;
+          }
+          field += c; i++; continue;
+        }
+
+        if (c === '"') { inQuotes = true; i++; continue; }
+        if (c === ',' || c === ';' || c === '\t') { row.push(field); field = ''; i++; continue; }
+        if (c === '\r') { i++; continue; }
+        if (c === '\n') { row.push(field); rows.push(row); row = []; field = ''; i++; continue; }
+
+        field += c; i++;
+      }
+      row.push(field);
+      rows.push(row);
+
+      return rows.filter(function (r) {
+        return r.some(function (v) { return String(v).trim() !== ''; });
+      });
+    }
+
+    /* Work out which column holds the code and which holds the reason.
+       A recognised header wins; otherwise fall back to the first two columns. */
+    function mapColumns(rows) {
+      var first = (rows[0] || []).map(function (v) {
+        return String(v).toLowerCase().replace(/[\s_-]/g, '');
+      });
+
+      var codeIdx = first.findIndex(function (h) {
+        return h === 'shortcode' || h === 'code' || h === 'merchantshortcode' ||
+               h === 'merchantcode' || h === 'merchant';
+      });
+      var reasonIdx = first.findIndex(function (h) {
+        return h === 'reason' || h === 'blacklistreason' || h === 'remark' || h === 'remarks';
+      });
+
+      if (codeIdx !== -1) {
+        return { code: codeIdx, reason: reasonIdx === -1 ? codeIdx + 1 : reasonIdx, skipHeader: true };
+      }
+      return { code: 0, reason: 1, skipHeader: false };
+    }
+
+    /* Validate every row without writing anything, so the preview can show
+       exactly what an import would and would not do. */
+    function buildPreview(rows) {
+      var map = mapColumns(rows);
+      var data = map.skipHeader ? rows.slice(1) : rows;
+      var seen = {};
+
+      parsedRows = data.map(function (r, idx) {
+        var code = String(r[map.code] == null ? '' : r[map.code]).trim();
+        var reason = String(r[map.reason] == null ? '' : r[map.reason]).trim().toLowerCase();
+
+        /* Excel often hands back a number for a numeric-looking cell */
+        if (/^\d+\.0+$/.test(code)) code = code.split('.')[0];
+
+        var row = {
+          line: idx + (map.skipHeader ? 2 : 1),
+          shortCode: code,
+          reason: reason || 'fraudulent activity',
+          reasonWasBlank: !reason
+        };
+
+        if (!code) { row.status = 'bad'; row.note = 'Missing short code'; return row; }
+        if (!/^\d+$/.test(code)) { row.status = 'bad'; row.note = 'Short code must be digits only'; return row; }
+        if (!LP.merchant(code)) { row.status = 'bad'; row.note = 'Not in the loyalty register'; return row; }
+        if (LP.isBlacklisted(code)) { row.status = 'skip'; row.note = 'Already blacklisted'; return row; }
+        if (seen[code]) { row.status = 'skip'; row.note = 'Duplicate of row ' + seen[code]; return row; }
+
+        seen[code] = row.line;
+        row.status = 'ok';
+        row.note = row.reasonWasBlank ? 'Reason defaulted' : 'Ready to import';
+        return row;
+      });
+
+      renderPreview();
+    }
+
+    function renderPreview() {
+      var counts = { ok: 0, skip: 0, bad: 0 };
+      parsedRows.forEach(function (r) { counts[r.status]++; });
+
+      document.getElementById('blSummary').innerHTML =
+        '<div class="bl-sum ok"><b>' + counts.ok + '</b> ready</div>' +
+        '<div class="bl-sum skip"><b>' + counts.skip + '</b> skipped</div>' +
+        '<div class="bl-sum bad"><b>' + counts.bad + '</b> rejected</div>';
+
+      document.getElementById('blPreviewBody').innerHTML = parsedRows.map(function (r) {
+        var chipClass = r.status === 'ok' ? 'lp-chip-fulfilled'
+                      : r.status === 'skip' ? 'lp-chip-pending' : 'lp-chip-exception';
+        var icon = r.status === 'ok' ? 'check' : r.status === 'skip' ? 'minus' : 'x';
+        var name = (r.shortCode && LP.merchant(r.shortCode)) ? LP.merchantName(r.shortCode) : '—';
+
+        return '<tr class="is-' + r.status + '">' +
+          '<td class="lp-muted">' + r.line + '</td>' +
+          '<td><strong class="lp-mono">' + LP.esc(r.shortCode || '—') + '</strong></td>' +
+          '<td>' + LP.esc(name) + '</td>' +
+          '<td>' + LP.esc(r.reason) + '</td>' +
+          '<td><span class="lp-chip ' + chipClass + '"><i data-lucide="' + icon + '"></i>' + LP.esc(r.note) + '</span></td>' +
+        '</tr>';
+      }).join('');
+
+      document.getElementById('blResult').style.display = 'block';
+      setImportButton(counts.ok);
+      LP.icons();
+    }
+
+    function commitImport() {
+      var added = 0, failed = 0;
+
+      parsedRows.forEach(function (r) {
+        if (r.status !== 'ok') return;
+        var res = LP.addBlacklist(r.shortCode, r.reason, 'import');
+        if (res.ok) added++; else failed++;
+      });
+
+      LP.audit('Blacklist bulk import', added + ' merchant(s) from file', failed ? 'Partial' : 'Success');
+      LP.toast('Import Complete',
+        added + (added === 1 ? ' merchant was' : ' merchants were') + ' added to the blacklist' +
+        (failed ? ', ' + failed + ' failed' : '') + '.', failed ? 'error' : 'success');
+
+      closeImportModal();
+      renderTable();
+    }
+
+    function readFile(file) {
+      if (!file) return;
+
+      var isExcel = /\.(xlsx|xls)$/i.test(file.name);
+      if (isExcel && typeof XLSX === 'undefined') {
+        document.getElementById('blXlsxWarn').classList.add('show');
+        LP.toast('Excel Not Available', 'Save the sheet as CSV and upload that instead.', 'error');
+        return;
+      }
+
+      document.getElementById('blFileName').textContent = file.name;
+      document.getElementById('blFileMeta').textContent = (file.size / 1024).toFixed(1) + ' KB';
+      document.getElementById('blFileRow').style.display = 'flex';
+      LP.icons();
+
+      var reader = new FileReader();
+
+      reader.onerror = function () {
+        LP.toast('Could Not Read File', 'The file could not be opened.', 'error');
+      };
+
+      reader.onload = function (e) {
+        var rows;
+        try {
+          if (isExcel) {
+            var wb = XLSX.read(e.target.result, { type: 'array' });
+            var sheet = wb.Sheets[wb.SheetNames[0]];
+            rows = XLSX.utils.sheet_to_json(sheet, { header: 1, blankrows: false, raw: false });
+          } else {
+            rows = parseCsv(String(e.target.result));
+          }
+        } catch (err) {
+          LP.toast('Could Not Read File', 'The file is not a readable CSV or Excel sheet.', 'error');
+          return;
+        }
+
+        if (!rows || !rows.length) {
+          LP.toast('Empty File', 'No rows were found in that file.', 'error');
+          return;
+        }
+
+        buildPreview(rows);
+      };
+
+      if (isExcel) reader.readAsArrayBuffer(file);
+      else reader.readAsText(file);
+    }
+
+    function downloadTemplate() {
+      var sample = Object.keys(LP.MERCHANTS).filter(function (c) { return !LP.isBlacklisted(c); }).slice(0, 3);
+      var csv = 'Short Code,Reason\n' +
+        (sample.length ? sample : ['10072', '10076']).map(function (c) {
+          return c + ',fraudulent activity';
+        }).join('\n') + '\n';
+
+      var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = 'loyalty-blacklist-template.csv';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+    }
+
+    /* ── Drop zone wiring ── */
+    var drop = document.getElementById('blDrop');
+    var fileInput = document.getElementById('blFile');
+
+    drop.addEventListener('click', function () { fileInput.click(); });
+    drop.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInput.click(); }
+    });
+    fileInput.addEventListener('change', function () { readFile(this.files[0]); });
+
+    ['dragenter', 'dragover'].forEach(function (ev) {
+      drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.add('dragover'); });
+    });
+    ['dragleave', 'drop'].forEach(function (ev) {
+      drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.remove('dragover'); });
+    });
+    drop.addEventListener('drop', function (e) {
+      if (e.dataTransfer && e.dataTransfer.files.length) readFile(e.dataTransfer.files[0]);
+    });
+
+    /* ═══════════ BOOT ═══════════ */
+
+    /* Exposed for the inline handlers in the markup above */
+    window.submitBlacklist = submitBlacklist;
+    window.renderTable = renderTable;
+    window.askRemove = askRemove;
+    window.openReasonModal = openReasonModal;
+    window.closeReasonModal = closeReasonModal;
+    window.addReason = addReason;
+    window.openImportModal = openImportModal;
+    window.closeImportModal = closeImportModal;
+    window.commitImport = commitImport;
+    window.downloadTemplate = downloadTemplate;
+
+    LP.mountRoleChip('topbarRight');
+
+    if (!IS_ADMIN) {
+      document.getElementById('portalWrap').innerHTML =
+        '<div class="el-card"><div class="result-empty is-error">' +
+          '<i data-lucide="shield-off"></i><h3>Access Denied</h3>' +
+          '<p>Only a Merchant Loyalty administrator can manage the blacklist.</p>' +
+        '</div></div>';
+      LP.icons();
+      return;
+    }
+
+    document.getElementById('blNewReason').addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') { e.preventDefault(); addReason(); }
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'Escape') return;
+      var open = document.querySelector('.modal-overlay.open');
+      if (open) open.classList.remove('open');
+    });
+
+    /* Clicking the backdrop closes the modal */
+    [].forEach.call(document.querySelectorAll('.modal-overlay'), function (o) {
+      o.addEventListener('click', function (e) { if (e.target === o) o.classList.remove('open'); });
+    });
+
+    buildReasons();
+    renderTable();
+    LP.icons();
+  })();
+  </script>
+  <noscript>Enable JavaScript to manage the Merchant Loyalty blacklist.</noscript>
+  <script src="sidebar.js"></script>
+</body>
+</html>

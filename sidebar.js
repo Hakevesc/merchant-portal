@@ -138,10 +138,16 @@
               <span class="sb-link-text">Care Desk Lookup</span>
             </a>
           </li>
-          <li class="sb-item" data-loyalty data-roles="admin,tdr">
+          <li class="sb-item" data-loyalty data-roles="admin,tdr,rsm">
             <a class="sb-link sb-sub-link" href="loyalty-fulfilment.html" data-page="loyalty-fulfilment">
               <span class="sb-link-icon"><i data-lucide="package-check"></i></span>
               <span class="sb-link-text">Reward Fulfilment</span>
+            </a>
+          </li>
+          <li class="sb-item" data-loyalty data-roles="admin">
+            <a class="sb-link sb-sub-link" href="loyalty-blacklist.html" data-page="loyalty-blacklist">
+              <span class="sb-link-icon"><i data-lucide="shield-alert"></i></span>
+              <span class="sb-link-text">Blacklist</span>
             </a>
           </li>
           <li class="sb-item" data-loyalty data-roles="admin">
@@ -212,6 +218,7 @@
     'merchant-tools.html':     'merchant-tools',
     'loyalty-care-desk.html':  'loyalty-care-desk',
     'loyalty-fulfilment.html': 'loyalty-fulfilment',
+    'loyalty-blacklist.html':  'loyalty-blacklist',
   };
   const activePage = matchMap[page] || page;
 
