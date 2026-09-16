@@ -21,15 +21,26 @@
   var ROLE_KEY = 'mpesa_loyalty_role';
   var STATE_KEY = 'mpesa_loyalty_state';
 
-  /* ── TDR / RSM DIRECTORY ────────────────────────────── */
+  /* ── RSM DIRECTORY ─────────────────────────────────── */
+  /* An RSM owns a region. They take a redeemed reward, put it in the hands of
+     one of their TDRs, and answer for it until the merchant has it. */
+  var RSMS = [
+    { id: 'RSM-01', name: 'Dawit Alemu',   region: 'Central Region', email: 'dawit.alemu@partner.safaricom.et' },
+    { id: 'RSM-02', name: 'Meron Tesfaye', region: 'Eastern Region', email: 'meron.tesfaye@partner.safaricom.et' }
+  ];
+
+  /* ── TDR DIRECTORY ─────────────────────────────────── */
+  /* Every TDR reports to exactly one RSM, so a record's RSM decides which TDRs
+     it can be handed to — an RSM never allocates outside their own team. */
   var TDRS = [
-    { id: 'TDR-01', name: 'Samuel Girma',  region: 'Addis Ababa', email: 'samuel.girma@partner.safaricom.et' },
-    { id: 'TDR-02', name: 'Hanna Bekele',  region: 'Dire Dawa',   email: 'hanna.bekele@partner.safaricom.et' },
-    { id: 'RSM-01', name: 'Dawit Alemu',   region: 'Hawassa',     email: 'dawit.alemu@partner.safaricom.et' }
+    { id: 'TDR-01', name: 'Samuel Girma',  region: 'Addis Ababa', rsm: 'RSM-01', email: 'samuel.girma@partner.safaricom.et' },
+    { id: 'TDR-02', name: 'Hanna Bekele',  region: 'Dire Dawa',   rsm: 'RSM-02', email: 'hanna.bekele@partner.safaricom.et' },
+    { id: 'TDR-03', name: 'Yonas Kebede',  region: 'Hawassa',     rsm: 'RSM-01', email: 'yonas.kebede@partner.safaricom.et' },
+    { id: 'TDR-04', name: 'Liya Getachew', region: 'Harar',       rsm: 'RSM-02', email: 'liya.getachew@partner.safaricom.et' }
   ];
   /* The signed-in TDR for the demo — records assigned here are "mine". */
   var CURRENT_TDR = 'TDR-01';
-  /* The signed-in RSM for the demo — the agent who does the assigning. */
+  /* The signed-in RSM for the demo — the manager who does the assigning. */
   var CURRENT_RSM = 'RSM-01';
 
   /* ── CAMPAIGN ───────────────────────────────────────── */
@@ -129,7 +140,7 @@
     {
       id: 'FUL-0001', redemptionRef: 'RDM-2026-0070', shortCode: '10070',
       rewardItemId: 'RWD-SP-01', item: 'Smartphone — Tecno Spark 20',
-      tdr: 'TDR-01', status: 'fulfilled',
+      rsm: 'RSM-01', tdr: 'TDR-01', status: 'fulfilled',
       allocatedAt: '2026-08-13', dispatchRef: 'DSP-2026-0041', dispatchedAt: '2026-08-15',
       fromLocation: 'Central Warehouse — Addis Ababa', toLocation: 'Kality Zone Office',
       receivedAt: '2026-08-18', handoverAt: '2026-08-21 14:32',
@@ -138,7 +149,7 @@
     {
       id: 'FUL-0002', redemptionRef: 'RDM-2026-0072', shortCode: '10072',
       rewardItemId: 'RWD-SP-02', item: 'Smartphone — Samsung A06',
-      tdr: 'TDR-01', status: 'received',
+      rsm: 'RSM-01', tdr: 'TDR-01', status: 'received',
       allocatedAt: '2026-09-03', dispatchRef: 'DSP-2026-0052', dispatchedAt: '2026-09-05',
       fromLocation: 'Central Warehouse — Addis Ababa', toLocation: 'Bole Zone Office',
       receivedAt: '2026-09-08', handoverAt: null,
@@ -148,7 +159,7 @@
       /* Handover already started — a live OTP the merchant is holding right now */
       id: 'FUL-0003', redemptionRef: 'RDM-2026-0076', shortCode: '10076',
       rewardItemId: 'RWD-SP-01', item: 'Smartphone — Tecno Spark 20',
-      tdr: 'TDR-01', status: 'pending',
+      rsm: 'RSM-01', tdr: 'TDR-01', status: 'pending',
       allocatedAt: '2026-09-07', dispatchRef: 'DSP-2026-0058', dispatchedAt: '2026-09-09',
       fromLocation: 'Central Warehouse — Addis Ababa', toLocation: 'Belay Zeleke Zone Office',
       receivedAt: '2026-09-12', handoverAt: null,
@@ -158,7 +169,7 @@
       /* Handover started but the merchant's code has already lapsed */
       id: 'FUL-0004', redemptionRef: 'RDM-2026-0088', shortCode: '10071',
       rewardItemId: 'RWD-TV-01', item: 'Television — 32" LED',
-      tdr: 'TDR-02', status: 'pending',
+      rsm: 'RSM-02', tdr: 'TDR-02', status: 'pending',
       allocatedAt: '2026-09-10', dispatchRef: 'DSP-2026-0061', dispatchedAt: '2026-09-11',
       fromLocation: 'Central Warehouse — Addis Ababa', toLocation: 'Sabian Zone Office',
       receivedAt: '2026-09-12', handoverAt: null,
@@ -167,7 +178,7 @@
     {
       id: 'FUL-0005', redemptionRef: 'RDM-2026-0092', shortCode: '10072',
       rewardItemId: 'RWD-FL-01', item: 'Float Top-Up — 700 ETB',
-      tdr: 'RSM-01', status: 'dispatched',
+      rsm: 'RSM-01', tdr: 'TDR-03', status: 'dispatched',
       allocatedAt: '2026-09-11', dispatchRef: 'DSP-2026-0063', dispatchedAt: '2026-09-12',
       fromLocation: 'Central Warehouse — Addis Ababa', toLocation: 'Tabor Zone Office',
       receivedAt: null, handoverAt: null,
@@ -176,7 +187,7 @@
     {
       id: 'FUL-0006', redemptionRef: 'RDM-2026-0093', shortCode: '10070',
       rewardItemId: 'RWD-FL-02', item: 'Float Top-Up — 100 ETB',
-      tdr: 'TDR-01', status: 'allocated',
+      rsm: 'RSM-01', tdr: 'TDR-01', status: 'allocated',
       allocatedAt: '2026-09-13', dispatchRef: null, dispatchedAt: null,
       fromLocation: null, toLocation: null,
       receivedAt: null, handoverAt: null,
@@ -185,7 +196,7 @@
     {
       id: 'FUL-0007', redemptionRef: 'RDM-2026-0094', shortCode: '10072',
       rewardItemId: 'RWD-SP-02', item: 'Smartphone — Samsung A06',
-      tdr: 'TDR-02', status: 'exception',
+      rsm: 'RSM-02', tdr: 'TDR-02', status: 'exception',
       exceptionType: 'Damaged reward', exceptionNote: 'Screen cracked in transit, returned to warehouse.',
       allocatedAt: '2026-09-04', dispatchRef: 'DSP-2026-0055', dispatchedAt: '2026-09-06',
       fromLocation: 'Central Warehouse — Addis Ababa', toLocation: 'Sabian Zone Office',
@@ -439,6 +450,15 @@
     return null;
   }
   function tdrName(id) { var t = tdr(id); return t ? t.name + ' (' + t.id + ')' : '—'; }
+  function rsm(id) {
+    for (var i = 0; i < RSMS.length; i++) if (RSMS[i].id === id) return RSMS[i];
+    return null;
+  }
+  function rsmName(id) { var m = rsm(id); return m ? m.name + ' (' + m.id + ')' : '—'; }
+  /* The TDRs one RSM may hand a reward to. */
+  function tdrsFor(rsmId) {
+    return TDRS.filter(function (t) { return t.rsm === rsmId; });
+  }
   function inventoryItem(id) {
     var inv = loadState().inventory;
     for (var i = 0; i < inv.length; i++) if (inv[i].id === id) return inv[i];
@@ -525,12 +545,13 @@
     return c;
   }
 
-  /* TDR/RSM only ever sees their own records. */
+  /* A TDR sees the records they must deliver; an RSM sees the records they own.
+     Only admin sees the whole pipeline. */
   function visibleRecords() {
     var f = loadState().fulfilment;
-    if (getRole() === 'tdr') {
-      return f.filter(function (r) { return r.tdr === CURRENT_TDR; });
-    }
+    var r = getRole();
+    if (r === 'tdr') return f.filter(function (x) { return x.tdr === CURRENT_TDR; });
+    if (r === 'rsm') return f.filter(function (x) { return x.rsm === CURRENT_RSM; });
     return f.slice();
   }
 
@@ -727,7 +748,7 @@
 
   /* ── EXPORT ─────────────────────────────────────────── */
   global.LP = {
-    ROLES: ROLES, TDRS: TDRS, CURRENT_TDR: CURRENT_TDR, CURRENT_RSM: CURRENT_RSM, CAMPAIGN: CAMPAIGN,
+    ROLES: ROLES, TDRS: TDRS, RSMS: RSMS, CURRENT_TDR: CURRENT_TDR, CURRENT_RSM: CURRENT_RSM, CAMPAIGN: CAMPAIGN,
     MERCHANTS: MERCHANTS, FAILURE_CODE: FAILURE_CODE,
     LIFECYCLE: LIFECYCLE, STATUS_LABELS: STATUS_LABELS, STATUS_ICONS: STATUS_ICONS,
     EXCEPTION_TYPES: EXCEPTION_TYPES,
@@ -741,7 +762,7 @@
     blacklistList: blacklistList, blacklistEntry: blacklistEntry,
     isBlacklisted: isBlacklisted, addBlacklist: addBlacklist, removeBlacklist: removeBlacklist,
     merchant: merchant, merchantName: merchantName,
-    tdr: tdr, tdrName: tdrName,
+    tdr: tdr, tdrName: tdrName, rsm: rsm, rsmName: rsmName, tdrsFor: tdrsFor,
     inventoryItem: inventoryItem, inventoryCounts: inventoryCounts, availableStock: availableStock,
     redemption: redemption, fulfilmentFor: fulfilmentFor, record: record,
     redemptionsFor: redemptionsFor, pointsFor: pointsFor, claimStatusOf: claimStatusOf,

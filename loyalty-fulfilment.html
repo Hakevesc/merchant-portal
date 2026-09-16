@@ -79,12 +79,13 @@
           <span class="records-badge" id="flCount">0 records</span>
         </div>
 
-        <div class="lp-filter-row">
+        <div class="lp-filter-row cols-5">
           <div class="search-input-wrapper">
             <i data-lucide="search" class="search-icon"></i>
             <input type="text" id="flSearch" placeholder="Search short code, merchant, reward ID or redemption ref…" oninput="renderFulfilment()" />
           </div>
           <select class="form-select" id="flStatus" onchange="renderFulfilment()"></select>
+          <select class="form-select" id="flRsm" onchange="onRsmFilterChange()"></select>
           <select class="form-select" id="flTdr" onchange="renderFulfilment()"></select>
           <select class="form-select" id="flType" onchange="renderFulfilment()"></select>
         </div>
@@ -94,7 +95,8 @@
           <table class="premium-table">
             <thead><tr>
               <th>Reward ID</th><th>Merchant</th><th>Short Code</th><th>Reward / Item</th>
-              <th>Redemption Ref</th><th>Assigned TDR / RSM</th><th>Status</th><th class="text-right">Action</th>
+              <th>Redemption Ref</th><th>Assigned RSM</th><th>Assigned TDR</th>
+              <th>Status</th><th class="text-right">Action</th>
             </tr></thead>
             <tbody id="flBody"></tbody>
           </table>
@@ -203,14 +205,14 @@
     <div class="p-modal wide">
       <div class="modal-icon-wrap green"><i data-lucide="user-check"></i></div>
       <h3>Allocate Reward</h3>
-      <p>Assign this redemption's reward to a TDR / RSM for fulfilment.</p>
+      <p>Assign this redemption's reward to one of your TDRs for fulfilment.</p>
       <div class="lp-modal-note">
         <div class="lp-modal-note-lbl">Redemption</div>
         <div class="lp-modal-note-val" id="alcSummary">—</div>
       </div>
       <div class="lp-modal-grid">
         <div class="form-group">
-          <label class="form-label" for="alcTdr">Assign to TDR / RSM</label>
+          <label class="form-label" for="alcTdr">Assign to TDR</label>
           <select class="form-select no-icon" id="alcTdr"></select>
         </div>
         <div class="form-group">
@@ -230,7 +232,7 @@
     <div class="p-modal wide">
       <div class="modal-icon-wrap green"><i data-lucide="truck"></i></div>
       <h3>Dispatch Reward</h3>
-      <p>Record the physical dispatch of this reward to the assigned TDR / RSM.</p>
+      <p>Record the physical dispatch of this reward to the assigned TDR.</p>
       <div class="lp-modal-note">
         <div class="lp-modal-note-lbl">Reward</div>
         <div class="lp-modal-note-val" id="dspSummary">—</div>
@@ -336,23 +338,51 @@
     </div>
   </div>
 
-  <!-- Reassign -->
+  <!-- Reassign TDR — the RSM moves the reward to another of their own TDRs -->
   <div class="modal-overlay" id="reassignModal">
     <div class="p-modal wide">
       <div class="modal-icon-wrap slate"><i data-lucide="repeat"></i></div>
-      <h3>Reassign Reward</h3>
-      <p>Return this record to the fulfilment pipeline under a new TDR / RSM.</p>
+      <h3>Reassign TDR</h3>
+      <p>Return this record to the fulfilment pipeline under a new TDR.</p>
       <div class="lp-modal-note">
         <div class="lp-modal-note-lbl">Reward</div>
         <div class="lp-modal-note-val" id="rsnSummary">—</div>
       </div>
       <div class="form-group">
-        <label class="form-label" for="rsnTdr">Reassign to</label>
+        <label class="form-label" for="rsnTdr">Reassign to TDR</label>
         <select class="form-select no-icon" id="rsnTdr"></select>
       </div>
       <div class="modal-btns">
-        <button class="btn-confirm-green" onclick="confirmReassign()">Reassign</button>
+        <button class="btn-confirm-green" onclick="confirmReassign()">Reassign TDR</button>
         <button class="btn-cancel" onclick="LP.closeModal('reassignModal')">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reassign RSM — admin hands the whole record to another region -->
+  <div class="modal-overlay" id="reassignRsmModal">
+    <div class="p-modal wide">
+      <div class="modal-icon-wrap slate"><i data-lucide="user-cog"></i></div>
+      <h3>Reassign RSM</h3>
+      <p>Move this record to another RSM. Because TDRs report to one RSM, the
+         reward must also be handed to a TDR on the receiving RSM's team.</p>
+      <div class="lp-modal-note">
+        <div class="lp-modal-note-lbl">Reward</div>
+        <div class="lp-modal-note-val" id="rsrSummary">—</div>
+      </div>
+      <div class="lp-modal-grid">
+        <div class="form-group">
+          <label class="form-label" for="rsrRsm">Reassign to RSM</label>
+          <select class="form-select no-icon" id="rsrRsm" onchange="onReassignRsmChange()"></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="rsrTdr">Assign to TDR</label>
+          <select class="form-select no-icon" id="rsrTdr"></select>
+        </div>
+      </div>
+      <div class="modal-btns">
+        <button class="btn-confirm-green" onclick="confirmReassignRsm()">Reassign RSM</button>
+        <button class="btn-cancel" onclick="LP.closeModal('reassignRsmModal')">Cancel</button>
       </div>
     </div>
   </div>
@@ -430,6 +460,9 @@
       redemptions: 'Redemptions', audit: 'Audit Trail'
     };
 
+    /* Statuses where the reward is still in the pipeline and can change hands. */
+    var OPEN_FOR_REASSIGN = ['allocated', 'dispatched', 'received', 'pending', 'exception'];
+
     var PAGE_SIZE = 8;
     var flPage = 1;
     var activeStatusFilter = '';
@@ -487,13 +520,27 @@
         Object.keys(LP.STATUS_LABELS).filter(function (k) { return k !== 'available'; })
           .map(function (k) { return '<option value="' + k + '">' + LP.STATUS_LABELS[k] + '</option>'; }).join('');
 
+      /* The RSM filter is fixed for anyone who is not admin: an RSM only ever
+         sees their own region, and a TDR only their own RSM's records. */
+      var rs = document.getElementById('flRsm');
+      if (IS_RSM) {
+        rs.innerHTML = opt(LP.CURRENT_RSM, LP.rsmName(LP.CURRENT_RSM));
+        rs.disabled = true;
+      } else if (IS_TDR) {
+        var mine = LP.tdr(LP.CURRENT_TDR);
+        rs.innerHTML = opt(mine ? mine.rsm : '', LP.rsmName(mine ? mine.rsm : ''));
+        rs.disabled = true;
+      } else {
+        rs.innerHTML = '<option value="">All RSMs</option>' +
+          LP.RSMS.map(function (m) { return opt(m.id, m.name + ' (' + m.id + ')'); }).join('');
+      }
+
       var td = document.getElementById('flTdr');
       if (IS_TDR) {
-        td.innerHTML = '<option value="' + LP.CURRENT_TDR + '">' + LP.tdrName(LP.CURRENT_TDR) + '</option>';
+        td.innerHTML = opt(LP.CURRENT_TDR, LP.tdrName(LP.CURRENT_TDR));
         td.disabled = true;
       } else {
-        td.innerHTML = '<option value="">All TDR / RSM</option>' +
-          LP.TDRS.map(function (t) { return '<option value="' + t.id + '">' + t.name + ' (' + t.id + ')</option>'; }).join('');
+        buildTdrFilter();
       }
 
       var types = {};
@@ -502,9 +549,36 @@
         Object.keys(types).map(function (c) { return '<option value="' + c + '">' + c + '</option>'; }).join('');
     }
 
+    function opt(value, label) {
+      return '<option value="' + LP.esc(value) + '">' + LP.esc(label) + '</option>';
+    }
+
+    /* Only ever offer TDRs who report to the RSM in the RSM filter — picking a
+       TDR from another region could never match a record. */
+    function buildTdrFilter() {
+      var rsmSel = document.getElementById('flRsm').value;
+      var list = rsmSel ? LP.tdrsFor(rsmSel) : LP.TDRS;
+      document.getElementById('flTdr').innerHTML = '<option value="">All TDRs</option>' +
+        list.map(function (t) { return opt(t.id, t.name + ' (' + t.id + ')'); }).join('');
+    }
+
+    function onRsmFilterChange() {
+      var keep = document.getElementById('flTdr').value;
+      buildTdrFilter();
+      var td = document.getElementById('flTdr');
+      td.value = keep;
+      if (td.value !== keep) td.value = '';   /* that TDR is not in this region */
+      flPage = 1;
+      renderFulfilment();
+    }
+
     function resetFilters() {
       document.getElementById('flSearch').value = '';
       document.getElementById('flStatus').value = '';
+      if (IS_ADMIN) {
+        document.getElementById('flRsm').value = '';
+        buildTdrFilter();
+      }
       if (!IS_TDR) document.getElementById('flTdr').value = '';
       document.getElementById('flType').value = '';
       activeStatusFilter = '';
@@ -546,19 +620,22 @@
 
       var q = (document.getElementById('flSearch').value || '').toLowerCase().trim();
       var status = document.getElementById('flStatus').value;
+      var rsmSel = IS_ADMIN ? document.getElementById('flRsm').value : '';
       var tdrSel = IS_TDR ? '' : document.getElementById('flTdr').value;
       var type = document.getElementById('flType').value;
       activeStatusFilter = status;
 
       var rows = LP.visibleRecords().filter(function (r) {
         if (status && r.status !== status) return false;
+        if (rsmSel && r.rsm !== rsmSel) return false;
         if (tdrSel && r.tdr !== tdrSel) return false;
         if (type) {
           var inv = LP.inventoryItem(r.rewardItemId);
           if (!inv || inv.category !== type) return false;
         }
         if (q) {
-          var hay = [r.id, r.shortCode, LP.merchantName(r.shortCode), r.item, r.redemptionRef, LP.tdrName(r.tdr)]
+          var hay = [r.id, r.shortCode, LP.merchantName(r.shortCode), r.item, r.redemptionRef,
+                     LP.rsmName(r.rsm), LP.tdrName(r.tdr)]
             .join(' ').toLowerCase();
           if (hay.indexOf(q) === -1) return false;
         }
@@ -589,6 +666,7 @@
             '<td>' + LP.esc(r.shortCode) + '</td>' +
             '<td>' + LP.esc(r.item) + '</td>' +
             '<td><span class="lp-mono">' + LP.esc(r.redemptionRef) + '</span></td>' +
+            '<td class="lp-muted">' + LP.esc(LP.rsmName(r.rsm)) + '</td>' +
             '<td class="lp-muted">' + LP.esc(LP.tdrName(r.tdr)) + '</td>' +
             '<td>' + LP.chip(r.status) + '</td>' +
             '<td class="text-right" onclick="event.stopPropagation()">' + rowActions(r) + '</td>' +
@@ -600,7 +678,7 @@
       LP.icons();
     }
 
-    /* One action per row, decided by the record's status and the viewer's role. */
+    /* Row actions, decided by the record's status and the viewer's role. */
     function rowActions(r) {
       var btns = [];
       if (r.status === 'allocated' && IS_ADMIN)
@@ -611,8 +689,14 @@
         btns.push(btn('Start Handover', 'smartphone', "startHandover('" + r.id + "')", ''));
       if (r.status === 'pending' && IS_TDR)
         btns.push(btn('Enter OTP', 'key-round', "openOtp('" + r.id + "')", 'amber'));
-      if (r.status === 'exception' && IS_RSM)
-        btns.push(btn('Reassign', 'repeat', "openReassign('" + r.id + "')", 'ghost'));
+      /* Reassignment is open until the reward is off the pipeline: the RSM can
+         move it to another of their TDRs, admin can move it to another RSM. */
+      if (OPEN_FOR_REASSIGN.indexOf(r.status) !== -1) {
+        if (IS_RSM)
+          btns.push(btn('Reassign TDR', 'repeat', "openReassign('" + r.id + "')", 'ghost'));
+        if (IS_ADMIN)
+          btns.push(btn('Reassign RSM', 'user-cog', "openReassignRsm('" + r.id + "')", 'ghost'));
+      }
       if (IS_ADMIN && ['fulfilled', 'exception', 'cancelled'].indexOf(r.status) === -1)
         btns.push(btn('Exception', 'alert-triangle', "openException('" + r.id + "')", 'danger'));
       if (btns.length === 0)
@@ -769,8 +853,7 @@
       currentRedemptionRef = ref;
       document.getElementById('alcSummary').textContent =
         r.ref + ' · ' + LP.merchantName(r.shortCode) + ' (' + r.shortCode + ') · ' + r.item;
-      document.getElementById('alcTdr').innerHTML =
-        LP.TDRS.map(function (t) { return '<option value="' + t.id + '">' + t.name + ' (' + t.id + ') — ' + t.region + '</option>'; }).join('');
+      document.getElementById('alcTdr').innerHTML = tdrOptions(LP.CURRENT_RSM);
       document.getElementById('alcDate').value = LP.today();
       LP.openModal('allocateModal');
     }
@@ -786,7 +869,7 @@
       s.fulfilment.unshift({
         id: id, redemptionRef: r.ref, shortCode: r.shortCode,
         rewardItemId: r.rewardItemId, item: r.item,
-        tdr: tdrId, status: 'allocated',
+        rsm: LP.CURRENT_RSM, tdr: tdrId, status: 'allocated',
         allocatedAt: date, dispatchRef: null, dispatchedAt: null,
         fromLocation: null, toLocation: null, receivedAt: null, handoverAt: null,
         txnRef: null, otpVerified: false, otp: null, otpExpiresAt: null, otpAttempts: 0
@@ -1103,14 +1186,31 @@
     }
 
     /* ── Reassign ───────────────────────────────────── */
+    /* Reassignment always sends the reward back to the start of the pipeline:
+       the new holder has nothing in hand yet, so the dispatch, receipt and
+       exception trail left by the previous holder is cleared. */
+    function rewindToAllocated(r) {
+      r.status = 'allocated';
+      r.dispatchRef = null; r.dispatchedAt = null; r.receivedAt = null;
+      r.fromLocation = null; r.toLocation = null;
+      r.exceptionType = null; r.exceptionNote = null;
+      r.otp = null; r.otpExpiresAt = null; r.otpAttempts = 0;
+    }
+
+    function tdrOptions(rsmId) {
+      return LP.tdrsFor(rsmId).map(function (t) {
+        return opt(t.id, t.name + ' (' + t.id + ') — ' + t.region);
+      }).join('');
+    }
+
+    /* The RSM's reassign: a different TDR on their own team. */
     function openReassign(id) {
       var r = LP.record(id);
       if (!r) return;
       currentRecordId = id;
       document.getElementById('rsnSummary').textContent =
         r.id + ' · ' + r.item + ' · currently ' + LP.tdrName(r.tdr);
-      document.getElementById('rsnTdr').innerHTML =
-        LP.TDRS.map(function (t) { return '<option value="' + t.id + '">' + t.name + ' (' + t.id + ') — ' + t.region + '</option>'; }).join('');
+      document.getElementById('rsnTdr').innerHTML = tdrOptions(r.rsm);
       LP.openModal('reassignModal');
     }
 
@@ -1118,14 +1218,55 @@
       var r = LP.record(currentRecordId);
       if (!r) return;
       var to = document.getElementById('rsnTdr').value;
+      if (!to) { LP.toast('Pick a TDR', 'Choose the TDR who will take this reward.', 'error'); return; }
       r.tdr = to;
-      r.status = 'allocated';
-      r.dispatchRef = null; r.dispatchedAt = null; r.receivedAt = null;
-      r.exceptionType = null; r.exceptionNote = null;
+      rewindToAllocated(r);
       LP.save();
-      LP.audit('Reward reassigned', r.id + ' → ' + LP.tdrName(to), 'Success');
-      LP.toast('Reward reassigned', r.id + ' reassigned to ' + LP.tdrName(to) + '.');
+      LP.audit('TDR reassigned', r.id + ' → ' + LP.tdrName(to), 'Success');
+      LP.toast('TDR reassigned', r.id + ' reassigned to ' + LP.tdrName(to) + '.');
       LP.closeModal('reassignModal');
+      refresh();
+    }
+
+    /* Admin's reassign: hand the record to another RSM, and with it a TDR from
+       the receiving RSM's team — the outgoing TDR does not follow it across. */
+    function openReassignRsm(id) {
+      var r = LP.record(id);
+      if (!r) return;
+      currentRecordId = id;
+      document.getElementById('rsrSummary').textContent =
+        r.id + ' · ' + r.item + ' · currently ' + LP.rsmName(r.rsm) + ' / ' + LP.tdrName(r.tdr);
+
+      var sel = document.getElementById('rsrRsm');
+      sel.innerHTML = LP.RSMS.map(function (m) {
+        return opt(m.id, m.name + ' (' + m.id + ') — ' + m.region);
+      }).join('');
+      /* Default to an RSM other than the one holding it — reassigning to the
+         same RSM is a no-op the admin never wants. */
+      var other = LP.RSMS.filter(function (m) { return m.id !== r.rsm; })[0];
+      sel.value = other ? other.id : r.rsm;
+      onReassignRsmChange();
+      LP.openModal('reassignRsmModal');
+    }
+
+    function onReassignRsmChange() {
+      document.getElementById('rsrTdr').innerHTML =
+        tdrOptions(document.getElementById('rsrRsm').value);
+    }
+
+    function confirmReassignRsm() {
+      var r = LP.record(currentRecordId);
+      if (!r) return;
+      var toRsm = document.getElementById('rsrRsm').value;
+      var toTdr = document.getElementById('rsrTdr').value;
+      if (!toTdr) { LP.toast('Pick a TDR', 'Choose a TDR on the receiving RSM team.', 'error'); return; }
+      r.rsm = toRsm;
+      r.tdr = toTdr;
+      rewindToAllocated(r);
+      LP.save();
+      LP.audit('RSM reassigned', r.id + ' → ' + LP.rsmName(toRsm) + ' / ' + LP.tdrName(toTdr), 'Success');
+      LP.toast('RSM reassigned', r.id + ' now sits with ' + LP.rsmName(toRsm) + '.');
+      LP.closeModal('reassignRsmModal');
       refresh();
     }
 
@@ -1142,7 +1283,8 @@
         ['Reward ID', r.id], ['Redemption Reference', r.redemptionRef],
         ['Merchant Name', LP.merchantName(r.shortCode)], ['Merchant Short Code', r.shortCode],
         ['Reward / Item', r.item], ['Reward Item ID', r.rewardItemId],
-        ['Assigned TDR / RSM', LP.tdrName(r.tdr)], ['Fulfilment Status', LP.STATUS_LABELS[r.status]],
+        ['Assigned RSM', LP.rsmName(r.rsm)], ['Assigned TDR', LP.tdrName(r.tdr)],
+        ['Fulfilment Status', LP.STATUS_LABELS[r.status]],
         ['Allocation Date', r.allocatedAt], ['Dispatch Reference', r.dispatchRef],
         ['Dispatch Date', r.dispatchedAt], ['From Location', r.fromLocation],
         ['Destination', r.toLocation], ['Received Date', r.receivedAt],
@@ -1242,8 +1384,9 @@
       } else if (IS_RSM) {
         document.getElementById('flScopeNote').innerHTML =
           '<div class="fl-scope-note"><i data-lucide="info"></i> ' +
-          'You are signed in as ' + LP.esc(LP.tdrName(LP.CURRENT_RSM)) + '. ' +
-          'Allocate redeemed rewards to a TDR from the Redemptions tab, and reassign them here when a handover fails.</div>';
+          'You are signed in as ' + LP.esc(LP.rsmName(LP.CURRENT_RSM)) + ', so you see only the records your region owns. ' +
+          'Allocate redeemed rewards to one of your TDRs from the Redemptions tab, and reassign the TDR here when a handover fails.</div>';
+        document.getElementById('flRsm').value = LP.CURRENT_RSM;
       }
 
       var hash = (window.location.hash || '').replace('#', '');

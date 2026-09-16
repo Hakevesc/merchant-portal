@@ -174,6 +174,9 @@ textarea.form-input { padding-left: 16px; min-height: 88px; resize: vertical; li
 }
 @media (min-width: 720px) { .lp-filter-row { grid-template-columns: 2fr 1fr 1fr; } }
 @media (min-width: 1000px) { .lp-filter-row { grid-template-columns: 2fr 1fr 1fr 1fr; } }
+/* cols-5 — a filter row that splits RSM and TDR into selects of their own. */
+@media (min-width: 1000px) { .lp-filter-row.cols-5 { grid-template-columns: 2fr 1fr 1fr 1fr; } }
+@media (min-width: 1240px) { .lp-filter-row.cols-5 { grid-template-columns: 2fr 1fr 1fr 1fr 1fr; } }
 .lp-filter-row .form-select {
   padding: 11px 38px 11px 14px; font-size: 0.85rem; font-weight: 600;
   border-color: #e2e8f0; border-radius: 12px;
