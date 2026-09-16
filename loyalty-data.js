@@ -619,6 +619,76 @@
     return html + '</div>';
   }
 
+  /* ── ROW ACTION BUTTON ─────────────────── */
+  /* An action cell can carry three controls. Spelled out they wrapped onto a
+     second line and doubled the row height, so inside .lp-row-actions the
+     button shows only its icon. The label stays in the markup — visually
+     hidden, so it is still the button's accessible name and still matches a
+     find-in-page — and data-tip surfaces it on hover or keyboard focus. */
+  function rowBtn(label, icon, onclick, tone) {
+    return '<button class="lp-row-btn ' + (tone || '') + '" onclick="' + onclick + '" ' +
+             'data-tip="' + esc(label) + '">' +
+             '<i data-lucide="' + esc(icon) + '"></i>' +
+             '<span class="lp-btn-lbl">' + esc(label) + '</span>' +
+           '</button>';
+  }
+
+  /* ── TOOLTIPS ──────────────────────────── */
+  /* The bubble hangs off <body> rather than the cell: tables sit inside
+     .table-responsive, whose overflow-x:auto makes the y axis clip too, so a
+     tooltip nested in a row would be cut off on the first and last rows.
+     Listeners are delegated, so re-rendering a table needs no rebinding. */
+  var tipEl = null;
+
+  function tipNode() {
+    if (!tipEl) {
+      tipEl = document.createElement('div');
+      tipEl.className = 'lp-tip';
+      document.body.appendChild(tipEl);
+    }
+    return tipEl;
+  }
+
+  function showTip(host) {
+    var text = host.getAttribute('data-tip');
+    if (!text) return;
+    var t = tipNode();
+    t.textContent = text;
+    t.classList.add('open');
+
+    var b = host.getBoundingClientRect();
+    var w = t.offsetWidth, h = t.offsetHeight;
+    /* Centred over the control, pulled back inside the viewport at the edges
+       — the action column sits hard against the right of the page. */
+    var left = b.left + b.width / 2 - w / 2;
+    left = Math.max(8, Math.min(left, window.innerWidth - w - 8));
+    var top = b.top - h - 8;
+    if (top < 8) top = b.bottom + 8;       /* flip under when the row is at the top */
+    t.style.left = left + 'px';
+    t.style.top = top + 'px';
+  }
+
+  function hideTip() { if (tipEl) tipEl.classList.remove('open'); }
+
+  function tipHost(e) {
+    return (e.target && e.target.closest) ? e.target.closest('[data-tip]') : null;
+  }
+
+  function bindTips() {
+    document.addEventListener('mouseover', function (e) {
+      var host = tipHost(e);
+      if (host) showTip(host); else hideTip();
+    });
+    document.addEventListener('focusin', function (e) {
+      var host = tipHost(e);
+      if (host) showTip(host);
+    });
+    document.addEventListener('focusout', hideTip);
+    /* Scrolling slides the control out from under a fixed-position bubble. */
+    window.addEventListener('scroll', hideTip, true);
+  }
+  bindTips();
+
   /* ── SHARED UI HELPERS ──────────────────────────────── */
   function icons() {
     if (typeof lucide !== 'undefined' && lucide.createIcons) lucide.createIcons();
@@ -771,7 +841,7 @@
     nextFulfilmentId: nextFulfilmentId, nextDispatchRef: nextDispatchRef, nextTxnRef: nextTxnRef,
 
     today: today, stamp: stamp, points: points, dash: dash, esc: esc, pad: pad,
-    chip: chip, stepper: stepper,
+    chip: chip, stepper: stepper, rowBtn: rowBtn,
 
     icons: icons, toast: toast, closeToast: closeToast,
     openModal: openModal, closeModal: closeModal,

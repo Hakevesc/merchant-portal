@@ -380,8 +380,9 @@
           '<td class="lp-muted">' + LP.esc(b.addedBy) + '</td>' +
           '<td class="text-right">' +
             (IS_ADMIN
-              ? '<button class="lp-row-btn danger" onclick="askRemove(\'' + LP.esc(b.shortCode) + '\')">' +
-                  '<i data-lucide="shield-check"></i> Remove</button>'
+              ? '<div class="lp-row-actions">' +
+                  LP.rowBtn('Remove', 'shield-check', "askRemove('" + LP.esc(b.shortCode) + "')", 'danger') +
+                '</div>'
               : '<span class="lp-muted">—</span>') +
           '</td>' +
         '</tr>';

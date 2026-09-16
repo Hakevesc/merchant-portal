@@ -153,7 +153,39 @@ textarea.form-input { padding-left: 16px; min-height: 88px; resize: vertical; li
 .lp-row-btn.danger:hover { background: #ffe4e6; border-color: #fda4af; }
 .lp-row-btn.ghost { border-color: #e2e8f0; background: #f8fafc; color: #64748b; }
 .lp-row-btn.ghost:hover { background: #f1f5f9; border-color: #cbd5e1; }
-.lp-row-actions { display: inline-flex; gap: 7px; justify-content: flex-end; flex-wrap: wrap; }
+.lp-row-actions { display: inline-flex; gap: 6px; justify-content: flex-end; flex-wrap: nowrap; }
+
+/* Icon-only actions. An action cell can carry three controls; spelled out they
+   wrapped onto a second line and doubled the row height. Inside an action cell
+   the button keeps its icon and hands the label to the .lp-tip bubble, so the
+   column stays one line however many actions a row has. */
+.lp-row-actions .lp-row-btn {
+  width: 32px; height: 32px; padding: 0; gap: 0;
+  justify-content: center; flex: 0 0 auto;
+}
+.lp-row-actions .lp-row-btn [data-lucide] { width: 15px; height: 15px; }
+/* Kept in the DOM: it names the button for a screen reader and still answers
+   to find-in-page — only the pixels go. */
+.lp-btn-lbl {
+  position: absolute; width: 1px; height: 1px;
+  overflow: hidden; white-space: nowrap; clip-path: inset(50%);
+}
+
+/* ── TOOLTIP ──────────────────────────────── */
+/* Fixed to the viewport and parked on <body>: a table scrolls inside
+   .table-responsive, which clips both axes, so a bubble in the cell would be
+   cut off. LP positions it against the control it belongs to. */
+.lp-tip {
+  position: fixed; left: 0; top: -9999px; z-index: 4000; pointer-events: none;
+  padding: 6px 10px; border-radius: 8px;
+  background: #1e293b; color: #ffffff;
+  font-family: 'Barlow', sans-serif; font-size: 0.72rem; font-weight: 700;
+  letter-spacing: 0.2px; white-space: nowrap;
+  box-shadow: 0 6px 20px rgba(15,23,42,0.22);
+  opacity: 0; transform: translateY(3px);
+  transition: opacity 0.12s ease, transform 0.12s ease;
+}
+.lp-tip.open { opacity: 1; transform: translateY(0); }
 
 /* ── SEARCH BAR ────────────────────────────────────────── */
 .table-search-bar { margin-bottom: 18px; }

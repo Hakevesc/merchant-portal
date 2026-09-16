@@ -705,8 +705,7 @@
     }
 
     function btn(label, icon, onclick, tone) {
-      return '<button class="lp-row-btn ' + tone + '" onclick="' + onclick + '">' +
-             '<i data-lucide="' + icon + '"></i> ' + label + '</button>';
+      return LP.rowBtn(label, icon, onclick, tone);
     }
 
     function renderPagination(total, pages) {
@@ -741,8 +740,9 @@
           '<td>' + c.dispatched + '</td>' +
           '<td>' + c.fulfilled + '</td>' +
           '<td><span class="lp-chip ' + tone + '">' + LP.esc(status) + '</span></td>' +
-          '<td class="text-right"><button class="lp-row-btn ghost" onclick="openInventoryModal(\'' + i.id + '\')">' +
-            '<i data-lucide="pencil"></i> Update</button></td>' +
+          '<td class="text-right"><div class="lp-row-actions">' +
+            LP.rowBtn('Update', 'pencil', "openInventoryModal('" + i.id + "')", 'ghost') +
+          '</div></td>' +
         '</tr>';
       }).join('');
       LP.icons();
