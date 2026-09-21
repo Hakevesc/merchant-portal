@@ -639,6 +639,20 @@ button.lp-kpi:hover { border-color: #cbd5e1; transform: translateY(-2px); box-sh
 .lp-pipe-card.tone-red .lp-pipe-ico { background: #fee2e2; color: #e11d48; }
 .lp-pipe-card.tone-red .lp-pipe-val { color: #b91c1c; }
 .lp-pipe-card.tone-red .lp-pipe-sub { color: #d06767; }
+/* The first three stages share their hue with the status chips below the strip,
+   so the pipeline and the table read as the same language. */
+.lp-pipe-card.tone-blue { border-color: #bfdbfe; background: #f7fbff; }
+.lp-pipe-card.tone-blue .lp-pipe-ico { background: #dbeafe; color: #1d4ed8; }
+.lp-pipe-card.tone-blue .lp-pipe-val { color: #1d4ed8; }
+.lp-pipe-card.tone-blue .lp-pipe-sub { color: #6a94d8; }
+.lp-pipe-card.tone-violet { border-color: #ddd6fe; background: #faf9ff; }
+.lp-pipe-card.tone-violet .lp-pipe-ico { background: #ede9fe; color: #6d28d9; }
+.lp-pipe-card.tone-violet .lp-pipe-val { color: #6d28d9; }
+.lp-pipe-card.tone-violet .lp-pipe-sub { color: #a18fc8; }
+.lp-pipe-card.tone-cyan { border-color: #a5f3fc; background: #f5feff; }
+.lp-pipe-card.tone-cyan .lp-pipe-ico { background: #cffafe; color: #0e7490; }
+.lp-pipe-card.tone-cyan .lp-pipe-val { color: #0e7490; }
+.lp-pipe-card.tone-cyan .lp-pipe-sub { color: #57aec0; }
 /* Filtering by a stage is a different thing from the stage's own tone, so it
    reads as a green ring rather than by recolouring the card. */
 .lp-pipe-card.active {
