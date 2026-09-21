@@ -101,7 +101,7 @@ body.portal-body {
 .input-icon [data-lucide] { width: 18px; height: 18px; }
 .form-input, .form-select {
   width: 100%; padding: 13px 16px 13px 44px;
-  background: #f8fafc; border: 1.5px solid #cbd5e1; border-radius: 13px;
+  background-color: #f8fafc; border: 1.5px solid #cbd5e1; border-radius: 13px;
   font-family: 'Barlow', sans-serif; font-size: 0.93rem; font-weight: 600; color: #0f172a;
   outline: none; transition: all 0.2s ease;
 }
@@ -109,11 +109,18 @@ body.portal-body {
 .form-input::placeholder { color: #94a3b8; font-weight: 500; }
 .form-select {
   appearance: none; -webkit-appearance: none; cursor: pointer;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-  background-repeat: no-repeat; background-position: right 14px center; background-size: 16px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='17' height='17' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 14px center; background-size: 17px;
+}
+/* Modal dropdowns — the Reassign TDR / Reassign RSM selects and their siblings —
+   get the same air as the filter row, so the chevron reads as a dropdown and is
+   never crowded out by the selected option's label. */
+.p-modal .form-select {
+  padding-right: 40px;
+  background-position: right 15px center;
 }
 .form-input:focus, .form-select:focus {
-  background: #fff; border-color: #239150; box-shadow: 0 0 0 4px rgba(35,145,80,0.1);
+  background-color: #fff; border-color: #239150; box-shadow: 0 0 0 4px rgba(35,145,80,0.1);
 }
 .form-input:disabled, .form-select:disabled { background: #f1f5f9; color: #94a3b8; cursor: not-allowed; }
 textarea.form-input { padding-left: 16px; min-height: 88px; resize: vertical; line-height: 1.5; }
