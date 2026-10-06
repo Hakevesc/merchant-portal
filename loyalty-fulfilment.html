@@ -601,19 +601,24 @@
     function renderKpis() {
       var c = LP.statusCounts();
       /* In lifecycle order, with a caption saying what the stage means for
-         whoever is reading. Exception is not a stage, so it sits past a
-         divider rather than at the end of the flow. */
+         whoever is reading. The working stages fill two rows, and Fulfilled,
+         where every reward should end up, closes the strip as a tall card
+         spanning both. The last entry is the stage's colour on the arc. */
       var stages = [
-        ['allocated',  'Allocated',        'package',       'Ready for dispatch', 'tone-blue'],
-        ['dispatched', 'Dispatched',       'truck',         'On the way',         'tone-violet'],
-        ['received',   'Received',         'package-check', 'At merchant',        'tone-cyan'],
-        ['pending',    'Pending Handover', 'hand-coins',    'Requires action',    'tone-amber'],
-        ['fulfilled',  'Fulfilled',        'check-circle',  'Completed',          'tone-green']
+        ['allocated',  'Allocated',        'package',        'Ready for dispatch', 'tone-blue',   '#3b82f6'],
+        ['dispatched', 'Dispatched',       'truck',          'On the way',         'tone-violet', '#8b5cf6'],
+        ['received',   'Received',         'package-check',  'At merchant',        'tone-cyan',   '#06b6d4'],
+        ['pending',    'Pending Handover', 'hand-coins',     'Requires action',    'tone-amber',  '#fbbf24'],
+        ['fulfilled',  'Fulfilled',        'check-circle',   'Completed',          'tone-green',  '#22a55b'],
+        ['exception',  'Exception',        'alert-triangle', 'Review required',    'tone-red',    '#f43f5e']
       ];
-      var exception = ['exception', 'Exception', 'alert-triangle', 'Review required', 'tone-red'];
+
+      var total = stages.reduce(function (s, t) { return s + c[t[0]]; }, 0);
 
       function card(t) {
+        if (t[0] === 'fulfilled') return featureCard(t);
         return '<button class="lp-pipe-card ' + t[4] +
+                 (t[0] === 'pending' ? ' wide' : '') +
                  (activeStatusFilter === t[0] ? ' active' : '') + '" ' +
                  'onclick="filterByStatus(\'' + t[0] + '\')" ' +
                  'data-tip="Filter by ' + LP.esc(t[1]) + '">' +
@@ -626,10 +631,77 @@
                '</button>';
       }
 
-      var arrow = '<span class="lp-pipe-arrow"><i data-lucide="arrow-right"></i></span>';
+      function featureCard(t) {
+        var share = total ? Math.round(c[t[0]] * 100 / total) : 0;
+        return '<button class="lp-pipe-card lp-pipe-feature' +
+                 (activeStatusFilter === t[0] ? ' active' : '') + '" ' +
+                 'onclick="filterByStatus(\'' + t[0] + '\')" ' +
+                 'data-tip="Filter by ' + LP.esc(t[1]) + '">' +
+                 '<span class="lp-pf-head">' +
+                   '<span class="lp-pipe-ico"><i data-lucide="' + t[2] + '"></i></span>' +
+                   '<span class="lp-pf-lbl">' + LP.esc(t[1]) + '</span>' +
+                 '</span>' +
+                 '<span class="lp-pf-foot">' +
+                   '<span class="lp-pf-val">' + c[t[0]] + '</span>' +
+                   '<span class="lp-pf-share"><i data-lucide="trending-up"></i>' + share + '% of rewards</span>' +
+                 '</span>' +
+               '</button>';
+      }
+
       document.getElementById('flKpis').innerHTML =
-        stages.map(card).join(arrow) +
-        '<span class="lp-pipe-split"></span>' + card(exception);
+        overview(stages, c) +
+        '<div class="lp-pipe-grid">' + stages.map(card).join('') + '</div>';
+    }
+
+    /* Arc gauge: the track fills to the share of rewards fulfilled, and the
+       five lifecycle stages sit along it in order, each showing its count in
+       the stage's colour. Each stage node filters the table like its card. */
+    function overview(stages, c) {
+      var total = stages.reduce(function (s, t) { return s + c[t[0]]; }, 0);
+      var rate  = total ? Math.round(c.fulfilled * 100 / total) : 0;
+      var open  = total - c.fulfilled - c.exception;
+
+      /* A 220° arc opening at the bottom, angles clockwise from 3 o'clock. */
+      var CX = 110, CY = 98, R = 76, A0 = 160, SWEEP = 220;
+      function pt(deg) {
+        var a = deg * Math.PI / 180;
+        return [(CX + R * Math.cos(a)).toFixed(1), (CY + R * Math.sin(a)).toFixed(1)];
+      }
+      var s = pt(A0), e = pt(A0 + SWEEP);
+      var arc = 'M' + s[0] + ' ' + s[1] + ' A' + R + ' ' + R + ' 0 1 1 ' + e[0] + ' ' + e[1];
+
+      var path = stages.filter(function (t) { return t[0] !== 'exception'; });
+      var nodes = path.map(function (t, i) {
+        var n = c[t[0]], p = pt(A0 + SWEEP * i / (path.length - 1));
+        var col = n ? t[5] : '#cbd5e1';
+        return '<g class="lp-ov-node" onclick="filterByStatus(\'' + t[0] + '\')">' +
+                 '<title>' + LP.esc(t[1]) + ': ' + n + '</title>' +
+                 '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="14" fill="' + (n ? col : '#ffffff') + '" stroke="' +
+                   (n ? '#ffffff' : col) + '" stroke-width="' + (n ? 3 : 2) + '"/>' +
+                 '<text x="' + p[0] + '" y="' + p[1] + '" fill="' + (n ? '#ffffff' : '#94a3b8') + '">' + n + '</text>' +
+               '</g>';
+      }).join('');
+
+      return '<div class="lp-ov">' +
+               '<svg class="lp-ov-ring" viewBox="0 0 220 176" role="img" aria-label="' + rate + '% of rewards fulfilled">' +
+                 '<defs><linearGradient id="lpOvFill" x1="0" y1="0" x2="1" y2="0">' +
+                   '<stop offset="0" stop-color="#4cc77f"/><stop offset="1" stop-color="#1b7341"/>' +
+                 '</linearGradient></defs>' +
+                 '<path d="' + arc + '" fill="none" stroke="#eef2f6" stroke-width="22" stroke-linecap="round"/>' +
+                 (rate ? '<path d="' + arc + '" pathLength="100" fill="none" stroke="url(#lpOvFill)" stroke-width="22" ' +
+                   'stroke-linecap="round" stroke-dasharray="' + rate + ' 100"/>' : '') +
+                 nodes +
+                 '<text class="lp-ov-total" x="' + CX + '" y="' + (CY + 4) + '">' + rate + '%</text>' +
+                 '<rect class="lp-ov-pill" x="' + (CX - 34) + '" y="' + (CY + 24) + '" width="68" height="20" rx="10"/>' +
+                 '<text class="lp-ov-cap" x="' + CX + '" y="' + (CY + 34) + '">Fulfilled</text>' +
+               '</svg>' +
+               '<div class="lp-ov-txt">' +
+                 '<div class="lp-ov-title">Pipeline Overview</div>' +
+                 '<div class="lp-ov-row"><b>' + total + '</b><span>total rewards</span></div>' +
+                 '<div class="lp-ov-row"><b>' + open + '</b><span>in progress</span></div>' +
+                 '<div class="lp-ov-row"><b class="r">' + c.exception + '</b><span>exception' + (c.exception === 1 ? '' : 's') + '</span></div>' +
+               '</div>' +
+             '</div>';
     }
 
     /* \u2500\u2500 Active filter chips \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */

@@ -589,16 +589,56 @@ button.lp-kpi:hover { border-color: #cbd5e1; transform: translateY(-2px); box-sh
 }
 
 /* ══ PIPELINE STRIP ═════════════════════════════════════
-   The six counts are the lifecycle in order, so they read as a flow with
-   arrows between the stages rather than as six unrelated tiles. Exception
-   sits after a divider because it is off the pipeline, not the end of it.
-   Each card still filters the table by its status.                        */
+   A donut overview on the left, and the six status counts beside it in two
+   rows of three: the hand-off stages on top, the closing ones and Exception
+   below. Each card and each slice filters the table by its status.        */
 .lp-pipe {
-  display: flex; align-items: stretch; gap: 8px;
-  margin-bottom: 24px; flex-wrap: wrap;
+  display: grid; grid-template-columns: minmax(330px, 380px) minmax(0, 1fr);
+  gap: 12px; margin-bottom: 24px;
+}
+.lp-pipe-grid {
+  display: grid; gap: 12px;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(190px, 0.85fr);
+}
+/* Pending Handover is the last step before Fulfilled, so it takes the second
+   row's spare column and sits right beside it. */
+.lp-pipe-card.wide { grid-column: span 2; }
+
+/* Fulfilled: the strip's end point, a tall brand-green card spanning both rows. */
+.lp-pipe-card.lp-pipe-feature {
+  grid-column: 4; grid-row: 1 / span 2;
+  position: relative; overflow: hidden;
+  flex-direction: column; align-items: stretch; justify-content: space-between;
+  padding: 16px 18px; border: none; color: #ffffff;
+  background: linear-gradient(150deg, #2ec56d 0%, #1f9a52 55%, #16703c 100%);
+  box-shadow: 0 10px 24px rgba(27,115,65,0.22);
+}
+.lp-pipe-feature::before,
+.lp-pipe-feature::after {
+  content: ''; position: absolute; pointer-events: none;
+  background: rgba(255,255,255,0.10); transform: skewX(-24deg);
+}
+.lp-pipe-feature::before { top: -20px; right: 34px; width: 46px; height: 140%; }
+.lp-pipe-feature::after  { top: -20px; right: -6px; width: 22px; height: 140%; }
+.lp-pf-head, .lp-pf-foot { position: relative; display: flex; flex-direction: column; gap: 10px; }
+.lp-pipe-feature .lp-pipe-ico { background: rgba(255,255,255,0.20); color: #ffffff; }
+.lp-pf-lbl {
+  font-size: 0.78rem; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase;
+}
+.lp-pf-foot { flex-direction: row; align-items: flex-end; justify-content: space-between; gap: 8px; }
+.lp-pf-val { font-size: 2.3rem; font-weight: 900; line-height: 1; }
+.lp-pf-share {
+  display: inline-flex; align-items: center; gap: 4px; white-space: nowrap;
+  padding: 4px 9px; border-radius: 999px; background: rgba(255,255,255,0.20);
+  font-size: 0.68rem; font-weight: 800;
+}
+.lp-pf-share [data-lucide] { width: 13px; height: 13px; stroke-width: 2.6; }
+.lp-pipe-card.lp-pipe-feature:hover { border-color: transparent; box-shadow: 0 14px 28px rgba(27,115,65,0.3); }
+.lp-pipe-card.lp-pipe-feature.active {
+  box-shadow: 0 0 0 3px rgba(35,145,80,0.35), 0 14px 28px rgba(27,115,65,0.3);
 }
 .lp-pipe-card {
-  flex: 1 1 200px; min-width: 0;
+  min-width: 0;
   display: flex; align-items: center; gap: 11px;
   background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px;
   padding: 13px 14px; text-align: left;
@@ -627,29 +667,31 @@ button.lp-kpi:hover { border-color: #cbd5e1; transform: translateY(-2px); box-sh
   font-size: 0.68rem; font-weight: 600; color: #94a3b8; margin-top: 1px;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-/* Stage tones. Green is the brand's, so it marks the finished stage; amber
+/* Stage tones, each a soft wash of the stage's hue fading to white. Green is
+   the brand's, so it marks the finished stage; amber
    flags the stage that is waiting on somebody, red the off-path one. */
+.lp-pipe-card.tone-green { border-color: #bbe5cb; background: linear-gradient(135deg, #dcf3e5 0%, #f4fbf7 55%, #ffffff 100%); }
 .lp-pipe-card.tone-green .lp-pipe-ico { background: #e7f6ed; color: #1b7341; }
 .lp-pipe-card.tone-green .lp-pipe-val { color: #1b7341; }
-.lp-pipe-card.tone-amber { border-color: #fcd9a0; background: #fffaf0; }
+.lp-pipe-card.tone-amber { border-color: #fcd9a0; background: linear-gradient(135deg, #feefcc 0%, #fff8e8 55%, #ffffff 100%); }
 .lp-pipe-card.tone-amber .lp-pipe-ico { background: #fbbf24; color: #ffffff; }
 .lp-pipe-card.tone-amber .lp-pipe-val { color: #b45309; }
 .lp-pipe-card.tone-amber .lp-pipe-sub { color: #c2831f; }
-.lp-pipe-card.tone-red { border-color: #fecdd3; background: #fff7f7; }
+.lp-pipe-card.tone-red { border-color: #fecdd3; background: linear-gradient(135deg, #ffe0e3 0%, #fff4f5 55%, #ffffff 100%); }
 .lp-pipe-card.tone-red .lp-pipe-ico { background: #fee2e2; color: #e11d48; }
 .lp-pipe-card.tone-red .lp-pipe-val { color: #b91c1c; }
 .lp-pipe-card.tone-red .lp-pipe-sub { color: #d06767; }
 /* The first three stages share their hue with the status chips below the strip,
    so the pipeline and the table read as the same language. */
-.lp-pipe-card.tone-blue { border-color: #bfdbfe; background: #f7fbff; }
+.lp-pipe-card.tone-blue { border-color: #bfdbfe; background: linear-gradient(135deg, #deebff 0%, #f3f8ff 55%, #ffffff 100%); }
 .lp-pipe-card.tone-blue .lp-pipe-ico { background: #dbeafe; color: #1d4ed8; }
 .lp-pipe-card.tone-blue .lp-pipe-val { color: #1d4ed8; }
 .lp-pipe-card.tone-blue .lp-pipe-sub { color: #6a94d8; }
-.lp-pipe-card.tone-violet { border-color: #ddd6fe; background: #faf9ff; }
+.lp-pipe-card.tone-violet { border-color: #ddd6fe; background: linear-gradient(135deg, #ebe5ff 0%, #f8f6ff 55%, #ffffff 100%); }
 .lp-pipe-card.tone-violet .lp-pipe-ico { background: #ede9fe; color: #6d28d9; }
 .lp-pipe-card.tone-violet .lp-pipe-val { color: #6d28d9; }
 .lp-pipe-card.tone-violet .lp-pipe-sub { color: #a18fc8; }
-.lp-pipe-card.tone-cyan { border-color: #a5f3fc; background: #f5feff; }
+.lp-pipe-card.tone-cyan { border-color: #a5f3fc; background: linear-gradient(135deg, #d5f8fd 0%, #f1fdff 55%, #ffffff 100%); }
 .lp-pipe-card.tone-cyan .lp-pipe-ico { background: #cffafe; color: #0e7490; }
 .lp-pipe-card.tone-cyan .lp-pipe-val { color: #0e7490; }
 .lp-pipe-card.tone-cyan .lp-pipe-sub { color: #57aec0; }
@@ -659,25 +701,43 @@ button.lp-kpi:hover { border-color: #cbd5e1; transform: translateY(-2px); box-sh
   border-color: #239150;
   box-shadow: 0 0 0 3px rgba(35,145,80,0.16), 0 6px 18px rgba(35,145,80,0.12);
 }
-.lp-pipe-arrow {
-  flex: 0 0 auto; display: flex; align-items: center; color: #cbd5e1;
+.lp-ov {
+  display: flex; align-items: center; gap: 18px;
+  background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px;
+  padding: 12px 20px 12px 12px; font-family: 'Barlow', sans-serif;
 }
-.lp-pipe-arrow [data-lucide] { width: 17px; height: 17px; }
-.lp-pipe-split { flex: 0 0 auto; width: 1px; background: #e2e8f0; margin: 6px 6px; }
-/* Below the breakpoint the cards wrap, and a flow arrow pointing at a card on
-   the next line would be a lie. */
-@media (min-width: 1280px) {
-  .lp-pipe { flex-wrap: nowrap; }
-  .lp-pipe-card { flex: 1 1 0; }
+.lp-ov-ring { flex: 0 0 auto; width: 200px; height: 160px; overflow: visible; }
+.lp-ov-node { cursor: pointer; filter: drop-shadow(0 2px 4px rgba(15,23,42,0.18)); }
+.lp-ov-node circle { transition: r 0.15s ease; }
+.lp-ov-node:hover circle { r: 16; }
+.lp-ov-node text {
+  font-size: 12px; font-weight: 800;
+  text-anchor: middle; dominant-baseline: central; pointer-events: none;
 }
-@media (max-width: 1279px) {
-  .lp-pipe-arrow, .lp-pipe-split { display: none; }
+.lp-ov-total { font-size: 38px; font-weight: 900; fill: #0f172a; text-anchor: middle; }
+.lp-ov-pill { fill: #e7f6ed; }
+.lp-ov-cap {
+  font-size: 10.5px; font-weight: 700; fill: #1b7341;
+  text-anchor: middle; dominant-baseline: central;
 }
-@media (max-width: 1420px) and (min-width: 1280px) {
-  .lp-pipe-card { padding: 12px; gap: 9px; }
-  .lp-pipe-ico { width: 36px; height: 36px; }
-  .lp-pipe-ico [data-lucide] { width: 17px; height: 17px; }
-  .lp-pipe-val { font-size: 1.3rem; }
+.lp-ov-txt { min-width: 0; }
+.lp-ov-title {
+  font-size: 0.72rem; font-weight: 800; color: #475569;
+  text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px;
+}
+.lp-ov-row { display: flex; align-items: baseline; gap: 7px; margin-top: 5px; }
+.lp-ov-row b { font-size: 1.15rem; font-weight: 900; color: #0f172a; min-width: 42px; }
+.lp-ov-row b.g { color: #1b7341; }
+.lp-ov-row b.r { color: #b91c1c; }
+.lp-ov-row span { font-size: 0.78rem; font-weight: 600; color: #64748b; }
+@media (max-width: 1100px) {
+  .lp-pipe { grid-template-columns: minmax(0, 1fr); }
+  .lp-ov { justify-content: center; }
+}
+@media (max-width: 640px) {
+  .lp-pipe-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .lp-pipe-card.wide { grid-column: auto; }
+  .lp-pipe-card.lp-pipe-feature { grid-column: 1 / -1; grid-row: auto; gap: 14px; }
 }
 
 /* ══ ACTIVE FILTER CHIPS ════════════════════════════════
