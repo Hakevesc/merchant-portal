@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Conversion Successful</title>
+<title>Redemption Successful</title>
 <style>
   /* ---------- Switzer (local, same as Home) ---------- */
   @font-face{font-family:'Switzer';src:url('assets/fonts/switzer-300.woff2') format('woff2');font-weight:300;font-style:normal;font-display:swap}
@@ -295,10 +295,10 @@
 <div class="phone-scroll">
 <!-- Header -->
 <div class="header">
-  <button class="back-btn" onclick="goBack('12.html')" aria-label="Go back">
+  <button class="back-btn" onclick="goBack('9.html')" aria-label="Go back">
     <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
   </button>
-  <div class="header-title">CONVERSION SUCCESSFUL</div>
+  <div class="header-title">REDEMPTION SUCCESSFUL</div>
   <div class="header-spacer"></div>
 </div>
 
@@ -313,8 +313,8 @@
         <svg viewBox="0 0 24 24"><path d="m4.5 12.5 5 5 10-11"/></svg>
       </div>
     </div>
-    <h1>Conversion Successful</h1>
-    <p>Your loyalty points have been converted<br>to float and added to your account.</p>
+    <h1>Redemption Successful</h1>
+    <p id="heroMsg">Your Float Top-Up 100 reward has been<br>credited to your float account.</p>
   </div>
 
   <!-- Amount -->
@@ -325,6 +325,10 @@
 
   <!-- Details -->
   <div class="details">
+    <div class="drow">
+      <div class="dlabel">Reward</div>
+      <div class="dvalue" id="dItem">Float Top-Up 100</div>
+    </div>
     <div class="drow">
       <div class="dlabel">Points Redeemed</div>
       <div class="dvalue" id="dPoints">1,000 PTS</div>
@@ -369,11 +373,12 @@
   (function () {
     var q = new URLSearchParams(location.search);
 
-    // Points actually converted (multiples of 100), and the leftover.
-    var entered   = parseInt(q.get('pts') || '1004', 10);
-    var converted = Math.floor(entered / 100) * 100;
-    var remaining = entered - converted;
-    var floatBr   = converted / 100;
+    // A fixed catalogue top-up: its ETB value and point cost are set by the reward, never by the merchant.
+    var item      = q.get('item') || 'Float Top-Up 100';
+    var floatBr   = parseInt(q.get('value') || '100', 10);
+    var cost      = parseInt(q.get('pts')   || '134', 10);
+    var have      = parseInt(q.get('have')  || '12450', 10);
+    var remaining = Math.max(0, have - cost);
 
     // Working account balance carried over from Home.
     var OPENING_BALANCE = 24605;
@@ -390,7 +395,9 @@
 
     document.getElementById('amtValue').textContent   = money(floatBr);
     document.getElementById('dFloat').textContent     = money(floatBr);
-    document.getElementById('dPoints').textContent    = converted.toLocaleString('en-US') + ' PTS';
+    document.getElementById('heroMsg').innerHTML      = 'Your ' + item.replace(/[<>&]/g, '') + ' reward has been<br>credited to your float account.';
+    document.getElementById('dItem').textContent      = item;
+    document.getElementById('dPoints').textContent    = cost.toLocaleString('en-US') + ' PTS';
     document.getElementById('dRemaining').textContent = remaining.toLocaleString('en-US') + ' PTS';
     document.getElementById('dBalance').textContent   = money(OPENING_BALANCE + floatBr);
     document.getElementById('dRef').textContent       = reference();
