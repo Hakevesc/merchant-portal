@@ -24,6 +24,7 @@
       font-size: 0.8rem; font-weight: 600; color: #1d4ed8;
     }
     .fl-scope-note [data-lucide] { width: 15px; height: 15px; flex-shrink: 0; }
+    .fl-by-rsm { color: #b45309; font-weight: 700; font-family: 'Barlow', sans-serif; }
     .fl-demo-code {
       text-align: center; font-size: 0.72rem; font-weight: 600; color: #94a3b8; margin-top: 14px;
     }
@@ -801,7 +802,8 @@
             '<td>' + cell(tile(rewardIcon(r.item), 'green'),
                           r.item, inv ? inv.category : '\u2014') + '</td>' +
             '<td>' + person(LP.rsm(r.rsm), r.rsm) + '</td>' +
-            '<td>' + person(LP.tdr(r.tdr), r.tdr) + '</td>' +
+            '<td>' + person(LP.tdr(r.tdr), r.tdr,
+                            isRsmHandover(r) ? 'Handover by RSM' : null) + '</td>' +
             '<td>' + LP.chip(r.status) + '</td>' +
             '<td class="text-right" onclick="event.stopPropagation()">' + rowActions(r) + '</td>' +
           '</tr>';
@@ -834,12 +836,13 @@
       return '<span class="lp-tile ' + (tone || '') + '"><i data-lucide="' + icon + '"></i></span>';
     }
 
-    function person(rec, id) {
+    function person(rec, id, note) {
       if (!rec) return '<span class="lp-muted">\u2014</span>';
       return '<div class="lp-cell">' + LP.avatar(rec.name, id) +
                '<div class="lp-cell-txt">' +
                  '<div class="lp-cell-top">' + LP.esc(rec.name) + '</div>' +
-                 '<div class="lp-cell-sub">' + LP.esc(id) + '</div>' +
+                 '<div class="lp-cell-sub">' + LP.esc(id) +
+                   (note ? ' \u00b7 <span class="fl-by-rsm">' + LP.esc(note) + '</span>' : '') + '</div>' +
                '</div>' +
              '</div>';
     }
@@ -875,11 +878,19 @@
         acts.push({ label: label, icon: icon, onclick: onclick, tone: tone || '' });
       }
 
-      /* The step that moves the reward along belongs to exactly one role. */
+      /* The step that moves the reward along belongs to one role, except the
+         handover: the RSM answers for the reward until the merchant has it, so
+         on their own team's records they can do the handover themselves
+         instead of reassigning it. Once an RSM has started one, it is theirs
+         to finish and the TDR stands back. */
+      var rsmOwns  = IS_RSM && r.rsm === LP.CURRENT_RSM;
+      var rsmHolds = isRsmHandover(r);
       if (r.status === 'allocated'  && IS_ADMIN) add('Dispatch', 'truck', "openDispatch('" + r.id + "')");
       if (r.status === 'dispatched' && IS_TDR)   add('Confirm Receipt', 'package-check', "openReceipt('" + r.id + "')");
-      if (r.status === 'received'   && IS_TDR)   add('Start Handover', 'smartphone', "startHandover('" + r.id + "')");
-      if (r.status === 'pending'    && IS_TDR)   add('Enter OTP', 'key-round', "openOtp('" + r.id + "')", 'amber');
+      if (r.status === 'received'   && (IS_TDR || rsmOwns))
+        add('Start Handover', 'smartphone', "startHandover('" + r.id + "')");
+      if (r.status === 'pending'    && ((IS_TDR && !rsmHolds) || rsmOwns))
+        add('Enter OTP', 'key-round', "openOtp('" + r.id + "')", 'amber');
 
       if (OPEN_FOR_REASSIGN.indexOf(r.status) !== -1) {
         if (IS_RSM)   add('Reassign TDR', 'repeat', "openReassign('" + r.id + "')");
@@ -892,6 +903,16 @@
         add('Raise Exception', 'alert-triangle', "openException('" + r.id + "')", 'danger');
 
       return acts;
+    }
+
+    /* Who is doing the handover is kept as an id, so an RSM's id says the
+       manager stepped in rather than the assigned TDR. */
+    function isRsmHandover(r) {
+      return !!r.handoverBy && !!LP.rsm(r.handoverBy);
+    }
+    function handoverByLabel(r) {
+      if (!r.handoverBy) return null;
+      return isRsmHandover(r) ? LP.rsmName(r.handoverBy) + ' — RSM' : LP.tdrName(r.handoverBy) + ' — TDR';
     }
 
     function rowActions(r) {
@@ -1171,8 +1192,11 @@
       r.otpExpiresAt = Date.now() + OTP_TTL_MS;
       r.otpAttempts = 0;
       r.status = 'pending';
+      r.handoverBy = IS_RSM ? LP.CURRENT_RSM : r.tdr;
       LP.save();
-      LP.audit('Handover started', r.id + ' · OTP sent to ' + r.shortCode, 'Success');
+      LP.audit('Handover started',
+        r.id + ' · OTP sent to ' + r.shortCode + (IS_RSM ? ' · by RSM ' + LP.rsmName(r.handoverBy) : ''),
+        'Success');
       LP.toast('OTP sent', 'A handover code was sent to ' + LP.merchantName(r.shortCode) + '.');
       refresh();
       openOtp(id);
@@ -1409,6 +1433,7 @@
       r.fromLocation = null; r.toLocation = null;
       r.exceptionType = null; r.exceptionNote = null;
       r.otp = null; r.otpExpiresAt = null; r.otpAttempts = 0;
+      r.handoverBy = null;
     }
 
     function tdrOptions(rsmId) {
@@ -1502,6 +1527,7 @@
         ['Allocation Date', r.allocatedAt], ['Dispatch Reference', r.dispatchRef],
         ['Dispatch Date', r.dispatchedAt], ['From Location', r.fromLocation],
         ['Destination', r.toLocation], ['Received Date', r.receivedAt],
+        ['Handover By', handoverByLabel(r)],
         ['Handover Date / Time', r.handoverAt],
         ['OTP Verification', r.otpVerified ? 'Verified' : 'Not verified'],
         ['Transaction Reference', r.txnRef]
