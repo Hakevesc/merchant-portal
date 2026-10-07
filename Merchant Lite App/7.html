@@ -234,6 +234,9 @@
     font-family: 'Switzer', 'Inter', sans-serif;
   }
 
+  /* Currency trails the figure small, as everywhere in the app. */
+  .prize-amount .cur { font-size: .5em; font-weight: 700; margin-left: 3px; }
+
   .prize-amount-white {
     color: #fff;
   }
@@ -461,7 +464,7 @@
   <div class="prize-card prize-card-green">
     <div class="prize-info">
       <div class="prize-label prize-label-white">GRAND PRIZE</div>
-      <div class="prize-amount prize-amount-white">1,000,000 ETB</div>
+      <div class="prize-amount prize-amount-white">1,000,000<small class="cur">ETB</small></div>
     </div>
     <div class="prize-image">
       <svg width="100" height="80" viewBox="0 0 100 80">
@@ -491,7 +494,7 @@
   <div class="prize-card prize-card-orange">
     <div class="prize-info">
       <div class="prize-label prize-label-dark">MEGA PRIZE</div>
-      <div class="prize-amount prize-amount-dark">500,000 ETB</div>
+      <div class="prize-amount prize-amount-dark">500,000<small class="cur">ETB</small></div>
     </div>
     <div class="prize-image">
       <svg width="100" height="80" viewBox="0 0 100 80">
@@ -518,7 +521,7 @@
   <div class="prize-card prize-card-blue">
     <div class="prize-info">
       <div class="prize-label prize-label-dark">SUPER PRIZE</div>
-      <div class="prize-amount prize-amount-dark">100,000 ETB</div>
+      <div class="prize-amount prize-amount-dark">100,000<small class="cur">ETB</small></div>
     </div>
     <div class="prize-image">
       <svg width="100" height="80" viewBox="0 0 100 80">

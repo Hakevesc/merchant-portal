@@ -144,7 +144,10 @@
   .hero-eye.is-hidden .eye-off{display:none}
 
   /* Headline figures — same treatment in both columns */
-  .hero-pts{display:flex;align-items:baseline;gap:4px;}
+  .hero-pts{display:flex;align-items:baseline;gap:4px;margin-top:4px;}
+  /* A glyph beside each figure says what it counts at a glance. */
+  .hero-ico{width:18px;height:18px;flex-shrink:0;align-self:center;color:#fff;margin-right:4px;opacity:.95}
+  .hero-unit-word{font-size:14px !important;font-weight:600 !important;text-transform:none}
   .hero-pts b{font-size:23px;font-weight:800;color:#fff;letter-spacing:-.9px;line-height:1;font-family:'Switzer','Inter',sans-serif;}
   .hero-pts span{font-size:12px;font-weight:700;color:rgba(255,255,255,.85);}
   .hero-chev{
@@ -153,13 +156,15 @@
   }
 
   /* Split totals row */
-  .hero-split{display:flex;align-items:stretch;gap:16px;margin-top:16px;}
-  .hero-cell{flex:1;min-width:0;}
+  .hero-split{display:flex;align-items:stretch;gap:16px;margin-top:0;}
+  /* A hairline over each column separates the headline figures from the totals. */
+  .hero-cell{flex:1;min-width:0;border-top:1px solid rgba(255,255,255,.22);padding-top:12px;margin-top:12px;}
   .hero-cell-label{
-    font-size:10px;font-weight:500;color:rgba(255,255,255,.74);margin-bottom:2px;
+    font-size:10px;font-weight:600;color:rgba(255,255,255,.78);margin-bottom:0;
+    letter-spacing:.4px;text-transform:uppercase;
     white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
   }
-  .hero-cell-value{
+  .hero-cell-value{display:flex;align-items:baseline;margin-top:4px;
     font-size:23px;font-weight:800;color:#fff;letter-spacing:-.9px;line-height:1;
     font-family:'Switzer','Inter',sans-serif;
   }
@@ -171,7 +176,7 @@
      tile with the gift box; the two reference tiles stack beside it. */
   .quick-grid{
     display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.08fr);
-    grid-template-rows:repeat(2,76px);gap:10px;margin-bottom:34px;
+    grid-template-rows:repeat(2,76px);gap:10px;margin-bottom:22px;
   }
   .qa-tile{
     position:relative;overflow:hidden;
@@ -183,7 +188,7 @@
   .qa-tile:active{transform:scale(.97)}
   .qa-tile:hover{box-shadow:0 4px 12px rgba(0,0,0,.08)}
   .qa-icon{
-    width:42px;height:42px;border-radius:13px;
+    width:42px;height:42px;border-radius:50%;
     background:linear-gradient(145deg,#e8343e,#c41e2a);
     display:flex;align-items:center;justify-content:center;
     box-shadow:0 5px 12px rgba(196,30,42,.28);
@@ -203,30 +208,36 @@
   }
   .qa-row .qa-icon{flex-shrink:0}
   .qa-row .qa-label{text-align:left;font-size:14px;line-height:1.25}
+  .qa-chev{width:18px;height:18px;margin-left:auto;flex-shrink:0;color:#6b7280}
 
-  /* The main action, so it carries the brand green; the label sits on top
-     and the gift box is drawn bigger than the tile so it breaks out past
-     the edges. */
+  /* The main action: a soft blush tile in the brand red family, with the
+     gift box tucked into its bottom-right corner and a red arrow button. */
   .qa-tile.qa-feature{
     grid-column:2;grid-row:1 / span 2;
     justify-content:flex-start;align-items:flex-start;
-    padding:13px 14px;overflow:visible;
-    background:linear-gradient(145deg,#2dba65 0%,#1fa856 45%,#0f7c3e 100%);
-    box-shadow:0 6px 16px rgba(15,124,62,.24);
+    padding:13px 14px;
+    background:linear-gradient(160deg,#fff6f7 0%,#fde3e6 100%);
+    border:1px solid #f9d4d9;
   }
-  .qa-feature .qa-label{position:relative;z-index:3;font-size:15px;text-align:left;color:#fff}
-  .qa-feature .qa-sub{color:rgba(255,255,255,.78);font-size:12px;font-weight:600}
-  /* The gift box hides any hint that the tile is a button, so a bold
-     diagonal arrow in the empty bottom-left corner says so. */
+  .qa-feature::after{
+    content:'';position:absolute;right:-40px;bottom:-50px;
+    width:170px;height:170px;border-radius:50%;
+    background:rgba(232,52,62,.07);pointer-events:none;
+  }
+  .qa-feature .qa-label{position:relative;z-index:3;font-size:15px;text-align:left;color:#121417}
+  .qa-feature .qa-sub{color:#6b7280;font-size:12px;font-weight:500}
   .qa-go{
-    position:absolute;left:12px;bottom:10px;z-index:3;
-    display:flex;color:#fff;
+    position:absolute;left:12px;bottom:12px;z-index:3;
+    width:34px;height:34px;border-radius:50%;
+    background:linear-gradient(145deg,#e8343e,#c41e2a);color:#fff;
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 4px 10px rgba(196,30,42,.30);
   }
-  .qa-go svg{width:34px;height:34px}
+  .qa-go svg{width:17px;height:17px}
   .qa-gift{
-    position:absolute;right:-12px;bottom:-24px;z-index:2;
-    width:142px;height:142px;object-fit:contain;
-    filter:drop-shadow(0 10px 14px rgba(0,0,0,.20));
+    position:absolute;right:-6px;bottom:-8px;z-index:2;
+    width:118px;height:118px;object-fit:contain;
+    filter:drop-shadow(0 8px 12px rgba(0,0,0,.16));
     pointer-events:none;
   }
 
@@ -243,17 +254,19 @@
     overflow-y:auto;overflow-x:hidden;
     -webkit-overflow-scrolling:touch;
     scrollbar-width:none;
-    padding-bottom:20px;
+    /* One white card with hairlines between rows. */
+    background:#fff;border:1px solid #ececf0;border-radius:16px;
+    padding:0 14px;margin-bottom:28px;
+    box-shadow:0 1px 4px rgba(0,0,0,.04);
   }
   .history-list::-webkit-scrollbar{display:none}
   body.sheet-open .history-list{overflow:hidden}
   .history-item{
     display:flex;align-items:center;gap:12px;
-    padding:12px 14px;
-    background:#fff;border:1px solid #ececf0;
-    border-radius:12px;margin-bottom:8px;
-    box-shadow:0 1px 3px rgba(0,0,0,.04);
+    padding:13px 0;
+    border-bottom:1px solid #eef0f3;
   }
+  .history-item:last-child{border-bottom:none}
   .h-icon{
     width:38px;height:38px;border-radius:50%;flex-shrink:0;
     background:#e4f9ed;
@@ -310,26 +323,26 @@
             <svg class="eye-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 12S6 5.6 12 5.6 21.5 12 21.5 12 18 18.4 12 18.4 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.9"/></svg>
           </button>
         </div>
-        <div class="hero-pts"><b class="hb">1,750</b><span>PTS</span></div>
+        <div class="hero-pts"><svg class="hero-ico" viewBox="0 0 24 24" fill="currentColor"><ellipse cx="12" cy="5.5" rx="7.5" ry="3"/><path d="M4.5 8.6c0 1.7 3.4 3 7.5 3s7.5-1.3 7.5-3v2.8c0 1.7-3.4 3-7.5 3s-7.5-1.3-7.5-3V8.6z"/><path d="M4.5 14c0 1.7 3.4 3 7.5 3s7.5-1.3 7.5-3v2.8c0 1.7-3.4 3-7.5 3s-7.5-1.3-7.5-3V14z"/></svg><b class="hb">1,750</b><span>PTS</span></div>
       </div>
 
       <div class="hero-vbar"></div>
 
       <a class="hero-col hero-col-link" href="9.html">
         <div class="hero-label"><span>REWARDS AVAILABLE</span></div>
-        <div class="hero-pts"><b class="hb">4</b><span>ITEMS</span><svg class="hero-chev" viewBox="0 0 24 24" fill="currentColor"><path d="M9.4 6 8 7.4l4.6 4.6L8 16.6 9.4 18l6-6z"/></svg></div>
+        <div class="hero-pts"><svg class="hero-ico" viewBox="0 0 24 24" fill="currentColor"><path d="M20 7h-2.2A3 3 0 0 0 12 3.9 3 3 0 0 0 6.2 7H4a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h7V7h2v5h7a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1zM9 7a1.2 1.2 0 1 1 1.2-1.2V7H9zm6 0h-1.2V5.8A1.2 1.2 0 1 1 15 7zM4 13.5V20a1 1 0 0 0 1 1h6v-7.5H4zm9 7.5h6a1 1 0 0 0 1-1v-6.5h-7V21z"/></svg><b class="hb">4</b><span class="hero-unit-word">Items</span><svg class="hero-chev" viewBox="0 0 24 24" fill="currentColor"><path d="M9.4 6 8 7.4l4.6 4.6L8 16.6 9.4 18l6-6z"/></svg></div>
       </a>
     </div>
 
     <div class="hero-split">
       <div class="hero-cell">
         <div class="hero-cell-label">Total Points Earned</div>
-        <div class="hero-cell-value"><span class="hb">2,000</span><em>PTS</em></div>
+        <div class="hero-cell-value"><svg class="hero-ico" viewBox="0 0 24 24" fill="currentColor"><path d="m12 2.6 3 6 6.7.9-4.8 4.7 1.1 6.6-6-3.1-6 3.1 1.1-6.6L2.3 9.5l6.7-.9 3-6z"/></svg><span class="hb">2,000</span><em>PTS</em></div>
       </div>
       <div class="hero-vbar"></div>
       <div class="hero-cell">
         <div class="hero-cell-label">Total Points Redeemed</div>
-        <div class="hero-cell-value"><span class="hb">250</span><em>PTS</em></div>
+        <div class="hero-cell-value"><svg class="hero-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 2.6-6.4L3 8.2"/><path d="M3 3.5v4.7h4.7"/><path d="M12 7.5V12l3 2"/></svg><span class="hb">250</span><em>PTS</em></div>
       </div>
     </div>
   </div>
@@ -341,6 +354,7 @@
         <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
       </div>
       <div class="qa-label">How It<br>Works</div>
+      <svg class="qa-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>
     </a>
 
     <a class="qa-tile qa-row" href="20.html">
@@ -348,13 +362,14 @@
         <svg viewBox="0 0 24 24"><path d="M12.6 3a9 9 0 0 0-9 9H.7l3.9 3.9.1.1L8.6 12H5.7a6.9 6.9 0 1 1 2 4.9l-1.4 1.4A8.9 8.9 0 1 0 12.6 3z"/><path d="M11.6 7.7v5.1l4.4 2.6.7-1.2-3.7-2.2V7.7h-1.4z"/></svg>
       </div>
       <div class="qa-label">Activity<br>History</div>
+      <svg class="qa-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>
     </a>
 
     <a class="qa-tile qa-feature" href="9.html">
       <img class="qa-gift" src="assets/Gift%20Box.png" alt="">
       <div class="qa-label">Redeem Rewards<br><span class="qa-sub">from 134 pts</span></div>
       <span class="qa-go" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 18 18 6M8.5 6H18v9.5"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
       </span>
     </a>
   </div>

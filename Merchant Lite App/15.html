@@ -43,7 +43,7 @@
     display:flex;
     flex-direction:column;
     min-height:100%;
-    padding:0 20px;
+    padding:0 20px 150px;
   }
 
   /* ---------- Hero ---------- */
@@ -54,26 +54,14 @@
 
   .check-wrap{
     position:relative;
-    width:96px;
-    height:96px;
+    width:68px;
+    height:68px;
     margin:0 auto 20px;
-  }
-
-  .check-ring{
-    position:absolute;
-    inset:0;
-    border-radius:50%;
-    background:#eaf7ef;
-  }
-
-  .check-ring.outer{
-    inset:-14px;
-    background:#f4fbf7;
   }
 
   .check-core{
     position:absolute;
-    inset:14px;
+    inset:0;
     border-radius:50%;
     background:linear-gradient(135deg,#33ca73,#1f9e52);
     display:flex;
@@ -112,6 +100,9 @@
     letter-spacing:-1.2px;
     line-height:1.05;
   }
+
+  /* The currency trails the figure small, as it does everywhere in the app. */
+  .amount .value small{font-size:.42em;font-weight:700;letter-spacing:0;margin-left:4px}
 
   .amount .caption{
     margin-top:6px;
@@ -184,12 +175,16 @@
   }
 
   /* ---------- Actions ---------- */
+  /* Pinned to the bottom of the screen so Done is always in reach; the
+     receipt scrolls underneath it. */
   .actions{
-    margin-top:auto;
-    padding:24px 0 24px;
+    position:fixed;left:0;right:0;bottom:24px;z-index:60;
+    padding:12px 20px 12px;
     display:flex;
     flex-direction:column;
-    gap:11px;
+    gap:10px;
+    background:#fff;
+    box-shadow:0 -10px 18px -12px rgba(0,0,0,.12);
   }
 
   .btn-primary{
@@ -307,8 +302,6 @@
   <!-- Success hero -->
   <div class="hero">
     <div class="check-wrap">
-      <div class="check-ring outer"></div>
-      <div class="check-ring"></div>
       <div class="check-core">
         <svg viewBox="0 0 24 24"><path d="m4.5 12.5 5 5 10-11"/></svg>
       </div>
@@ -319,7 +312,7 @@
 
   <!-- Amount -->
   <div class="amount">
-    <div class="value" id="amtValue">10.00 ETB</div>
+    <div class="value" id="amtValue">10.00<small>ETB</small></div>
     <div class="caption">Float credited to your account</div>
   </div>
 
@@ -393,7 +386,7 @@
       return out;
     }
 
-    document.getElementById('amtValue').textContent   = money(floatBr);
+    document.getElementById('amtValue').innerHTML     = money(floatBr).replace(' ETB', '<small>ETB</small>');
     document.getElementById('dFloat').textContent     = money(floatBr);
     document.getElementById('heroMsg').innerHTML      = 'Your ' + item.replace(/[<>&]/g, '') + ' reward has been<br>credited to your float account.';
     document.getElementById('dItem').textContent      = item;

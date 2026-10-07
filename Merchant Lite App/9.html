@@ -43,307 +43,134 @@
     box-shadow:0 18px 50px rgba(0,0,0,.32);
   }
 
-  /* Header */
-  /* ---------- Header ---------- */
+  /* ---------- Header ----------
+     This screen opens the catalogue, so it gets a left-aligned title with a
+     line of copy and the gift box, instead of the centred bar the other
+     screens use. */
   .header{
-    display:grid;grid-template-columns:auto 1fr auto;align-items:center;
-    background:#fff;position:sticky;top:0;z-index:50;
-    padding:10px 16px 34px;
+    position:relative;background:#fff;
+    padding:10px 16px 6px;
   }
   .back-btn{
-    grid-column:1;grid-row:1;
     width:28px;height:28px;margin-left:-4px;
     display:flex;align-items:center;justify-content:center;
     cursor:pointer;background:none;border:none;padding:0;
   }
   .back-btn svg{width:20px;height:20px;fill:#1a1a1a}
-  .info-btn{
-    grid-column:3;grid-row:1;
-    width:28px;height:28px;
-    display:flex;align-items:center;justify-content:center;
-    cursor:pointer;background:none;border:none;padding:0;
-  }
-  .info-btn svg{width:20px;height:20px;fill:#1a1a1a}
+  .head-copy{margin-top:12px;padding-right:96px}
   .header-title{
-    grid-column:1/-1;grid-row:2;
-    text-align:center;margin-top:11px;line-height:1.15;
-    font-size:22px;font-weight:500;color:#000;
-    letter-spacing:.5px;white-space:nowrap;
-    overflow:hidden;text-overflow:ellipsis;
+    font-size:24px;font-weight:800;color:#16181d;line-height:1.1;
+    letter-spacing:.2px;font-family:'Switzer','Inter',sans-serif;
   }
-  .header-spacer{display:none}
-
-
-
-
-  /* Points Card */
-  .points-card {
-    position: relative;
-    display: flex;
-    align-items: center;
-    gap: 13px;
-    margin: 14px 16px 0;
-    padding: 15px 16px;
-    background: linear-gradient(135deg, #e8343e 0%, #c41e2a 45%, #a81520 100%);
-    border-radius: 16px;
-    overflow: hidden;
-    box-shadow: 0 4px 14px rgba(168,21,32,0.24);
+  .header-sub{font-size:12.5px;color:#6b7280;margin-top:5px;line-height:1.35}
+  /* Sits low enough that the points card covers its base, so the box looks
+     tucked in behind the card. */
+  .head-gift{
+    position:absolute;right:10px;top:48px;z-index:0;
+    width:96px;height:96px;object-fit:contain;
+    filter:drop-shadow(0 8px 12px rgba(0,0,0,.14));
+    pointer-events:none;
   }
 
-  .points-card::before {
-    content: '';
-    position: absolute;
-    top: -46px;
-    left: -30px;
-    width: 240px;
-    height: 160px;
-    background: linear-gradient(120deg, rgba(255,255,255,0.14), rgba(255,255,255,0) 70%);
-    transform: rotate(-8deg);
-    pointer-events: none;
+  /* ---------- Points card ---------- */
+  .points-card{
+    position:relative;z-index:1;display:flex;align-items:center;
+    margin:16px 16px 0;padding:16px;
+    background:linear-gradient(135deg,#e8343e 0%,#c41e2a 45%,#a81520 100%);
+    border-radius:18px;overflow:hidden;
+    box-shadow:0 6px 18px rgba(168,21,32,.26);
   }
-
-  .points-star {
-    position: relative;
-    width: 34px;
-    height: 34px;
-    flex-shrink: 0;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.20);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  .points-card::before{
+    content:'';position:absolute;right:-50px;top:-60px;
+    width:180px;height:180px;border-radius:50%;
+    background:rgba(255,255,255,.07);pointer-events:none;
   }
-
-  .points-star svg { width: 17px; height: 17px; fill: #fff; }
-
-  .points-body { position: relative; flex: 1; min-width: 0; }
-
-  .points-label {
-    font-size: 11.5px;
-    font-weight: 500;
-    color: rgba(255,255,255,0.88);
-    letter-spacing: 0.1px;
+  .points-left{position:relative;display:flex;align-items:center;gap:12px;flex:1;min-width:0}
+  .points-star{
+    flex-shrink:0;width:40px;height:40px;border-radius:50%;
+    background:#fff;display:flex;align-items:center;justify-content:center;
+    box-shadow:0 4px 10px rgba(0,0,0,.14);
   }
-
-  .points-total {
-    font-size: 27px;
-    font-weight: 800;
-    color: #fff;
-    letter-spacing: -0.7px;
-    line-height: 1.1;
-    margin: 1px 0 2px;
+  .points-star svg{width:20px;height:20px;fill:#e8343e}
+  .points-body{min-width:0}
+  .points-label{font-size:11.5px;font-weight:500;color:rgba(255,255,255,.88)}
+  .points-total{
+    font-size:27px;font-weight:800;color:#fff;letter-spacing:-.7px;
+    line-height:1.1;margin:1px 0 2px;font-family:'Switzer','Inter',sans-serif;
   }
-
-  .points-sub {
-    font-size: 11px;
-    font-weight: 400;
-    color: rgba(255,255,255,0.80);
+  .points-sub{font-size:11px;font-weight:400;color:rgba(255,255,255,.80)}
+  .points-divider{position:relative;width:1px;align-self:stretch;background:rgba(255,255,255,.24);margin:2px 14px}
+  .points-expiry{position:relative;flex-shrink:0;display:flex;flex-direction:column;gap:5px}
+  .pe-label{font-size:11px;font-weight:400;color:rgba(255,255,255,.80)}
+  .pe-row{display:flex;align-items:center;gap:6px}
+  .pe-row svg{width:17px;height:17px;flex-shrink:0}
+  .pe-count{
+    font-size:19px;font-weight:800;color:#fff;letter-spacing:-.4px;line-height:1.1;
+    font-variant-numeric:tabular-nums;font-family:'Switzer','Inter',sans-serif;
   }
-
-  .points-expiry {
-    position: relative;
-    flex-shrink: 0;
-    margin-left: auto;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 3px;
-    text-align: left;
-    z-index: 2;
+  .pe-link{
+    display:inline-flex;align-items:center;gap:4px;align-self:flex-start;
+    margin-top:2px;padding:5px 10px;border-radius:999px;
+    border:1px solid rgba(255,255,255,.55);
+    font-size:10.5px;font-weight:600;color:#fff;text-decoration:none;white-space:nowrap;
   }
+  .pe-link svg{width:12px;height:12px}
+  .pe-link:active{background:rgba(255,255,255,.12)}
 
-  .pe-label {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    /* Same voice as "Available to redeem" on the left. */
-    font-size: 11px;
-    font-weight: 400;
-    color: rgba(255,255,255,0.80);
+  /* ---------- Search ---------- */
+  .search-container{padding:14px 16px 0}
+  .search-bar{
+    display:flex;align-items:center;gap:10px;
+    height:46px;padding:0 14px;border-radius:14px;
+    background:#fff;border:1px solid #e5e7eb;
   }
-
-  .pe-count {
-    font-size: 24px;
-    font-weight: 800;
-    color: #fff;
-    letter-spacing: -.4px;
-    line-height: 1.1;
-    font-variant-numeric: tabular-nums;
-    font-family: 'Switzer', 'Inter', sans-serif;
-    margin: 1px 0 3px;
+  .search-bar svg{width:19px;height:19px;fill:#6b7280;flex-shrink:0}
+  .search-bar input{
+    flex:1;min-width:0;border:none;background:transparent;outline:none;
+    font-size:13.5px;font-family:'Switzer','Inter',sans-serif;color:#16181d;
   }
+  .search-bar input::placeholder{color:#9aa0a6}
 
-  .pe-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 3.5px 10px;
-    background: rgba(0, 0, 0, 0.22);
-    border-radius: 999px;
-    font-size: 9.5px;
-    font-weight: 700;
-    color: #fff;
-    letter-spacing: .4px;
-    white-space: nowrap;
-    text-transform: uppercase;
-    font-family: 'Switzer', 'Inter', sans-serif;
+  /* ---------- Category chips ---------- */
+  .chip-row{display:flex;gap:8px;padding:12px 16px 0;overflow-x:auto;scrollbar-width:none}
+  .chip-row::-webkit-scrollbar{display:none}
+  .chip{
+    flex-shrink:0;height:36px;padding:0 18px;border-radius:18px;
+    display:flex;align-items:center;
+    background:#f3f4f6;font-size:12.5px;font-weight:600;color:#374151;
+    cursor:pointer;white-space:nowrap;
   }
+  .chip.active{background:#e8343e;color:#fff;font-weight:700;box-shadow:0 4px 10px rgba(232,52,62,.28)}
 
-  .pe-pill svg {
-    width: 13px;
-    height: 13px;
-    flex-shrink: 0;
+  /* ---------- Reward list ---------- */
+  .reward-list{padding:14px 16px 24px;display:flex;flex-direction:column;gap:10px}
+  .reward-card{
+    display:flex;align-items:center;gap:12px;
+    background:#fff;border:1px solid #eef0f3;border-radius:16px;padding:9px;
+    box-shadow:0 2px 8px rgba(0,0,0,.04);
+    cursor:pointer;transition:transform .15s ease;
   }
-
-  /* Search */
-  .search-container {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 14px 16px 0;
+  .reward-card:active{transform:scale(.99)}
+  .reward-image{width:96px;height:76px;border-radius:12px;overflow:hidden;flex-shrink:0;background:#eef0f3}
+  .reward-image img{width:100%;height:100%;object-fit:cover;display:block}
+  .reward-info{flex:1;min-width:0}
+  .reward-title{
+    font-size:14px;font-weight:700;color:#16181d;line-height:1.25;
+    font-family:'Switzer','Inter',sans-serif;
   }
-
-  .search-bar {
-    flex: 1;
-    min-width: 0;
-    display: flex;
-    align-items: center;
-    background: #f3f4f6;
-    border-radius: 13px;
-    padding: 0 13px;
-    height: 44px;
-    gap: 9px;
+  .reward-desc{font-size:11.5px;color:#6b7280;margin-top:2px;line-height:1.35}
+  .reward-meta{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin-top:7px}
+  .reward-points{
+    display:inline-flex;align-items:center;gap:5px;
+    padding:4px 10px;border-radius:999px;background:#e8f7ee;
+    font-size:11.5px;font-weight:700;color:#1b7341;
   }
-
-  .search-bar svg { width: 17px; height: 17px; fill: #9aa0a6; flex-shrink: 0; }
-
-  .search-bar input {
-    flex: 1;
-    min-width: 0;
-    border: none;
-    background: transparent;
-    font-size: 13.5px;
-    font-family: 'Switzer', 'Inter', sans-serif;
-    color: #16181d;
-    outline: none;
-  }
-
-  .search-bar input::placeholder { color: #9aa0a6; }
-
-  /* Category chips */
-  .chip-row {
-    display: flex;
-    gap: 8px;
-    padding: 12px 16px 0;
-    overflow-x: auto;
-    scrollbar-width: none;
-  }
-
-  .chip-row::-webkit-scrollbar { display: none; }
-
-  .chip {
-    flex-shrink: 0;
-    height: 34px;
-    display: flex;
-    align-items: center;
-    padding: 0 15px;
-    border-radius: 17px;
-    background: #f3f4f6;
-    font-size: 12.5px;
-    font-weight: 600;
-    color: #5b6169;
-    cursor: pointer;
-    white-space: nowrap;
-  }
-
-  .chip.active {
-    background: #e8343e;
-    color: #fff;
-    font-weight: 700;
-  }
-
-  /* Reward List */
-  .reward-list {
-    padding: 14px 16px 0;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .reward-card {
-    display: flex;
-    align-items: center;
-    background: #fff;
-    border: 1px solid #eceef1;
-    border-radius: 14px;
-    padding: 10px;
-    gap: 12px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-    cursor: pointer;
-    transition: transform 0.15s ease;
-  }
-
-  .reward-card:active { transform: scale(0.99); }
-
-  .reward-image {
-    width: 84px;
-    height: 84px;
-    border-radius: 11px;
-    overflow: hidden;
-    flex-shrink: 0;
-    background: #eef0f3;
-  }
-
-  .reward-image img { width: 100%; height: 100%; object-fit: cover; display: block; }
-
-  .reward-info { flex: 1; min-width: 0; }
-
-  .reward-title {
-    font-size: 12.5px;
-    font-weight: 800;
-    color: #16181d;
-    letter-spacing: 0.3px;
-    line-height: 1.25;
-    font-family: 'Switzer', 'Inter', sans-serif;
-  }
-
-  .reward-value {
-    font-size: 16px;
-    font-weight: 800;
-    color: #1c9b52;
-    letter-spacing: -0.4px;
-    margin-top: 4px;
-  }
-
-  .reward-points {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    margin-top: 5px;
-    font-size: 11.5px;
-    font-weight: 500;
-    color: #8a9099;
-  }
-
-  .reward-points svg { width: 14px; height: 14px; fill: #c2c6cc; flex-shrink: 0; }
-
-  .reward-status {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    margin-top: 3px;
-    font-size: 10.5px;
-    font-weight: 700;
-    letter-spacing: 0.15px;
-    font-family: 'Switzer', 'Inter', sans-serif;
-  }
-
-  .reward-status.rs-ready { color: #1c9b52; }
-  .reward-status.rs-remaining { color: #e8912a; }
-
-  .reward-arrow { flex-shrink: 0; display: flex; }
-
-  .reward-arrow svg { width: 19px; height: 19px; fill: #22a55b; }
+  .reward-points svg{width:13px;height:13px;fill:#22a55b;flex-shrink:0}
+  .reward-status{font-size:10.5px;font-weight:700;letter-spacing:.1px}
+  .reward-status.rs-ready{color:#1c9b52}
+  .reward-status.rs-remaining{color:#e8912a}
+  .reward-arrow{flex-shrink:0;display:flex;padding-right:4px}
+  .reward-arrow svg{width:20px;height:20px;fill:#374151}
 
   /* Bottom Navigation */
 
@@ -391,30 +218,33 @@
   <button class="back-btn" onclick="goBack('8.html')" aria-label="Go back">
     <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
   </button>
-  <div class="header-title">REDEEM REWARDS</div>
-  <div class="header-spacer"></div>
+  <div class="head-copy">
+    <div class="header-title">REDEEM REWARDS</div>
+    <div class="header-sub">Turn your points into something valuable.</div>
+  </div>
+  <img class="head-gift" src="assets/Gift%20Box.png" alt="">
 </div>
 
 <!-- Points Card -->
 <div class="points-card">
-  <div class="points-star"><svg viewBox="0 0 24 24"><path d="m12 2.6 3 6 6.7.9-4.8 4.7 1.1 6.6-6-3.1-6 3.1 1.1-6.6L2.3 9.5l6.7-.9 3-6z"/></svg></div>
-  <div class="points-body">
-    <div class="points-label">Your Points</div>
-    <div class="points-total">12,450</div>
-    <div class="points-sub">Available to redeem</div>
+  <div class="points-left">
+    <div class="points-star"><svg viewBox="0 0 24 24"><path d="m12 2.6 3 6 6.7.9-4.8 4.7 1.1 6.6-6-3.1-6 3.1 1.1-6.6L2.3 9.5l6.7-.9 3-6z"/></svg></div>
+    <div class="points-body">
+      <div class="points-label">Your Points</div>
+      <div class="points-total">12,450</div>
+      <div class="points-sub">Available to redeem</div>
+    </div>
   </div>
+  <div class="points-divider"></div>
   <div class="points-expiry">
-    <div class="pe-label">
-      <span>Redemption opens</span>
+    <div class="pe-label">Redemption opens in</div>
+    <div class="pe-row">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.2 2"/></svg>
+      <div class="pe-count" id="expiryCount">6d 23h 59m</div>
     </div>
-    <div class="pe-count" id="expiryCount">6d 23h 59m</div>
-    <div class="pe-pill">
-      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="9"/>
-        <path d="M12 7v5l3.2 2"/>
-      </svg>
-      <span>7 DAYS TO REDEEM</span>
-    </div>
+    <a class="pe-link" href="20.html?tab=redemption">Redemption history
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>
+    </a>
   </div>
 </div>
 
@@ -439,52 +269,49 @@
   <div class="reward-card" data-cat="float" onclick="window.location.href='16.html?name=Float%20Top-Up%20100&value=100&pts=134&have=12450&img=assets/float-topup.jpg&cat=float'" role="link" tabindex="0" onkeydown="if(event.key==='Enter')window.location.href='16.html?name=Float%20Top-Up%20100&value=100&pts=134&have=12450&img=assets/float-topup.jpg&cat=float'">
     <div class="reward-image"><img src="assets/float-topup.jpg" alt="Float Top-Up 100"></div>
     <div class="reward-info">
-      <div class="reward-title">FLOAT TOP-UP 100</div>
-      <div class="reward-value">100.00 ETB</div>
-      <div class="reward-points"><svg viewBox="0 0 24 24"><path d="M12 2.6A9.4 9.4 0 1 0 21.4 12 9.4 9.4 0 0 0 12 2.6zm0 17A7.6 7.6 0 1 1 19.6 12 7.6 7.6 0 0 1 12 19.6z"/><path d="m12 6.6 1.7 3.4 3.8.5-2.7 2.7.6 3.8-3.4-1.8-3.4 1.8.6-3.8-2.7-2.7 3.8-.5L12 6.6z"/></svg> 134 points</div>
+      <div class="reward-title">Float Top-Up 100</div>
+      <div class="reward-desc">100 ETB added straight to your float.</div>
+      <div class="reward-meta"><span class="reward-points"><svg viewBox="0 0 24 24"><path d="m12 2.6 3 6 6.7.9-4.8 4.7 1.1 6.6-6-3.1-6 3.1 1.1-6.6L2.3 9.5l6.7-.9 3-6z"/></svg> 134 pts</span></div>
     </div>
     <div class="reward-arrow"><svg viewBox="0 0 24 24"><path d="M9.4 6 8 7.4l4.6 4.6L8 16.6 9.4 18l6-6z"/></svg></div>
   </div>
   <div class="reward-card" data-cat="float" onclick="window.location.href='16.html?name=Float%20Top-Up%20500&value=500&pts=667&have=12450&img=assets/float-topup.jpg&cat=float'" role="link" tabindex="0" onkeydown="if(event.key==='Enter')window.location.href='16.html?name=Float%20Top-Up%20500&value=500&pts=667&have=12450&img=assets/float-topup.jpg&cat=float'">
     <div class="reward-image"><img src="assets/float-topup.jpg" alt="Float Top-Up 500"></div>
     <div class="reward-info">
-      <div class="reward-title">FLOAT TOP-UP 500</div>
-      <div class="reward-value">500.00 ETB</div>
-      <div class="reward-points"><svg viewBox="0 0 24 24"><path d="M12 2.6A9.4 9.4 0 1 0 21.4 12 9.4 9.4 0 0 0 12 2.6zm0 17A7.6 7.6 0 1 1 19.6 12 7.6 7.6 0 0 1 12 19.6z"/><path d="m12 6.6 1.7 3.4 3.8.5-2.7 2.7.6 3.8-3.4-1.8-3.4 1.8.6-3.8-2.7-2.7 3.8-.5L12 6.6z"/></svg> 667 points</div>
+      <div class="reward-title">Float Top-Up 500</div>
+      <div class="reward-desc">500 ETB added straight to your float.</div>
+      <div class="reward-meta"><span class="reward-points"><svg viewBox="0 0 24 24"><path d="m12 2.6 3 6 6.7.9-4.8 4.7 1.1 6.6-6-3.1-6 3.1 1.1-6.6L2.3 9.5l6.7-.9 3-6z"/></svg> 667 pts</span></div>
     </div>
     <div class="reward-arrow"><svg viewBox="0 0 24 24"><path d="M9.4 6 8 7.4l4.6 4.6L8 16.6 9.4 18l6-6z"/></svg></div>
   </div>
   <div class="reward-card" data-cat="float" onclick="window.location.href='16.html?name=Float%20Top-Up%20700&value=700&pts=934&have=12450&img=assets/float-topup.jpg&cat=float'" role="link" tabindex="0" onkeydown="if(event.key==='Enter')window.location.href='16.html?name=Float%20Top-Up%20700&value=700&pts=934&have=12450&img=assets/float-topup.jpg&cat=float'">
     <div class="reward-image"><img src="assets/float-topup.jpg" alt="Float Top-Up 700"></div>
     <div class="reward-info">
-      <div class="reward-title">FLOAT TOP-UP 700</div>
-      <div class="reward-value">700.00 ETB</div>
-      <div class="reward-points"><svg viewBox="0 0 24 24"><path d="M12 2.6A9.4 9.4 0 1 0 21.4 12 9.4 9.4 0 0 0 12 2.6zm0 17A7.6 7.6 0 1 1 19.6 12 7.6 7.6 0 0 1 12 19.6z"/><path d="m12 6.6 1.7 3.4 3.8.5-2.7 2.7.6 3.8-3.4-1.8-3.4 1.8.6-3.8-2.7-2.7 3.8-.5L12 6.6z"/></svg> 934 points</div>
+      <div class="reward-title">Float Top-Up 700</div>
+      <div class="reward-desc">700 ETB added straight to your float.</div>
+      <div class="reward-meta"><span class="reward-points"><svg viewBox="0 0 24 24"><path d="m12 2.6 3 6 6.7.9-4.8 4.7 1.1 6.6-6-3.1-6 3.1 1.1-6.6L2.3 9.5l6.7-.9 3-6z"/></svg> 934 pts</span></div>
     </div>
     <div class="reward-arrow"><svg viewBox="0 0 24 24"><path d="M9.4 6 8 7.4l4.6 4.6L8 16.6 9.4 18l6-6z"/></svg></div>
   </div>
   <div class="reward-card" data-cat="electronics" onclick="window.location.href='16.html?name=Smartphone&value=5000&pts=6667&have=12450&img=assets/smartphone.jpg'" role="link" tabindex="0" onkeydown="if(event.key==='Enter')window.location.href='16.html?name=Smartphone&value=5000&pts=6667&have=12450&img=assets/smartphone.jpg'">
     <div class="reward-image"><img src="assets/smartphone.jpg" alt="Smart Phone"></div>
     <div class="reward-info">
-      <div class="reward-title">SMART PHONE</div>
-      <div class="reward-value">5,000.00 ETB</div>
-      <div class="reward-points"><svg viewBox="0 0 24 24"><path d="M12 2.6A9.4 9.4 0 1 0 21.4 12 9.4 9.4 0 0 0 12 2.6zm0 17A7.6 7.6 0 1 1 19.6 12 7.6 7.6 0 0 1 12 19.6z"/><path d="m12 6.6 1.7 3.4 3.8.5-2.7 2.7.6 3.8-3.4-1.8-3.4 1.8.6-3.8-2.7-2.7 3.8-.5L12 6.6z"/></svg> 6,667 points</div>
+      <div class="reward-title">Smart Phone</div>
+      <div class="reward-desc">Stay connected, always. 5,000 ETB value.</div>
+      <div class="reward-meta"><span class="reward-points"><svg viewBox="0 0 24 24"><path d="m12 2.6 3 6 6.7.9-4.8 4.7 1.1 6.6-6-3.1-6 3.1 1.1-6.6L2.3 9.5l6.7-.9 3-6z"/></svg> 6,667 pts</span></div>
     </div>
     <div class="reward-arrow"><svg viewBox="0 0 24 24"><path d="M9.4 6 8 7.4l4.6 4.6L8 16.6 9.4 18l6-6z"/></svg></div>
   </div>
   <div class="reward-card" data-cat="data" onclick="window.location.href='16.html?name=Data%20Bundle%201GB&value=150&pts=200&have=12450&img=assets/data-bundle.jpg'" role="link" tabindex="0" onkeydown="if(event.key==='Enter')window.location.href='16.html?name=Data%20Bundle%201GB&value=150&pts=200&have=12450&img=assets/data-bundle.jpg'">
     <div class="reward-image"><img src="assets/data-bundle.jpg" alt="Data Bundle 1GB"></div>
     <div class="reward-info">
-      <div class="reward-title">DATA BUNDLE 1GB</div>
-      <div class="reward-value">150.00 ETB</div>
-      <div class="reward-points"><svg viewBox="0 0 24 24"><path d="M12 2.6A9.4 9.4 0 1 0 21.4 12 9.4 9.4 0 0 0 12 2.6zm0 17A7.6 7.6 0 1 1 19.6 12 7.6 7.6 0 0 1 12 19.6z"/><path d="m12 6.6 1.7 3.4 3.8.5-2.7 2.7.6 3.8-3.4-1.8-3.4 1.8.6-3.8-2.7-2.7 3.8-.5L12 6.6z"/></svg> 200 points</div>
+      <div class="reward-title">Data Bundle 1GB</div>
+      <div class="reward-desc">Stay online, stay ahead. 150 ETB value.</div>
+      <div class="reward-meta"><span class="reward-points"><svg viewBox="0 0 24 24"><path d="m12 2.6 3 6 6.7.9-4.8 4.7 1.1 6.6-6-3.1-6 3.1 1.1-6.6L2.3 9.5l6.7-.9 3-6z"/></svg> 200 pts</span></div>
     </div>
     <div class="reward-arrow"><svg viewBox="0 0 24 24"><path d="M9.4 6 8 7.4l4.6 4.6L8 16.6 9.4 18l6-6z"/></svg></div>
   </div>
 </div>
-
-
-
 
 <script>
   (function () {
@@ -513,12 +340,12 @@
       status.className = 'reward-status';
       if (remaining <= 0) {
         status.className += ' rs-ready';
-        status.textContent = 'READY TO REDEEM';
+        status.textContent = 'Ready to redeem';
       } else {
         status.className += ' rs-remaining';
-        status.textContent = fmt(remaining) + ' more points needed';
+        status.textContent = fmt(remaining) + ' more needed';
       }
-      card.querySelector('.reward-info').appendChild(status);
+      (card.querySelector('.reward-meta') || card.querySelector('.reward-info')).appendChild(status);
     });
 
     function apply() {

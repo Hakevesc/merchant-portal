@@ -75,105 +75,59 @@
 
   /* ---------- Hero summary card ---------- */
   .hero-card{
-    display:flex;
-    align-items:center;
-    gap:14px;
-    background:#fff;
-    border:1px solid #eceef1;
-    border-radius:16px;
-    padding:14px;
-    box-shadow:0 1px 3px rgba(0,0,0,.05);
+    display:flex;align-items:center;gap:14px;
+    background:#fff;border:1px solid #eceef1;border-radius:18px;
+    padding:12px;box-shadow:0 2px 8px rgba(0,0,0,.04);
   }
-
   .hero-thumb{
-    width:118px;
-    height:118px;
-    flex-shrink:0;
-    border-radius:13px;
-    overflow:hidden;
-    background:#f4f5f7;
-    display:flex;
-    align-items:center;
-    justify-content:center;
+    width:142px;height:108px;flex-shrink:0;border-radius:14px;
+    overflow:hidden;background:#f4f5f7;
   }
-
-  .hero-thumb img{
-    width:100%;
-    height:100%;
-    object-fit:cover;
-    display:block;
-  }
-
+  .hero-thumb img{width:100%;height:100%;object-fit:cover;display:block}
   .hero-body{flex:1;min-width:0}
-
-  .hero-title{
-    font-size:18px;
-    font-weight:800;
-    color:#16181d;
-    letter-spacing:-.3px;
-    line-height:1.2;
-  }
-
-  .hero-value{
-    margin-top:7px;
-    font-size:13.5px;
-    font-weight:500;
-    color:#6b7079;
-    letter-spacing:-.1px;
-  }
-
+  .hero-title{font-size:18px;font-weight:800;color:#16181d;letter-spacing:-.3px;line-height:1.2}
+  .hero-value{margin-top:5px;font-size:13px;font-weight:500;color:#6b7079}
   .hero-points{
-    margin-top:8px;
-    font-size:14px;
-    font-weight:800;
-    color:#1c9b52;
-    letter-spacing:-.2px;
+    display:inline-flex;align-items:center;gap:5px;margin-top:9px;
+    padding:5px 11px;border-radius:999px;background:#e8f7ee;
+    font-size:12px;font-weight:700;color:#1b7341;white-space:nowrap;
   }
+  .hero-points svg{width:13px;height:13px;fill:#22a55b;flex-shrink:0}
 
   /* ---------- Progress card ---------- */
   .progress-card{
-    margin-top:16px;
-    background:#fff;
-    border:1px solid #eceef1;
-    border-radius:16px;
-    padding:14px 16px;
-    box-shadow:0 1px 3px rgba(0,0,0,.05);
+    margin-top:12px;background:#f8fbf9;
+    border:1px solid #e6efe9;border-radius:18px;padding:16px;
   }
-  .pc-head{display:flex;align-items:center;justify-content:space-between}
+  .pc-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
   .pc-col{flex:1;min-width:0}
   .pc-col.right{text-align:right}
-  .pc-label{font-size:10.5px;font-weight:500;color:#8a9099;letter-spacing:.1px}
-  .pc-value{
-    margin-top:3px;
-    font-size:19px;font-weight:800;color:#16181d;
-    letter-spacing:-.4px;line-height:1.15;
-  }
+  .pc-label{font-size:11.5px;font-weight:500;color:#6b7280}
+  .pc-value{margin-top:3px;font-size:26px;font-weight:800;color:#16181d;letter-spacing:-.6px;line-height:1.1}
   .pc-need{color:#1c9b52}
+  /* "vs" between hairlines, so the two figures read as a comparison. */
+  .pc-vs-wrap{flex-shrink:0;display:flex;align-items:center;gap:10px;align-self:stretch}
+  .pc-vs-wrap::before,.pc-vs-wrap::after{content:'';width:1px;align-self:stretch;background:#e2e8e4}
   .pc-vs{
-    flex-shrink:0;
-    width:30px;height:30px;border-radius:50%;
-    background:#eef0f3;
+    width:32px;height:32px;border-radius:50%;background:#eef0f3;
     display:flex;align-items:center;justify-content:center;
-    font-size:9.5px;font-weight:700;color:#8a9099;
+    font-size:10px;font-weight:700;color:#6b7280;
   }
-  .pc-track{
-    height:9px;
-    margin-top:12px;
-    border-radius:5px;
-    background:#eef0f3;
-    overflow:hidden;
-  }
-  .pc-fill{
-    height:100%;width:100%;
-    border-radius:5px;
-    background:linear-gradient(90deg,#33ca73,#1f9e52);
-  }
+  .pc-track{height:9px;margin-top:14px;border-radius:5px;background:#e9edf0;overflow:hidden}
+  .pc-fill{height:100%;width:100%;border-radius:5px;background:linear-gradient(90deg,#33ca73,#1f9e52)}
   .pc-note{
-    margin-top:10px;
-    font-size:12px;font-weight:500;color:#5b6169;
-    line-height:1.45;
+    display:flex;align-items:center;gap:8px;margin-top:12px;
+    font-size:12.5px;font-weight:500;color:#374151;line-height:1.45;
   }
-  .pc-note b{color:#c2410c;font-weight:700}
+  .pc-note-ico{
+    width:20px;height:20px;flex-shrink:0;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;background:#1fa856;
+  }
+  .pc-note-ico svg{width:12px;height:12px}
+  .pc-note b{color:#1c9b52;font-weight:700}
+  .progress-card.short .pc-note-ico{background:#e8912a}
+  .progress-card.short .pc-note b{color:#c2410c}
+  .progress-card.short .pc-fill{background:linear-gradient(90deg,#f5b14c,#e8912a)}
 
   /* ---------- Section titles ---------- */
   .section-title{
@@ -184,28 +138,25 @@
   }
 
   .card{
-    background:#fff;
-    border:1px solid #ececf0;
-    border-radius:14px;
-    box-shadow:0 1px 3px rgba(0,0,0,.04);
-    overflow:hidden;
+    background:#fff;border:1px solid #ececf0;border-radius:18px;
+    box-shadow:0 2px 8px rgba(0,0,0,.04);overflow:hidden;
   }
   .card-body{padding:14px 16px}
 
   /* ---------- Redemption info rows ---------- */
-  .info-row{display:flex;align-items:center;gap:12px;padding:11px 14px}
-  .info-row + .info-row{border-top:1px solid #f0f1f4}
-  .info-icon{
-    width:36px;height:36px;flex-shrink:0;
-    border-radius:50%;
-    display:flex;align-items:center;justify-content:center;
+  .info-row{position:relative;display:flex;align-items:center;gap:14px;padding:14px 16px}
+  .info-row + .info-row::before{
+    content:'';position:absolute;top:0;left:16px;right:16px;height:1px;background:#eef0f3;
   }
-  .icon-green{background:#e4f9ed}
-  .icon-blue{background:#e4f9ed}
-  .info-icon svg{width:18px;height:18px}
+  .info-icon{
+    width:44px;height:44px;flex-shrink:0;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;background:#e8f7ee;
+  }
+  .icon-green,.icon-blue{background:#e8f7ee}
+  .info-icon svg{width:21px;height:21px}
   .info-text{flex:1;min-width:0}
-  .info-title{font-size:12.5px;font-weight:700;color:#16181d}
-  .info-desc{margin-top:2px;font-size:11.5px;color:#8a9099;line-height:1.45}
+  .info-title{font-size:13.5px;font-weight:700;color:#16181d}
+  .info-desc{margin-top:3px;font-size:11.5px;color:#6b7280;line-height:1.45}
 
   /* ---------- CTA ---------- */
   .redeem-footer{
@@ -216,34 +167,31 @@
     z-index:60;
   }
   .redeem-btn{
-    display:flex;align-items:center;justify-content:center;gap:9px;
-    width:100%;height:54px;margin-top:10px;
-    background:linear-gradient(135deg,#33ca73,#1f9e52);
-    color:#fff;border:none;border-radius:27px;
+    display:flex;align-items:center;justify-content:center;gap:10px;
+    width:100%;height:56px;margin-top:10px;
+    background:linear-gradient(135deg,#e8343e 0%,#c41e2a 55%,#a81520 100%);
+    color:#fff;border:none;border-radius:28px;
     font-family:'Switzer','Inter',sans-serif;
-    font-size:15.5px;font-weight:700;letter-spacing:.2px;
+    font-size:15.5px;font-weight:800;letter-spacing:.4px;
     cursor:pointer;
-    box-shadow:0 6px 16px rgba(46,197,109,.30);
+    box-shadow:0 8px 18px rgba(196,30,42,.30);
     transition:transform .15s ease,box-shadow .15s ease;
   }
-  .redeem-btn:active{transform:translateY(1px);box-shadow:0 3px 10px rgba(46,197,109,.26)}
-  .redeem-btn svg.rd-gift{width:20px;height:20px;fill:#fff;flex-shrink:0}
+  .redeem-btn:active{transform:translateY(1px);box-shadow:0 4px 10px rgba(196,30,42,.26)}
+  .redeem-btn svg.rd-gift{width:21px;height:21px;fill:#fff;flex-shrink:0}
   .redeem-btn svg.rd-chev{width:8px;height:13px;flex-shrink:0}
   .redeem-hint{
-    margin-top:0;
-    font-size:11.5px;font-weight:500;color:#8a9099;
-    text-align:center;
+    display:flex;align-items:center;justify-content:center;gap:6px;
+    font-size:11.5px;font-weight:500;color:#6b7280;text-align:center;
   }
-
+  .redeem-hint svg{width:14px;height:14px;flex-shrink:0}
   .tc-link{
     display:flex;align-items:center;justify-content:center;gap:5px;
-    width:100%;
-    margin-top:2px;
+    width:100%;margin-top:2px;
     font-size:11.5px;font-weight:600;color:#1c9b52;
-    cursor:pointer;background:none;border:none;padding:6px 0;
-    text-align:center;
+    cursor:pointer;background:none;border:none;padding:6px 0;text-align:center;
   }
-  .tc-link svg{width:13px;height:13px;fill:#1c9b52;flex-shrink:0}
+  .tc-link svg{width:14px;height:14px;flex-shrink:0}
 
   /* ---------- Toast ---------- */
   .toast{
@@ -321,33 +269,33 @@
     <div class="hero-body">
       <div class="hero-title" id="heroTitle">Smartphone</div>
       <div class="hero-value" id="heroValue">5,000 ETB Value</div>
-      <div class="hero-points" id="heroPoints">6,667 Points Required</div>
+      <div class="hero-points"><svg viewBox="0 0 24 24"><path d="m12 2.6 3 6 6.7.9-4.8 4.7 1.1 6.6-6-3.1-6 3.1 1.1-6.6L2.3 9.5l6.7-.9 3-6z"/></svg><span id="heroPoints">6,667 Points Required</span></div>
     </div>
   </div>
 
   <!-- Progress card -->
-  <div class="progress-card">
+  <div class="progress-card" id="progressCard">
     <div class="pc-head">
       <div class="pc-col">
         <div class="pc-label">Your Points</div>
         <div class="pc-value" id="pcHave">12,450</div>
       </div>
-      <div class="pc-vs">vs</div>
+      <div class="pc-vs-wrap"><div class="pc-vs">vs</div></div>
       <div class="pc-col right">
         <div class="pc-label">Points Required</div>
         <div class="pc-value pc-need" id="pcNeed">6,667</div>
       </div>
     </div>
     <div class="pc-track"><div class="pc-fill" id="pcFill"></div></div>
-    <div class="pc-note" id="pcNote">You have enough points. <b>5,783 points</b> will remain.</div>
+    <div class="pc-note"><span class="pc-note-ico" id="pcNoteIco"></span><span id="pcNote">You have enough points. <b>5,783 points</b> will remain.</span></div>
   </div>
 
   <!-- Redemption info -->
   <div class="section-title">REDEMPTION INFO</div>
   <div class="card">
     <div class="info-row">
-      <div class="info-icon icon-green">
-        <svg viewBox="0 0 24 24" fill="#2ec56d"><path d="M19.9 7h-2.4a3.1 3.1 0 0 0-4.9-3.6l-.6.6-.6-.6A3.1 3.1 0 0 0 6.5 7H4.1c-.9 0-1.6.7-1.6 1.6v2.7c0 .5.4.9.9.9h7.5V7.9h2.2v4.3h7.5c.5 0 .9-.4.9-.9V8.6c0-.9-.7-1.6-1.6-1.6zM8.7 4.7c.6 0 1.1.5 1.1 1.1V7H8.7a1.15 1.15 0 0 1 0-2.3zm6.6 2.3h-1.1V5.8a1.15 1.15 0 1 1 1.1 1.2z"/></svg>
+      <div class="info-icon icon-green" id="fulfilIco">
+        <svg viewBox="0 0 24 24" fill="#1fa856"><path d="M19.9 7h-2.4a3.1 3.1 0 0 0-4.9-3.6l-.6.6-.6-.6A3.1 3.1 0 0 0 6.5 7H4.1c-.9 0-1.6.7-1.6 1.6v2.7c0 .5.4.9.9.9h7.5V7.9h2.2v4.3h7.5c.5 0 .9-.4.9-.9V8.6c0-.9-.7-1.6-1.6-1.6zM8.7 4.7c.6 0 1.1.5 1.1 1.1V7H8.7a1.15 1.15 0 0 1 0-2.3zm6.6 2.3h-1.1V5.8a1.15 1.15 0 1 1 1.1 1.2z"/></svg>
       </div>
       <div class="info-text">
         <div class="info-title" id="fulfilTitle">Item Delivery</div>
@@ -356,7 +304,7 @@
     </div>
     <div class="info-row">
       <div class="info-icon icon-blue">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#2ec56d" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M17.3 1.6H6.7c-1.2 0-2.2 1-2.2 2.2v16.4c0 1.2 1 2.2 2.2 2.2h10.6c1.2 0 2.2-1 2.2-2.2V3.8c0-1.2-1-2.2-2.2-2.2zM9 19.7H6.8v-2.2H9v2.2zm0-4H6.8v-2.2H9v2.2zm4.1 4h-2.2v-2.2h2.2v2.2zm0-4h-2.2v-2.2h2.2v2.2zm4.1 4H15v-2.2h2.2v2.2zm0-4H15v-2.2h2.2v2.2zm0-4.4H6.8V4.8h10.4v6.5z"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="#1fa856" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.2 2"/></svg>
       </div>
       <div class="info-text">
         <div class="info-title">Processing Time</div>
@@ -365,7 +313,7 @@
     </div>
     <div class="info-row">
       <div class="info-icon icon-green">
-        <svg viewBox="0 0 24 24" fill="#2ec56d"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4.2-8 4.6-8-4.6V6l8 4.6L20 6v2.2z"/></svg>
+        <svg viewBox="0 0 24 24" fill="#1fa856"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4.2-8 4.6-8-4.6V6l8 4.6L20 6v2.2z"/></svg>
       </div>
       <div class="info-text">
         <div class="info-title">SMS Confirmation</div>
@@ -378,13 +326,13 @@
 
 <!-- CTA pinned to the bottom edge -->
 <div class="redeem-footer">
-  <div class="redeem-hint" id="redeemHint">6,667 points will be deducted when you confirm.</div>
+  <div class="redeem-hint"><svg viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg><span id="redeemHint">6,667 points will be deducted when you confirm.</span></div>
   <button class="tc-link" onclick="window.location.href='14.html'">
-  <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+  <svg viewBox="0 0 24 24" fill="none" stroke="#1c9b52" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>
   Terms &amp; conditions apply
   </button>
   <button class="redeem-btn" id="redeemBtn">
-  <svg class="rd-gift" viewBox="0 0 24 24"><path d="M19.9 7h-2.4a3.1 3.1 0 0 0-4.9-3.6l-.6.6-.6-.6A3.1 3.1 0 0 0 6.5 7H4.1c-.9 0-1.6.7-1.6 1.6v2.7c0 .5.4.9.9.9h7.5V7.9h2.2v4.3h7.5c.5 0 .9-.4.9-.9V8.6c0-.9-.7-1.6-1.6-1.6zM8.7 4.7c.6 0 1.1.5 1.1 1.1V7H8.7a1.15 1.15 0 0 1 0-2.3zm6.6 2.3h-1.1V5.8a1.15 1.15 0 1 1 1.1 1.2z"/></svg>
+  <svg class="rd-gift" viewBox="0 0 24 24"><path d="M20 7h-2.2A3 3 0 0 0 12 3.9 3 3 0 0 0 6.2 7H4a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h7V7h2v5h7a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1zM9 7a1.2 1.2 0 1 1 1.2-1.2V7H9zm6 0h-1.2V5.8A1.2 1.2 0 1 1 15 7zM4 13.5V20a1 1 0 0 0 1 1h6v-7.5H4zm9 7.5h6a1 1 0 0 0 1-1v-6.5h-7V21z"/></svg>
   REDEEM NOW
   <svg class="rd-chev" viewBox="0 0 8 13" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m1.6 1.6 5 4.9-5 4.9"/></svg>
   </button>
@@ -423,6 +371,10 @@
     document.getElementById('pcNeed').textContent      = n(NEED);
 
     if (IS_FLOAT) {
+      document.getElementById('fulfilIco').innerHTML =
+        '<svg viewBox="0 0 24 24" fill="#1fa856"><ellipse cx="12" cy="5.5" rx="7.5" ry="3"/>' +
+        '<path d="M4.5 8.6c0 1.7 3.4 3 7.5 3s7.5-1.3 7.5-3v2.8c0 1.7-3.4 3-7.5 3s-7.5-1.3-7.5-3V8.6z"/>' +
+        '<path d="M4.5 14c0 1.7 3.4 3 7.5 3s7.5-1.3 7.5-3v2.8c0 1.7-3.4 3-7.5 3s-7.5-1.3-7.5-3V14z"/></svg>';
       document.getElementById('fulfilTitle').textContent = 'Float Credit';
       document.getElementById('fulfilDesc').textContent  = n(VALUE) + ' ETB is added to your float as soon as you confirm.';
     }
@@ -431,10 +383,14 @@
     document.getElementById('pcFill').style.width = pct + '%';
 
     var note = document.getElementById('pcNote');
+    var ico  = document.getElementById('pcNoteIco');
     if (HAVE >= NEED) {
+      ico.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>';
       note.innerHTML = 'You have enough points. <b>' + n(HAVE - NEED) + ' points</b> will remain.';
       document.getElementById('redeemHint').textContent = n(NEED) + ' points will be deducted when you confirm.';
     } else {
+      document.getElementById('progressCard').classList.add('short');
+      ico.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><path d="M12 7v6M12 17h.01"/></svg>';
       note.innerHTML = 'You need <b>' + n(shortfall) + ' more points</b> to redeem this reward.';
       document.getElementById('redeemHint').textContent = 'Redemption unlocks once you reach ' + n(NEED) + ' points.';
     }

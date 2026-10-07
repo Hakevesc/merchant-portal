@@ -321,6 +321,28 @@
     border-radius:3px;
     background:#1a1a1a;
   }
+
+  /* Each day's entries read as one white card with hairlines between rows,
+     the same as the Redeemed History list on the Loyalty Point screen.
+     Entries are siblings of their day heading (the filters rely on that),
+     so the card's top and bottom are marked by script as g-first / g-last. */
+  .entry{
+    position:relative;margin-top:0;border-radius:0;
+    border-top:none;border-bottom:none;box-shadow:none;
+  }
+  .entry.g-first{
+    margin-top:8px;border-top:1px solid #ececf0;
+    border-top-left-radius:16px;border-top-right-radius:16px;
+  }
+  .entry.g-last{
+    border-bottom:1px solid #ececf0;
+    border-bottom-left-radius:16px;border-bottom-right-radius:16px;
+    box-shadow:0 2px 6px rgba(0,0,0,.04);
+  }
+  .entry:not(.g-first)::before{
+    content:'';position:absolute;top:0;left:14px;right:14px;
+    height:1px;background:#eef0f3;
+  }
 </style>
 </head>
 <body>
@@ -1068,6 +1090,7 @@ function filterEntries() {
   if (empty) {
     empty.style.display = visibleCount === 0 ? 'block' : 'none';
   }
+  if (window.edgeEntries) edgeEntries();
 }
 
 // Initialize based on URL ?tab=
@@ -1082,5 +1105,28 @@ function filterEntries() {
 })();
 </script>
 
+
+<script>
+/* Marks the first and last visible entry under each day heading so the
+   day renders as a single card. Re-run after every filter change. */
+function edgeEntries() {
+  document.querySelectorAll('.entry').forEach(function (e) {
+    e.classList.remove('g-first', 'g-last');
+  });
+  document.querySelectorAll('.day-group').forEach(function (g) {
+    var sib = g.nextElementSibling, first = null, last = null;
+    while (sib && !sib.classList.contains('day-group')) {
+      if (sib.classList.contains('entry') && sib.style.display !== 'none') {
+        if (!first) first = sib;
+        last = sib;
+      }
+      sib = sib.nextElementSibling;
+    }
+    if (first) first.classList.add('g-first');
+    if (last) last.classList.add('g-last');
+  });
+}
+edgeEntries();
+</script>
 </body>
 </html>

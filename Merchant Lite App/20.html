@@ -117,7 +117,6 @@
     flex:1;min-height:0;
   }
   .tab-pane.active > .summary-card,
-  .tab-pane.active > .stats-grid,
   .tab-pane.active > .section-title{flex-shrink:0}
   .list-container{
     flex:1;min-height:0;
@@ -129,94 +128,51 @@
   .list-container::-webkit-scrollbar{display:none}
   body.sheet-open .list-container{overflow:hidden}
 
-  /* ---------- Summary card (Accumulation & Redemption) ---------- */
+  /* ---------- Summary card ----------
+     Same layout as the points card on Redeem Rewards: the lifetime total on
+     the left beside a white badge, and the two period figures folded into
+     the right side, the second one in an outlined pill. */
   .summary-card{
-    position:relative;
-    display:flex;
-    align-items:center;
-    gap:13px;
-    margin-bottom:14px;
-    padding:15px 16px;
+    position:relative;display:flex;align-items:center;
+    margin-bottom:18px;padding:16px;
     background:linear-gradient(135deg,#e8343e 0%,#c41e2a 45%,#a81520 100%);
-    border-radius:16px;
-    overflow:hidden;
-    box-shadow:0 4px 14px rgba(168,21,32,.24);
+    border-radius:18px;overflow:hidden;
+    box-shadow:0 6px 18px rgba(168,21,32,.26);
   }
   .summary-card::before{
-    content:'';
-    position:absolute;
-    top:-46px;left:-30px;
-    width:240px;height:160px;
-    background:linear-gradient(120deg,rgba(255,255,255,.14),rgba(255,255,255,0) 70%);
-    transform:rotate(-8deg);
-    pointer-events:none;
+    content:'';position:absolute;right:-50px;top:-60px;
+    width:180px;height:180px;border-radius:50%;
+    background:rgba(255,255,255,.07);pointer-events:none;
   }
+  .summary-left{position:relative;display:flex;align-items:center;gap:12px;flex:1;min-width:0}
   .summary-star{
-    position:relative;
-    width:34px;height:34px;flex-shrink:0;
-    border-radius:50%;
-    background:rgba(255,255,255,.20);
-    display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;width:40px;height:40px;border-radius:50%;
+    background:#fff;display:flex;align-items:center;justify-content:center;
+    box-shadow:0 4px 10px rgba(0,0,0,.14);
   }
-  .summary-star svg{width:17px;height:17px;fill:#fff}
-  .summary-body{position:relative;flex:1;min-width:0}
-  .summary-label{
-    font-size:11.5px;font-weight:500;
-    color:rgba(255,255,255,.88);
-    letter-spacing:.1px;
-  }
+  .summary-star svg{width:20px;height:20px;fill:#e8343e}
+  .summary-body{min-width:0}
+  .summary-label{font-size:11.5px;font-weight:500;color:rgba(255,255,255,.88)}
   .summary-total{
-    font-size:27px;font-weight:800;color:#fff;
-    letter-spacing:-.7px;line-height:1.1;
-    margin:1px 0 2px;
+    font-size:27px;font-weight:800;color:#fff;letter-spacing:-.7px;
+    line-height:1.1;margin:1px 0 2px;white-space:nowrap;
   }
-  .summary-sub{
-    font-size:11px;font-weight:400;
-    color:rgba(255,255,255,.80);
+  .summary-total small{font-size:12px;font-weight:700;letter-spacing:0;margin-left:3px;color:rgba(255,255,255,.85)}
+  .summary-sub{font-size:11px;font-weight:400;color:rgba(255,255,255,.80)}
+  .summary-divider{position:relative;width:1px;align-self:stretch;background:rgba(255,255,255,.24);margin:2px 14px}
+  .summary-side{position:relative;flex-shrink:0;display:flex;flex-direction:column;gap:5px}
+  .ss-label{font-size:11px;font-weight:400;color:rgba(255,255,255,.80)}
+  .ss-row{display:flex;align-items:center;gap:6px}
+  .ss-row svg{width:17px;height:17px;flex-shrink:0}
+  .ss-value{font-size:19px;font-weight:800;color:#fff;letter-spacing:-.4px;line-height:1.1;white-space:nowrap}
+  .ss-value small{font-size:10.5px;font-weight:700;letter-spacing:0;margin-left:2px;color:rgba(255,255,255,.85)}
+  .ss-pill{
+    display:inline-flex;align-items:center;gap:5px;align-self:flex-start;
+    margin-top:2px;padding:5px 10px;border-radius:999px;
+    border:1px solid rgba(255,255,255,.55);
+    font-size:10.5px;font-weight:600;color:#fff;white-space:nowrap;
   }
-
-  /* ---------- Stats row ---------- */
-  .stats-grid{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:10px;
-    margin-bottom:18px;
-  }
-  .stat-cell{
-    display:flex;
-    align-items:center;
-    gap:9px;
-    height:62px;
-    background:#fff;
-    border:1px solid #ececf0;
-    border-radius:12px;
-    padding:0 10px;
-    box-shadow:0 1px 3px rgba(0,0,0,.04);
-  }
-  .stat-icon{
-    width:32px;height:32px;
-    border-radius:50%;
-    flex-shrink:0;
-    display:flex;align-items:center;justify-content:center;
-  }
-  .si-green{background:#dff3e4}
-  .si-blue{background:#dff3e4}
-  .si-amber{background:#dff3e4}
-  .stat-icon svg{width:16px;height:16px}
-  .stat-text{flex:1;min-width:0}
-  .stat-label{
-    font-size:10px;font-weight:500;color:#5b6169;
-    line-height:1.25;margin-bottom:2px;
-    white-space:nowrap;
-  }
-  .stat-value{
-    font-size:15px;font-weight:800;color:#16181d;
-    letter-spacing:-.3px;line-height:1.2;
-  }
-  .stat-value span{
-    font-size:10px;font-weight:700;color:#8a9099;
-    letter-spacing:0;margin-left:2px;
-  }
+  .ss-pill b{font-weight:800}
 
   /* ---------- Order summary strip ---------- */
   .summary-strip{
@@ -507,6 +463,28 @@
     border-radius:3px;
     background:#1a1a1a;
   }
+
+  /* Each day's entries read as one white card with hairlines between rows,
+     the same as the Redeemed History list on the Loyalty Point screen.
+     Entries are siblings of their day heading (the filters rely on that),
+     so the card's top and bottom are marked by script as g-first / g-last. */
+  .entry{
+    position:relative;margin-top:0;border-radius:0;
+    border-top:none;border-bottom:none;box-shadow:none;
+  }
+  .entry.g-first{
+    margin-top:8px;border-top:1px solid #ececf0;
+    border-top-left-radius:16px;border-top-right-radius:16px;
+  }
+  .entry.g-last{
+    border-bottom:1px solid #ececf0;
+    border-bottom-left-radius:16px;border-bottom-right-radius:16px;
+    box-shadow:0 2px 6px rgba(0,0,0,.04);
+  }
+  .entry:not(.g-first)::before{
+    content:'';position:absolute;top:0;left:14px;right:14px;
+    height:1px;background:#eef0f3;
+  }
 </style>
 </head>
 <body>
@@ -536,34 +514,19 @@
 
     <!-- Summary card -->
     <div class="summary-card">
-      <div class="summary-star"><svg viewBox="0 0 24 24"><path d="m12 2.6 3 6 6.7.9-4.8 4.7 1.1 6.6-6-3.1-6 3.1 1.1-6.6L2.3 9.5l6.7-.9 3-6z"/></svg></div>
-      <div class="summary-body">
-        <div class="summary-label">Total Accumulated</div>
-        <div class="summary-total">12,450 PTS</div>
-        <div class="summary-sub">Lifetime points earned</div>
-      </div>
-    </div>
-
-    <!-- Stats -->
-    <div class="stats-grid">
-      <div class="stat-cell">
-        <div class="stat-icon si-green">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#22a55b" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="6.6" rx="6.6" ry="2.8"/><path d="M5.4 6.6v4.2c0 1.5 3 2.8 6.6 2.8s6.6-1.3 6.6-2.8V6.6"/><path d="M5.4 10.8V15c0 1.6 3 2.8 6.6 2.8s6.6-1.2 6.6-2.8v-4.2"/></svg>
-        </div>
-        <div class="stat-text">
-          <div class="stat-label">This Month</div>
-          <div class="stat-value">100.00 <span>PTS</span></div>
+      <div class="summary-left">
+        <div class="summary-star"><svg viewBox="0 0 24 24"><path d="m12 2.6 3 6 6.7.9-4.8 4.7 1.1 6.6-6-3.1-6 3.1 1.1-6.6L2.3 9.5l6.7-.9 3-6z"/></svg></div>
+        <div class="summary-body">
+          <div class="summary-label">Total Accumulated</div>
+          <div class="summary-total">12,450<small>PTS</small></div>
+          <div class="summary-sub">Lifetime points earned</div>
         </div>
       </div>
-
-      <div class="stat-cell">
-        <div class="stat-icon si-blue">
-          <svg viewBox="0 0 24 24" fill="#22a55b"><path d="M3.4 2.1v19.8l2.4-1.6 2.4 1.6 2.4-1.6 2.4 1.6 2.4-1.6 2.6 1.6V2.1l-2.6 1.6-2.4-1.6-2.4 1.6-2.4-1.6-2.4 1.6L3.4 2.1z"/></svg>
-        </div>
-        <div class="stat-text">
-          <div class="stat-label">This Week</div>
-          <div class="stat-value">80.00 <span>PTS</span></div>
-        </div>
+      <div class="summary-divider"></div>
+      <div class="summary-side">
+        <div class="ss-label">This month</div>
+        <div class="ss-row"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M8 3v4M16 3v4M3.5 10h17"/></svg><div class="ss-value">100<small>PTS</small></div></div>
+        <div class="ss-pill">This week <b>80 PTS</b></div>
       </div>
     </div>
 
@@ -675,34 +638,19 @@
 
     <!-- Summary card -->
     <div class="summary-card">
-      <div class="summary-star"><svg viewBox="0 0 24 24"><path d="M19.9 7h-2.4a3.1 3.1 0 0 0-4.9-3.6l-.6.6-.6-.6A3.1 3.1 0 0 0 6.5 7H4.1c-.9 0-1.6.7-1.6 1.6v2.7c0 .5.4.9.9.9h7.5V7.9h2.2v4.3h7.5c.5 0 .9-.4.9-.9V8.6c0-.9-.7-1.6-1.6-1.6zM8.7 4.7c.6 0 1.1.5 1.1 1.1V7H8.7a1.15 1.15 0 0 1 0-2.3zm6.6 2.3h-1.1V5.8a1.15 1.15 0 1 1 1.1 1.2z"/></svg></div>
-      <div class="summary-body">
-        <div class="summary-label">Total Redeemed</div>
-        <div class="summary-total">8,534 PTS</div>
-        <div class="summary-sub">Lifetime points redeemed</div>
-      </div>
-    </div>
-
-    <!-- Stats -->
-    <div class="stats-grid">
-      <div class="stat-cell">
-        <div class="stat-icon si-amber">
-          <svg viewBox="0 0 24 24" fill="#1c9b52"><path d="M7.2 18.4a2 2 0 1 0 0 4 2 2 0 0 0 0-4zM17.2 18.4a2 2 0 1 0 0 4 2 2 0 0 0 0-4zM1.7 2.4a1 1 0 1 0 0 2h1.6l3 12.3c.1.5.5.8 1 .8h11a1 1 0 1 0 0-2H8.1l-.4-1.8h9.9c.5 0 .9-.3 1-.8l1.7-7.3a1 1 0 0 0-1-1.2H5.7l-.6-2.4a1 1 0 0 0-1-.6H1.7z"/></svg>
-        </div>
-        <div class="stat-text">
-          <div class="stat-label">This Month</div>
-          <div class="stat-value">8,534 <span>PTS</span></div>
+      <div class="summary-left">
+        <div class="summary-star"><svg viewBox="0 0 24 24"><path d="M20 7h-2.2A3 3 0 0 0 12 3.9 3 3 0 0 0 6.2 7H4a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h7V7h2v5h7a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1zM9 7a1.2 1.2 0 1 1 1.2-1.2V7H9zm6 0h-1.2V5.8A1.2 1.2 0 1 1 15 7zM4 13.5V20a1 1 0 0 0 1 1h6v-7.5H4zm9 7.5h6a1 1 0 0 0 1-1v-6.5h-7V21z"/></svg></div>
+        <div class="summary-body">
+          <div class="summary-label">Total Redeemed</div>
+          <div class="summary-total">8,534<small>PTS</small></div>
+          <div class="summary-sub">Lifetime points redeemed</div>
         </div>
       </div>
-
-      <div class="stat-cell">
-        <div class="stat-icon si-blue">
-          <svg viewBox="0 0 24 24" fill="#22a55b"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
-        </div>
-        <div class="stat-text">
-          <div class="stat-label">This Week</div>
-          <div class="stat-value">7,867 <span>PTS</span></div>
-        </div>
+      <div class="summary-divider"></div>
+      <div class="summary-side">
+        <div class="ss-label">This month</div>
+        <div class="ss-row"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M8 3v4M16 3v4M3.5 10h17"/></svg><div class="ss-value">8,534<small>PTS</small></div></div>
+        <div class="ss-pill">This week <b>7,867 PTS</b></div>
       </div>
     </div>
 
@@ -787,34 +735,19 @@
 
     <!-- Summary card -->
     <div class="summary-card">
-      <div class="summary-star"><svg viewBox="0 0 24 24"><path d="M17.3 1.6H6.7c-1.2 0-2.2 1-2.2 2.2v16.4c0 1.2 1 2.2 2.2 2.2h10.6c1.2 0 2.2-1 2.2-2.2V3.8c0-1.2-1-2.2-2.2-2.2zM9 19.7H6.8v-2.2H9v2.2zm0-4H6.8v-2.2H9v2.2zm4.1 4h-2.2v-2.2h2.2v2.2zm0-4h-2.2v-2.2h2.2v2.2zm4.1 4H15v-2.2h2.2v2.2zm0-4H15v-2.2h2.2v2.2zm0-4.4H6.8V4.8h10.4v6.5z"/></svg></div>
-      <div class="summary-body">
-        <div class="summary-label">Total Orders</div>
-        <div class="summary-total">3 ORDERS</div>
-        <div class="summary-sub">Reward items ordered</div>
-      </div>
-    </div>
-
-    <!-- Stats -->
-    <div class="stats-grid">
-      <div class="stat-cell">
-        <div class="stat-icon si-amber">
-          <svg viewBox="0 0 24 24" fill="#1c9b52"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-        </div>
-        <div class="stat-text">
-          <div class="stat-label">In Transit</div>
-          <div class="stat-value">1 <span>ORDER</span></div>
+      <div class="summary-left">
+        <div class="summary-star"><svg viewBox="0 0 24 24"><path d="M21 7.5 12 3 3 7.5v9L12 21l9-4.5v-9zM12 5.2l6.2 3.1L12 11.4 5.8 8.3 12 5.2zM5 10l6 3v5.6l-6-3V10zm8 8.6V13l6-3v5.6l-6 3z"/></svg></div>
+        <div class="summary-body">
+          <div class="summary-label">Total Orders</div>
+          <div class="summary-total">3<small>ORDERS</small></div>
+          <div class="summary-sub">Reward items ordered</div>
         </div>
       </div>
-
-      <div class="stat-cell">
-        <div class="stat-icon si-green">
-          <svg viewBox="0 0 24 24" fill="#1c9b52"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg>
-        </div>
-        <div class="stat-text">
-          <div class="stat-label">Delivered</div>
-          <div class="stat-value">1 <span>ORDER</span></div>
-        </div>
+      <div class="summary-divider"></div>
+      <div class="summary-side">
+        <div class="ss-label">In transit</div>
+        <div class="ss-row"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.5h11v9h-11zM13.5 9.5h4l3 3v3h-7z"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/></svg><div class="ss-value">1<small>ORDER</small></div></div>
+        <div class="ss-pill">Delivered <b>1</b></div>
       </div>
     </div>
 
@@ -1183,6 +1116,7 @@
 
     var empty = document.getElementById('empty-' + tab);
     if (empty) empty.style.display = (visibleCount === 0) ? 'block' : 'none';
+    if (window.edgeEntries) edgeEntries();
   }
 
   function applyOrderFilters() {
@@ -1227,6 +1161,7 @@
 
     var empty = document.getElementById('empty-order');
     if (empty) empty.style.display = (visibleCount === 0) ? 'block' : 'none';
+    if (window.edgeEntries) edgeEntries();
   }
 
   // Initialize from URL or default
@@ -1248,5 +1183,28 @@ function goBack(f){if(history.length>1){history.back()}else{window.location.href
 
 <div class="gesture-bar"></div>
 
+
+<script>
+/* Marks the first and last visible entry under each day heading so the
+   day renders as a single card. Re-run after every filter change. */
+function edgeEntries() {
+  document.querySelectorAll('.entry').forEach(function (e) {
+    e.classList.remove('g-first', 'g-last');
+  });
+  document.querySelectorAll('.day-group').forEach(function (g) {
+    var sib = g.nextElementSibling, first = null, last = null;
+    while (sib && !sib.classList.contains('day-group')) {
+      if (sib.classList.contains('entry') && sib.style.display !== 'none') {
+        if (!first) first = sib;
+        last = sib;
+      }
+      sib = sib.nextElementSibling;
+    }
+    if (first) first.classList.add('g-first');
+    if (last) last.classList.add('g-last');
+  });
+}
+edgeEntries();
+</script>
 </body>
 </html>
