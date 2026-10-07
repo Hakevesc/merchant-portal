@@ -291,6 +291,17 @@ textarea.form-input { padding-left: 16px; min-height: 88px; resize: vertical; li
 .res-item-val { font-size: 0.97rem; font-weight: 800; color: #0f172a; word-break: break-word; }
 .res-item-val.pos { color: #1b7341; }
 .res-item-val.neg { color: #991b1b; }
+.res-item.has-copy { position: relative; padding-right: 54px; }
+.res-copy {
+  position: absolute; top: 50%; right: 12px; transform: translateY(-50%);
+  width: 32px; height: 32px; border-radius: 9px;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: #ffffff; border: 1px solid #e2e8f0; color: #64748b; cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+.res-copy [data-lucide] { width: 15px; height: 15px; stroke-width: 2.2; }
+.res-copy:hover { color: #1b7341; border-color: #9fd8b5; background: #f0faf4; }
+.res-copy.copied { color: #ffffff; border-color: #239150; background: #239150; }
 
 /* ── DETAIL CARD (header strip over a value grid) ──────── */
 .lp-detail-card {

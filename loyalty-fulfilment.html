@@ -1536,12 +1536,52 @@
         fields.push(['Exception Type', r.exceptionType], ['Exception Notes', r.exceptionNote]);
       }
 
+      /* References people read out over the phone or paste into another
+         system get a copy button; the rest are for reading. */
+      var COPYABLE = ['Reward ID', 'Redemption Reference', 'Merchant Short Code',
+                      'Dispatch Reference', 'Transaction Reference'];
       document.getElementById('detGrid').innerHTML = fields.map(function (f) {
-        return '<div class="res-item"><div class="res-item-lbl">' + LP.esc(f[0]) + '</div>' +
-               '<div class="res-item-val">' + LP.esc(LP.dash(f[1])) + '</div></div>';
+        var copy = f[1] && COPYABLE.indexOf(f[0]) !== -1;
+        return '<div class="res-item' + (copy ? ' has-copy' : '') + '"><div class="res-item-lbl">' + LP.esc(f[0]) + '</div>' +
+               '<div class="res-item-val">' + LP.esc(LP.dash(f[1])) + '</div>' +
+               (copy ? '<button class="res-copy" onclick="copyField(this, \'' + LP.esc(f[1]) + '\', \'' + LP.esc(f[0]) + '\')" ' +
+                         'data-tip="Copy" aria-label="Copy ' + LP.esc(f[0]) + '"><i data-lucide="copy"></i></button>' : '') +
+               '</div>';
       }).join('');
+      LP.icons();
 
       LP.openModal('detailModal');
+    }
+
+    function copyField(btn, value, label) {
+      function done() {
+        btn.classList.add('copied');
+        btn.innerHTML = '<i data-lucide="check"></i>';
+        LP.icons();
+        LP.toast('Copied', label + ' ' + value + ' copied to clipboard.');
+        setTimeout(function () {
+          btn.classList.remove('copied');
+          btn.innerHTML = '<i data-lucide="copy"></i>';
+          LP.icons();
+        }, 1600);
+      }
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(value).then(done, function () { fallbackCopy(value) && done(); });
+      } else if (fallbackCopy(value)) {
+        done();
+      }
+    }
+    /* Pages opened over plain http have no Clipboard API. */
+    function fallbackCopy(value) {
+      var ta = document.createElement('textarea');
+      ta.value = value; ta.setAttribute('readonly', '');
+      ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      var ok = false;
+      try { ok = document.execCommand('copy'); } catch (e) {}
+      document.body.removeChild(ta);
+      if (!ok) LP.toast('Copy failed', 'Select the value and copy it manually.', 'error');
+      return ok;
     }
 
     /* ── Audit ──────────────────────────────────────── */
