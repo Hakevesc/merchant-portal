@@ -105,14 +105,8 @@
   .pc-label{font-size:11.5px;font-weight:500;color:#6b7280}
   .pc-value{margin-top:3px;font-size:26px;font-weight:800;color:#16181d;letter-spacing:-.6px;line-height:1.1}
   .pc-need{color:#1c9b52}
-  /* "vs" between hairlines, so the two figures read as a comparison. */
-  .pc-vs-wrap{flex-shrink:0;display:flex;align-items:center;gap:10px;align-self:stretch}
-  .pc-vs-wrap::before,.pc-vs-wrap::after{content:'';width:1px;align-self:stretch;background:#e2e8e4}
-  .pc-vs{
-    width:32px;height:32px;border-radius:50%;background:#eef0f3;
-    display:flex;align-items:center;justify-content:center;
-    font-size:10px;font-weight:700;color:#6b7280;
-  }
+  /* A single hairline splits the two figures. */
+  .pc-split{flex-shrink:0;width:1px;align-self:stretch;background:#e2e8e4;margin:0 6px}
   .pc-track{height:9px;margin-top:14px;border-radius:5px;background:#e9edf0;overflow:hidden}
   .pc-fill{height:100%;width:100%;border-radius:5px;background:linear-gradient(90deg,#33ca73,#1f9e52)}
   .pc-note{
@@ -280,7 +274,7 @@
         <div class="pc-label">Your Points</div>
         <div class="pc-value" id="pcHave">12,450</div>
       </div>
-      <div class="pc-vs-wrap"><div class="pc-vs">vs</div></div>
+      <div class="pc-split"></div>
       <div class="pc-col right">
         <div class="pc-label">Points Required</div>
         <div class="pc-value pc-need" id="pcNeed">6,667</div>
