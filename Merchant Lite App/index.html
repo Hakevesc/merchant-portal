@@ -112,8 +112,8 @@ body{
 }
 .balance-cards::-webkit-scrollbar{display:none}
 .balance-card{
-  flex:0 0 292px;
-  width:292px;
+  flex:0 0 334px;
+  width:334px;
   background:#fff;
   border-radius:14px;
   padding:12px 15px 13px;
@@ -143,6 +143,9 @@ body{
 }
 .b-value .eye{width:18px;height:18px;flex-shrink:0;cursor:pointer}
 .b-value.small{font-size:17.5px;letter-spacing:-.2px}
+/* The unit trails the figure small and on its baseline, so the amount reads first. */
+.b-amt{white-space:nowrap}
+.b-unit{font-size:.56em;font-weight:700;color:#6b6b6b;letter-spacing:0;margin-left:3px}
 .reward{
   display:flex;
   align-items:center;
@@ -476,7 +479,7 @@ body.sheet-open .phone-scroll{overflow:hidden}
         <div class="b-col">
           <div class="b-label">Working Account Balance</div>
           <div class="b-value">
-            24,605.00 ETB
+            <span class="b-amt">24,605.00<small class="b-unit">ETB</small></span>
             <svg class="eye" viewBox="0 0 24 24" fill="none" stroke="#8d8d8d" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
               <path d="M2 12s3.8-7 10-7 10 7 10 7-3.8 7-10 7-10-7-10-7z"/>
               <circle cx="12" cy="12" r="2.9"/>
@@ -487,7 +490,7 @@ body.sheet-open .phone-scroll{overflow:hidden}
         <div class="b-col" style="flex:0 0 86px">
           <div class="b-label">Loyalty Points</div>
           <div class="b-value small reward" onclick="window.location.href='8.html'" role="link" tabindex="0" onkeydown="if(event.key==='Enter')window.location.href='8.html'">
-            <span>50 Point</span>
+            <span class="b-amt">50<small class="b-unit">Point</small></span>
             <svg class="chev" viewBox="0 0 10 16" fill="none" stroke="#2b2b2b" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M2 2l6 6-6 6"/></svg>
           </div>
         </div>
@@ -498,11 +501,11 @@ body.sheet-open .phone-scroll{overflow:hidden}
       <div class="b-grid">
         <div class="b-col">
           <div class="b-label">Mekoya Balance</div>
-          <div class="b-value small">100.00 ETB</div>
+          <div class="b-value small"><span class="b-amt">100.00<small class="b-unit">ETB</small></span></div>
         </div>
         <div class="b-col" style="flex:0 0 86px">
           <div class="b-label">Commission</div>
-          <div class="b-value small">0.00 ETB</div>
+          <div class="b-value small"><span class="b-amt">0.00<small class="b-unit">ETB</small></span></div>
         </div>
       </div>
     </div>
@@ -511,12 +514,12 @@ body.sheet-open .phone-scroll{overflow:hidden}
       <div class="b-grid">
         <div class="b-col">
           <div class="b-label">Printing Account Balance</div>
-          <div class="b-value">2,605.00 ETB</div>
+          <div class="b-value"><span class="b-amt">2,605.00<small class="b-unit">ETB</small></span></div>
         </div>
         <div class="b-col" style="flex:0 0 86px">
           <div class="b-label">Loyalty Points</div>
           <div class="b-value small reward" onclick="window.location.href='8.html'" role="link" tabindex="0" onkeydown="if(event.key==='Enter')window.location.href='8.html'">
-            <span>20 Point</span>
+            <span class="b-amt">20<small class="b-unit">Point</small></span>
             <svg class="chev" viewBox="0 0 10 16" fill="none" stroke="#2b2b2b" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M2 2l6 6-6 6"/></svg>
           </div>
         </div>
@@ -527,11 +530,11 @@ body.sheet-open .phone-scroll{overflow:hidden}
       <div class="b-grid">
         <div class="b-col">
           <div class="b-label">Mekoya Balance</div>
-          <div class="b-value small">100.00 ETB</div>
+          <div class="b-value small"><span class="b-amt">100.00<small class="b-unit">ETB</small></span></div>
         </div>
         <div class="b-col" style="flex:0 0 86px">
           <div class="b-label">Commission</div>
-          <div class="b-value small">0.00 ETB</div>
+          <div class="b-value small"><span class="b-amt">0.00<small class="b-unit">ETB</small></span></div>
         </div>
       </div>
     </div>
