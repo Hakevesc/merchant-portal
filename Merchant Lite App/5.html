@@ -294,6 +294,17 @@
     border-radius:3px;
     background:#1a1a1a;
   }
+
+  /* On a real phone the app fills the screen: no gradient backdrop, no
+     frame, no shadow. Wider screens keep the 390 x 844 phone preview. */
+  @media (max-width:500px){
+    html{background:#fff;display:block;min-height:0}
+    body{
+      width:100%;max-width:none;
+      height:100vh;height:100dvh;max-height:none;
+      margin:0;box-shadow:none;border-radius:0;
+    }
+  }
 </style>
 </head>
 <body>
