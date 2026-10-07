@@ -867,6 +867,13 @@ button.lp-kpi:hover { border-color: #cbd5e1; transform: translateY(-2px); box-sh
 .lp-btn-more:hover { background: #f8fafc; border-color: #cbd5e1; color: #1e293b; }
 .lp-btn-more.open { background: #f1f5f9; border-color: #cbd5e1; color: #1e293b; }
 .lp-btn-more [data-lucide] { width: 16px; height: 16px; }
+/* A step is waiting on the signed-in user behind this menu. */
+.lp-btn-more.has-task { position: relative; border-color: #9fd8b5; color: #1b7341; }
+.lp-btn-more.has-task::after {
+  content: ''; position: absolute; top: -3px; right: -3px;
+  width: 9px; height: 9px; border-radius: 50%;
+  background: #f59e0b; border: 2px solid #ffffff;
+}
 
 /* ══ OVERFLOW MENU ══════════════════════════════════════
    Fixed to the viewport and parked on <body> for the same reason as the

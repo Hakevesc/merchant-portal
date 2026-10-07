@@ -24,6 +24,17 @@
       font-size: 0.8rem; font-weight: 600; color: #1d4ed8;
     }
     .fl-scope-note [data-lucide] { width: 15px; height: 15px; flex-shrink: 0; }
+    #flTable.fl-ids-hidden .col-id { display: none; }
+    #flTable:not(.fl-ids-hidden) .fl-id-show { display: none; }
+    .fl-th-toggle { display: inline-flex; align-items: center; gap: 8px; }
+    .fl-id-toggle {
+      width: 20px; height: 20px; border-radius: 6px; padding: 0;
+      display: inline-flex; align-items: center; justify-content: center;
+      background: #ffffff; border: 1px solid #cbd5e1; color: #475569; cursor: pointer;
+    }
+    .fl-id-toggle:hover { border-color: #239150; color: #1b7341; background: #f0faf4; }
+    .fl-id-toggle [data-lucide] { width: 13px; height: 13px; stroke-width: 2.6; }
+    .fl-geo { font-weight: 600; color: #334155; white-space: nowrap; }
     .fl-by-rsm { color: #b45309; font-weight: 700; font-family: 'Barlow', sans-serif; }
     .fl-demo-code {
       text-align: center; font-size: 0.72rem; font-weight: 600; color: #94a3b8; margin-top: 14px;
@@ -97,9 +108,13 @@
         <div class="lp-chips" id="flChips"></div>
 
         <div class="table-responsive">
-          <table class="premium-table">
+          <table class="premium-table fl-ids-hidden" id="flTable">
             <thead><tr>
-              <th>Reward ID</th><th>Merchant</th><th>Reward / Item</th>
+              <th class="col-id"><span class="fl-th-toggle">
+                <button class="fl-id-toggle" onclick="toggleIdColumn()" data-tip="Hide Reward ID" aria-label="Hide Reward ID column"><i data-lucide="minus"></i></button>Reward ID</span></th>
+              <th><span class="fl-th-toggle">
+                <button class="fl-id-toggle fl-id-show" onclick="toggleIdColumn()" data-tip="Show Reward ID" aria-label="Show Reward ID column"><i data-lucide="plus"></i></button>Merchant</span></th>
+              <th>Region</th><th>Cluster</th><th>Reward / Item</th>
               <th>Assigned RSM</th><th>Assigned TDR</th>
               <th>Status</th><th class="text-right">Action</th>
             </tr></thead>
@@ -609,7 +624,7 @@
         ['allocated',  'Allocated',        'package',        'Ready for dispatch', 'tone-blue',   '#3b82f6'],
         ['dispatched', 'Dispatched',       'truck',          'On the way',         'tone-violet', '#8b5cf6'],
         ['received',   'Received',         'package-check',  'At merchant',        'tone-cyan',   '#06b6d4'],
-        ['pending',    'Pending Handover', 'hand-coins',     'Requires action',    'tone-amber',  '#fbbf24'],
+        ['pending',    'Pending',          'hand-coins',     'Awaiting handover',  'tone-amber',  '#fbbf24'],
         ['fulfilled',  'Fulfilled',        'check-circle',   'Completed',          'tone-green',  '#22a55b'],
         ['exception',  'Exception',        'alert-triangle', 'Review required',    'tone-red',    '#f43f5e']
       ];
@@ -767,8 +782,9 @@
           if (!inv || inv.category !== type) return false;
         }
         if (q) {
-          var hay = [r.id, r.shortCode, LP.merchantName(r.shortCode), r.item, r.redemptionRef,
-                     LP.rsmName(r.rsm), LP.tdrName(r.tdr)]
+          var mc = LP.merchant(r.shortCode) || {};
+          var hay = [r.id, r.shortCode, LP.merchantName(r.shortCode), mc.region, mc.cluster,
+                     r.item, r.redemptionRef, LP.rsmName(r.rsm), LP.tdrName(r.tdr)]
             .join(' ').toLowerCase();
           if (hay.indexOf(q) === -1) return false;
         }
@@ -795,10 +811,13 @@
         empty.style.display = 'none';
         tbody.innerHTML = slice.map(function (r) {
           var inv = LP.inventoryItem(r.rewardItemId);
+          var m = LP.merchant(r.shortCode);
           return '<tr class="fade-in-row clickable" onclick="openDetail(\'' + r.id + '\')">' +
-            '<td>' + cell(null, r.id, r.redemptionRef, 'mono') + '</td>' +
+            '<td class="col-id">' + cell(null, r.id, r.redemptionRef, 'mono') + '</td>' +
             '<td>' + cell(tile(merchantIcon(r.shortCode)),
                           LP.merchantName(r.shortCode), r.shortCode) + '</td>' +
+            '<td class="fl-geo">' + LP.esc(LP.dash(m && m.region)) + '</td>' +
+            '<td class="fl-geo">' + LP.esc(LP.dash(m && m.cluster)) + '</td>' +
             '<td>' + cell(tile(rewardIcon(r.item), 'green'),
                           r.item, inv ? inv.category : '\u2014') + '</td>' +
             '<td>' + person(LP.rsm(r.rsm), r.rsm) + '</td>' +
@@ -915,28 +934,30 @@
       return isRsmHandover(r) ? LP.rsmName(r.handoverBy) + ' — RSM' : LP.tdrName(r.handoverBy) + ' — TDR';
     }
 
+    /* Every action sits behind the ⋯ so the table has room for Region and
+       Cluster. A dot on the button marks rows with a step waiting on the
+       signed-in user, so the column can still be read down for work. */
     function rowActions(r) {
-      var acts = actionsFor(r);
-      var lead = acts[0];
-      /* With nothing to do but look, the button should not read as a call to
-         action — it goes quiet rather than solid. */
-      var quiet = (lead.label === 'View Details');
-      var html = '<button class="lp-btn-primary ' + (quiet ? 'quiet' : lead.tone) + '" ' +
-                   'onclick="' + lead.onclick + '">' +
-                   '<i data-lucide="' + lead.icon + '"></i>' +
-                   (quiet ? 'View' : LP.esc(lead.label)) +
-                 '</button>';
-      if (acts.length > 1)
-        html += '<button class="lp-btn-more" onclick="openRowMenu(this, \'' + r.id + '\')" ' +
-                  'data-tip="More actions" aria-label="More actions">' +
-                  '<i data-lucide="more-horizontal"></i></button>';
-      return '<div class="lp-act">' + html + '</div>';
+      var lead = actionsFor(r)[0];
+      var waiting = ['Dispatch', 'Confirm Receipt', 'Start Handover', 'Enter OTP'].indexOf(lead.label) !== -1;
+      return '<div class="lp-act">' +
+               '<button class="lp-btn-more' + (waiting ? ' has-task' : '') + '" ' +
+                 'onclick="openRowMenu(this, \'' + r.id + '\')" ' +
+                 'data-tip="' + (waiting ? LP.esc(lead.label) : 'Actions') + '" aria-label="Actions">' +
+                 '<i data-lucide="more-horizontal"></i></button>' +
+             '</div>';
+    }
+
+    /* Reward ID is for looking a record up, not for scanning the table, so
+       it starts hidden; the + beside Merchant brings it back on the left. */
+    function toggleIdColumn() {
+      document.getElementById('flTable').classList.toggle('fl-ids-hidden');
     }
 
     function openRowMenu(anchor, id) {
       var r = LP.record(id);
       if (!r) return;
-      var rest = actionsFor(r).slice(1);
+      var rest = actionsFor(r);
       /* Keep the destructive one away from the pointer's resting place. */
       var last = rest[rest.length - 1];
       if (last && last.tone === 'danger') rest.splice(rest.length - 1, 0, null);

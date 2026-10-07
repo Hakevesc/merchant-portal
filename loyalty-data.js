@@ -211,13 +211,13 @@
     { key: 'allocated',  label: 'Allocated' },
     { key: 'dispatched', label: 'Dispatched' },
     { key: 'received',   label: 'Received' },
-    { key: 'pending',    label: 'Pending Handover' },
+    { key: 'pending',    label: 'Pending' },
     { key: 'fulfilled',  label: 'Fulfilled' }
   ];
 
   var STATUS_LABELS = {
     available: 'Available', allocated: 'Allocated', dispatched: 'Dispatched',
-    received: 'Received', pending: 'Pending Handover', fulfilled: 'Fulfilled',
+    received: 'Received', pending: 'Pending', fulfilled: 'Fulfilled',
     exception: 'Exception', cancelled: 'Cancelled'
   };
 
@@ -488,7 +488,7 @@
       case 'fulfilled': return { status: 'Claimed', date: (ful.handoverAt || '').split(' ')[0] || null };
       case 'exception': return { status: 'Exception', date: null };
       case 'cancelled': return { status: 'Cancelled', date: null };
-      default:          return { status: 'Pending Handover', date: null };
+      default:          return { status: 'Pending', date: null };
     }
   }
 
