@@ -104,8 +104,8 @@
 
   .points-star {
     position: relative;
-    width: 46px;
-    height: 46px;
+    width: 34px;
+    height: 34px;
     flex-shrink: 0;
     border-radius: 50%;
     background: rgba(255,255,255,0.20);
@@ -114,7 +114,7 @@
     justify-content: center;
   }
 
-  .points-star svg { width: 23px; height: 23px; fill: #fff; }
+  .points-star svg { width: 17px; height: 17px; fill: #fff; }
 
   .points-body { position: relative; flex: 1; min-width: 0; }
 
@@ -156,18 +156,10 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
+    /* Same voice as "Available to redeem" on the left. */
     font-size: 11px;
-    font-weight: 700;
-    color: #fff;
-    letter-spacing: .4px;
-    text-transform: uppercase;
-    font-family: 'Switzer', 'Inter', sans-serif;
-  }
-
-  .pe-cal-icon {
-    width: 20px;
-    height: 20px;
-    flex-shrink: 0;
+    font-weight: 400;
+    color: rgba(255,255,255,0.80);
   }
 
   .pe-count {
@@ -413,16 +405,7 @@
   </div>
   <div class="points-expiry">
     <div class="pe-label">
-      <svg class="pe-cal-icon" viewBox="0 0 24 24" fill="none">
-        <path d="M7 2.2v3M17 2.2v3" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/>
-        <path d="M3.5 8h17" stroke="#fff" stroke-width="1.8"/>
-        <rect x="3.5" y="4" width="17" height="16.5" rx="3.5" stroke="#fff" stroke-width="2.2"/>
-        <circle cx="7.5" cy="12.5" r="1.1" fill="#fff"/>
-        <circle cx="7.5" cy="16" r="1.1" fill="#fff"/>
-        <circle cx="16" cy="15.5" r="4.2" fill="#a81520" stroke="#fff" stroke-width="2"/>
-        <path d="M16 13.4v2.1l1.5.9" stroke="#fff" stroke-width="1.7" stroke-linecap="round"/>
-      </svg>
-      <span>REDEMPTION OPENS</span>
+      <span>Redemption opens</span>
     </div>
     <div class="pe-count" id="expiryCount">6d 23h 59m</div>
     <div class="pe-pill">
