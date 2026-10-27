@@ -60,7 +60,8 @@
     '<div class="result-title">' + (on ? 'Cash sweep activated successfully!' : 'Cash sweep saved — automatic sweep is off') + '</div>' +
     '<div class="sum-av">' + CM.MERCHANT.initials + '</div>' +
     item('Allocation type', c.type === 'fixed' ? 'Fixed amount' : 'Percentage') +
-    '<div class="sum-item"><div class="grow"><div class="k">Bank accounts</div>' + alloc + '</div></div>' +
+    '<div class="sum-item sum-banks"><div class="grow"><div class="k">Bank accounts</div>' +
+      '<div class="bank-lines">' + alloc + '</div></div></div>' +
     item('Frequency', CM.freqLabel(c).toUpperCase()) +
     item('Sweep time', CM.time12(c.time)) +
     item('Start date', CM.dateLabel(c.start).toUpperCase()) +

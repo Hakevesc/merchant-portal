@@ -69,8 +69,9 @@
     '<div class="sum-av">' + CM.MERCHANT.initials + '</div>' +
     '<div class="sum-name">' + CM.MERCHANT.name + ' · ' + CM.MERCHANT.shortCode + '</div>' +
     item('Allocation type', d.type === 'fixed' ? 'Fixed amount' : 'Percentage', 'cm-allocation.html') +
-    '<div class="sum-item"><div class="grow"><div class="k">Bank accounts</div>' + alloc + '</div>' +
-      '<a class="edit-btn" href="cm-allocation.html" aria-label="Edit bank accounts" style="align-self:flex-start">' + I.edit + '</a></div>' +
+    '<div class="sum-item sum-banks"><div class="grow"><div class="sum-banks-head"><div class="k">Bank accounts</div>' +
+      '<a class="edit-btn" href="cm-allocation.html" aria-label="Edit bank accounts">' + I.edit + '</a></div>' +
+      '<div class="bank-lines">' + alloc + '</div></div></div>' +
     item('Frequency', CM.freqLabel(d).toUpperCase(), 'cm-schedule.html') +
     item('Sweep time', CM.time12(d.time), 'cm-schedule.html') +
     item('Start date', CM.dateLabel(d.start).toUpperCase(), 'cm-schedule.html') +

@@ -6,7 +6,7 @@
 <title>Sweep History</title>
 <link rel="stylesheet" href="cm.css">
 <style>
-  .filters{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin:16px -16px 12px;padding:0 16px 2px}
+  .filters{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin:2px -16px 4px;padding:0 16px 2px}
   .filters::-webkit-scrollbar{display:none}
   .filters button{
     flex-shrink:0;height:34px;padding:0 15px;border-radius:17px;border:none;cursor:pointer;
@@ -24,7 +24,6 @@
     <h1>Sweep History</h1>
   </div>
   <div class="page-simple" style="padding-bottom:40px">
-    <div class="bal" id="stats"></div>
     <div class="filters" id="filters"></div>
     <div id="list"></div>
   </div>
@@ -34,19 +33,11 @@
 <script src="cm.js"></script>
 <script>
 (function () {
-  var I = CM.ICON, S = CM.state, c = S.config;
+  var I = CM.ICON, S = CM.state;
   document.getElementById('backBtn').innerHTML = I.back;
 
-  var total = 0, failed = 0, runs = 0;
-  S.history.forEach(function (b) {
-    var t = CM.batchTotals(b); total += t.ok; failed += t.bad; if (b.status !== 'cancelled') runs++;
-  });
-  document.getElementById('stats').innerHTML =
-    '<div class="bal-label">Transferred this month</div>' +
-    '<div class="bal-big">' + CM.money(total) + '<span class="cur">ETB</span></div>' +
-    '<div class="bal-foot">' + I.swap + '<div><div class="k">' + runs + ' sweeps run</div>' +
-      '<div class="v">' + CM.money(failed) + ' ETB failed</div></div></div>';
-
+  /* PRD Screen 6: one row per sweep — date, amounts and overall status —
+     with status tabs to narrow the list. */
   var FILTERS = [['all', 'All'], ['successful', 'Successful'], ['partial', 'Partial'], ['failed', 'Failed'], ['cancelled', 'Cancelled']];
   var active = 'all';
   document.getElementById('filters').innerHTML = FILTERS.map(function (f) {
@@ -56,20 +47,12 @@
 
   function render() {
     document.querySelectorAll('[data-f]').forEach(function (b) { b.classList.toggle('on', b.dataset.f === active); });
-    var html = '';
-    if (active === 'all' && c && c.enabled) {
-      html += '<div class="group">UPCOMING</div><div class="hist"><a class="tile" href="cm-sweep.html?next=1">' +
-        '<span class="tile-ico info" style="background:#e8f1fd">' + I.clock.replace('<svg', '<svg style="stroke:#1d4ed8"') + '</span>' +
-        '<div class="tile-main"><div class="tile-title">' + CM.runLabel(CM.nextRun(c)) + '</div>' +
-        '<div class="tile-sub">' + CM.freqLabel(c) + '</div></div>' + CM.pill('scheduled') + I.chev + '</a></div>';
-    }
     var rows = S.history.filter(function (b) { return active === 'all' || b.status === active; });
-    html += rows.length
+    document.getElementById('list').innerHTML = rows.length
       ? '<div class="group">OCTOBER 2026</div><div class="hist">' + rows.map(function (b) {
           return '<a class="tile" href="cm-sweep.html?ref=' + b.ref + '">' + CM.sweepRow(b) + '</a>';
         }).join('') + '</div>'
       : '<div class="empty-list">No sweeps with this status.</div>';
-    document.getElementById('list').innerHTML = html;
   }
   render();
 })();

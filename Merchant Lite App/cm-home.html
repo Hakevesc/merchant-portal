@@ -89,9 +89,13 @@
   document.getElementById('bankTile').innerHTML = '<span class="tile-ico">' + I.bank + '</span>' +
     '<div class="tile-main"><div class="tile-title">Bank Accounts</div>' +
       '<div class="tile-sub">' + active.length + ' linked account' + (active.length === 1 ? '' : 's') + '</div>' +
-      '<div class="banks">' + active.slice(0, 3).map(function (b) {
-        return '<div title="' + CM.esc(b.bank) + '">' + CM.bankAv(b, true) + '<span>' + CM.mask(b.acct) + '</span></div>';
-      }).join('') + '</div></div>' + I.chev;
+      /* Overlapping logos, up to four; past that the fourth becomes +N. */
+      '<div class="logo-stack">' + (function () {
+        var show = active.length > 4 ? active.slice(0, 3) : active;
+        return show.map(function (b) {
+          return '<span title="' + CM.esc(b.bank) + '">' + CM.bankAv(b, true) + '</span>';
+        }).join('') + (active.length > 4 ? '<span class="more">+' + (active.length - 3) + '</span>' : '');
+      })() + '</div></div>' + I.chev;
 
   /* ---- Five latest sweeps ---- */
   document.getElementById('hist').innerHTML = S.history.slice(0, 5).map(function (b) {

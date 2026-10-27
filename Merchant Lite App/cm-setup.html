@@ -6,9 +6,14 @@
 <title>Cash Sweep</title>
 <link rel="stylesheet" href="cm.css">
 <style>
-  .alloc-mini{margin-top:8px}
-  .alloc-mini .alloc-line{margin-top:7px}
+  #allocTile .alloc-line .nm{font-size:12.5px}
+  #allocTile .alloc-line .amt .cur{font-size:.62em}
   .footer .btn{height:48px}
+  .tile .edit-btn{flex-shrink:0;align-self:center}
+  #allocTile{flex-direction:column;align-items:stretch;gap:0}
+  .alloc-head{display:flex;align-items:center;gap:14px}
+  #allocTile .bank-lines{margin:12px 0 -4px;padding-top:4px;border-top:1px solid var(--line)}
+  #allocTile .bank-lines .alloc-line::before{left:0}
 </style>
 </head>
 <body>
@@ -52,24 +57,30 @@
       (on ? CM.runLabel(CM.nextRun(c)) : 'Not scheduled') + '</div></div>' +
       '<span class="bal-pill">' + (on ? 'Active' : 'Paused') + '</span></div>';
 
+  /* Both tiles open their step of the set-up flow, so they carry an edit
+     pencil rather than a navigation arrow. */
+  var EDIT = '<span class="edit-btn" aria-hidden="true">' + I.edit + '</span>';
+
   /* Schedule edits reuse the same draft as the full set-up flow. */
   var st = document.getElementById('schedTile');
   st.onclick = function () { CM.startDraft(); };
   st.innerHTML = '<span class="tile-ico">' + I.clock + '</span>' +
     '<div class="tile-main"><div class="tile-title">Schedule</div>' +
-      '<div class="tile-sub">' + CM.freqLabel(c) + ' • ' + CM.time12(c.time) + '</div>' +
-      '<div class="tile-sub">Start: ' + CM.dateLabel(c.start) + '</div></div>' + I.chev;
+      '<div class="tile-sub">' + CM.freqLabel(c) + ' • ' + CM.time12(c.time) + ' • Start: ' + CM.dateLabel(c.start) + '</div></div>' + EDIT;
 
   var rows = CM.split(c, CM.WORKING_BALANCE).filter(function (r) { return !r.unallocated; });
-  document.getElementById('allocTile').innerHTML = '<span class="tile-ico">' + I.sliders + '</span>' +
-    '<div class="tile-main"><div class="tile-title">Allocation</div>' +
-      '<div class="tile-sub">' + (c.type === 'fixed' ? 'Fixed amount' : 'Percentage') + '</div>' +
-      '<div class="alloc-mini">' + rows.map(function (r) {
+  /* Header row (icon, title, pencil), a full-width divider, then the
+     accounts starting from the left edge in line with the icon. */
+  document.getElementById('allocTile').innerHTML =
+    '<div class="alloc-head"><span class="tile-ico">' + I.sliders + '</span>' +
+      '<div class="tile-main"><div class="tile-title">Allocation</div>' +
+      '<div class="tile-sub">' + (c.type === 'fixed' ? 'Fixed amount' : 'Percentage') + '</div></div>' + EDIT + '</div>' +
+    '<div class="bank-lines">' + rows.map(function (r) {
         var b = CM.bank(r.id);
         return '<div class="alloc-line">' + CM.bankAv(b, true) +
           '<div class="nm">' + CM.esc(b.short) + ' ' + CM.mask(b.acct) + (r.primary ? '<span class="tag">PRIMARY</span>' : '') + '</div>' +
-          '<div class="amt">' + (r.primary ? 'Remainder' : c.type === 'fixed' ? CM.money(r.value) : r.value + '%') + '</div></div>';
-      }).join('') + '</div></div>' + I.chev;
+          '<div class="amt">' + (r.primary ? 'Remainder' : c.type === 'fixed' ? CM.money(r.value) + '<span class="cur">ETB</span>' : r.value + '%') + '</div></div>';
+      }).join('') + '</div>';
 
   document.getElementById('refTile').innerHTML = '<span class="tile-ico">' + I.info + '</span>' +
     '<div class="tile-main"><div class="tile-title">' + c.ref + '</div>' +
