@@ -9,6 +9,9 @@
   #allocTile .alloc-line .nm{font-size:12.5px}
   #allocTile .alloc-line .amt .cur{font-size:.62em}
   .footer .btn{height:48px}
+  #statusCard{padding:16px 18px}
+  #statusCard .bal-foot{border-top:none;padding-top:0}
+  #statusCard .bal-foot .v{font-size:15px}
   .tile .edit-btn{flex-shrink:0;align-self:center}
   #allocTile{flex-direction:column;align-items:stretch;gap:0}
   .alloc-head{display:flex;align-items:center;gap:14px}
@@ -36,7 +39,7 @@
 
 <div class="footer">
   <div class="btn-row">
-    <a class="btn btn-ghost" href="cm-allocation.html?edit=1" id="editBtn"></a>
+    <a class="btn btn-ghost" href="cm-schedule.html?edit=1" id="editBtn"></a>
     <button class="btn" id="toggleBtn"></button>
   </div>
 </div>
@@ -47,15 +50,14 @@
 (function () {
   var I = CM.ICON, c = CM.state.config;
   document.getElementById('backBtn').innerHTML = I.back;
-  if (!c) { location.replace('cm-allocation.html?edit=1'); return; }
+  if (!c) { location.replace('cm-schedule.html?edit=1'); return; }
   var on = c.enabled !== false;
 
+  /* Just the next run and the state — the card no longer repeats a title. */
   document.getElementById('statusCard').innerHTML =
-    '<div class="bal-label">Automated Cash Sweep</div>' +
-    '<div class="bal-big">' + (on ? 'Running' : 'Paused') + '</div>' +
     '<div class="bal-foot">' + I.clock + '<div><div class="k">Next Cash Sweep</div><div class="v">' +
       (on ? CM.runLabel(CM.nextRun(c)) : 'Not scheduled') + '</div></div>' +
-      '<span class="bal-pill">' + (on ? 'Active' : 'Paused') + '</span></div>';
+      '<span class="bal-pill">' + (on ? 'Running' : 'Paused') + '</span></div>';
 
   /* Both tiles open their step of the set-up flow, so they carry an edit
      pencil rather than a navigation arrow. */
@@ -65,7 +67,7 @@
   var st = document.getElementById('schedTile');
   st.onclick = function () { CM.startDraft(); };
   st.innerHTML = '<span class="tile-ico">' + I.clock + '</span>' +
-    '<div class="tile-main"><div class="tile-title">Schedule</div>' +
+    '<div class="tile-main"><div class="tile-title">Sweep Schedule</div>' +
       '<div class="tile-sub">' + CM.freqLabel(c) + ' • ' + CM.time12(c.time) + ' • Start: ' + CM.dateLabel(c.start) + '</div></div>' + EDIT;
 
   var rows = CM.split(c, CM.WORKING_BALANCE).filter(function (r) { return !r.unallocated; });

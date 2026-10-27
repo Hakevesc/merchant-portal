@@ -20,6 +20,7 @@
   <div class="page">
     <div class="watermark"></div>
     <div class="sum-card" id="summary"></div>
+    <div class="sum-card banks-card" id="banksCard"></div>
   </div>
 </div>
 
@@ -55,13 +56,15 @@
   }).join('');
 
   var on = c.enabled !== false;
+  document.getElementById('banksCard').innerHTML =
+    '<div class="sum-banks-head"><div class="k">Bank accounts</div></div>' +
+    '<div class="bank-lines">' + alloc + '</div>';
+
   document.getElementById('summary').innerHTML =
     '<div class="result-ico">' + I.check + '</div>' +
     '<div class="result-title">' + (on ? 'Cash sweep activated successfully!' : 'Cash sweep saved — automatic sweep is off') + '</div>' +
     '<div class="sum-av">' + CM.MERCHANT.initials + '</div>' +
     item('Allocation type', c.type === 'fixed' ? 'Fixed amount' : 'Percentage') +
-    '<div class="sum-item sum-banks"><div class="grow"><div class="k">Bank accounts</div>' +
-      '<div class="bank-lines">' + alloc + '</div></div></div>' +
     item('Frequency', CM.freqLabel(c).toUpperCase()) +
     item('Sweep time', CM.time12(c.time)) +
     item('Start date', CM.dateLabel(c.start).toUpperCase()) +

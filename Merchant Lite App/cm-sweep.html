@@ -84,7 +84,7 @@
       kv('Sweep reference', b.ref + '<button class="copy-btn" data-copy="' + b.ref + '" aria-label="Copy sweep reference">' + I.copy + '</button>');
 
   document.getElementById('actions').innerHTML = upcoming
-    ? '<a class="btn btn-ghost" href="cm-allocation.html?edit=1">' + I.sliders + 'Edit setup</a><a class="btn btn-primary" href="cm-home.html">Done</a>'
+    ? '<a class="btn btn-ghost" href="cm-schedule.html?edit=1">' + I.sliders + 'Edit setup</a><a class="btn btn-primary" href="cm-home.html">Done</a>'
     : '<button class="btn btn-primary" id="dl">' + I.download + 'Download</button><button class="btn btn-ghost" id="sh">' + I.share + 'Share</button>';
   var dl = document.getElementById('dl'), sh = document.getElementById('sh');
   if (dl) dl.onclick = function () { CM.toast('Sweep receipt saved to your downloads.'); };

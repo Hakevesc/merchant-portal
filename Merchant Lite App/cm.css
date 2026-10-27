@@ -351,7 +351,7 @@ body.sheet-open .sheet-backdrop{opacity:1;pointer-events:auto}
     box-shadow:0 10px 22px rgba(168,21,32,.28);
   }
   .bal-label{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:500;color:rgba(255,255,255,.9)}
-  .bal-amt{font-size:30px;font-weight:800;letter-spacing:-.8px;margin:4px 0 16px;position:relative;z-index:1}
+  .bal-amt{font-size:30px;font-weight:700;letter-spacing:-.4px;margin:4px 0 16px;position:relative;z-index:1}
   .bal-amt .cur{font-size:.52em}
   .bal-foot{
     position:relative;z-index:1;display:flex;align-items:center;gap:10px;
@@ -429,7 +429,7 @@ body.sheet-open .sheet-backdrop{opacity:1;pointer-events:auto}
 .kv-list .kv b{font-weight:700;text-align:right;display:flex;align-items:center;gap:8px}
 .kv-list .copy-btn{width:28px;height:28px;margin:-4px 0}
 .reason{font-size:11px;color:var(--red-d);margin-top:3px;line-height:1.4}
-.bal-big{font-size:28px;font-weight:800;letter-spacing:-.7px;margin:4px 0 14px;position:relative;z-index:1}
+.bal-big{font-size:28px;font-weight:700;letter-spacing:-.4px;margin:4px 0 14px;position:relative;z-index:1}
 .bal-big .cur{font-size:.52em}
 
 /* Overlapping bank logos on the Bank Accounts tile. */
@@ -441,3 +441,44 @@ body.sheet-open .sheet-backdrop{opacity:1;pointer-events:auto}
   width:30px;height:30px;align-items:center;justify-content:center;
   background:#eef0f3;color:var(--ink-2);font-size:10.5px;font-weight:800;
 }
+
+/* Bank accounts as their own card below a summary. */
+.sum-card.banks-card{margin-top:12px;padding:14px 18px 10px}
+.banks-card .sum-banks-head{min-height:34px}
+.banks-card .k{font-size:10.5px;font-weight:600;color:var(--muted);letter-spacing:.5px;text-transform:uppercase}
+
+/* ---------- Prototype flow switcher (desktop only, beside the phone) ---------- */
+.demo-panel{
+  position:fixed;left:28px;top:50%;transform:translateY(-50%);z-index:1000;width:230px;
+  padding:16px;border-radius:18px;background:rgba(255,255,255,.96);
+  box-shadow:0 18px 40px rgba(0,0,0,.25);font-family:'Switzer','Inter',sans-serif;
+}
+.dp-title{font-size:11px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:#6b7280;margin-bottom:10px}
+.dp-flow{
+  display:flex;align-items:center;gap:10px;width:100%;text-align:left;cursor:pointer;
+  padding:11px 12px;margin-top:8px;border-radius:12px;background:#f3f4f6;border:1.5px solid transparent;
+}
+.dp-flow.on{background:#fff;border-color:#1fa856}
+.dp-num{
+  width:26px;height:26px;flex-shrink:0;border-radius:50%;background:#e5e7eb;color:#374151;
+  display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;
+}
+.dp-flow.on .dp-num{background:#1fa856;color:#fff}
+.dp-flow b{display:block;font-size:13px;font-weight:800;color:#16181d}
+.dp-flow small{display:block;font-size:11px;color:#6b7280;margin-top:1px}
+.dp-note{font-size:10.5px;color:#9aa0a6;margin-top:12px;line-height:1.4}
+@media (max-width:900px){ .demo-panel{display:none} }
+
+/* Bank logo in a white circle. */
+.bank-av.logo{background:#fff;box-shadow:inset 0 0 0 1px #e5e7eb}
+.bank-av.logo img{width:64%;height:64%;object-fit:contain;display:block}
+
+/* Empty sweep history. */
+.empty-state{text-align:center;padding:26px 24px 24px}
+.es-ico{
+  width:60px;height:60px;margin:0 auto 14px;border-radius:50%;background:#eef1f4;
+  display:flex;align-items:center;justify-content:center;
+}
+.es-ico svg{width:26px;height:26px;stroke:#4b5563;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.es-title{font-size:16px;font-weight:800;color:var(--ink)}
+.es-text{font-size:12.5px;color:var(--muted);line-height:1.5;margin-top:6px;max-width:250px;margin-left:auto;margin-right:auto}

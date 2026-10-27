@@ -6,6 +6,13 @@
 <title>Sweep Schedule</title>
 <link rel="stylesheet" href="cm.css">
 <style>
+  .wheel.wide{width:180px}
+  .md-grid{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:8px;
+    max-height:236px;overflow-y:auto;scrollbar-width:none;margin-bottom:18px;padding:2px;
+  }
+  .md-grid::-webkit-scrollbar{display:none}
+  .md-grid .day-chip{height:44px;font-size:14px}
   .start-opts{display:flex;gap:8px;margin-bottom:14px}
   .start-opts .day-chip{flex:1}
   #nextNote{margin-top:16px}
@@ -14,9 +21,9 @@
 <body>
 <div class="phone-scroll">
   <div class="header">
-    <button class="icon-btn" onclick="location.href='cm-allocation.html'" aria-label="Back" id="backBtn"></button>
+    <button class="icon-btn" onclick="location.href='cm-home.html'" aria-label="Close" id="backBtn"></button>
     <div class="header-title">SWEEP SCHEDULE</div>
-    <div class="step-dots"><i class="done"></i><i class="on"></i><i></i></div>
+    <div class="step-dots"><i class="on"></i><i></i><i></i></div>
   </div>
 
   <div class="page">
@@ -33,13 +40,6 @@
     <div class="field-label">Start date</div>
     <button class="field" id="dateBtn"><span class="val" id="dateVal"></span><span class="suffix" data-ico="cal"></span></button>
 
-    <div class="toggle-card">
-      <span class="opt-ico" data-ico="bolt"></span>
-      <div class="row-main"><div class="opt-title">Enable Automatic Sweep</div>
-        <div class="opt-sub">Turn off to save the setup without running it</div></div>
-      <label class="switch"><input type="checkbox" id="autoToggle"><span></span></label>
-    </div>
-
     <div id="nextNote"></div>
   </div>
 </div>
@@ -54,6 +54,18 @@
 <div class="sheet" id="freqSheet">
   <div class="sheet-title">Frequency</div>
   <div class="sheet-list" id="freqList"></div>
+</div>
+
+<!-- Day sheet (weekly / monthly) -->
+<div class="sheet" id="daySheet">
+  <div class="sheet-title" id="daySheetTitle">Sweep day</div>
+  <div class="wheels" id="dayWheelWrap"><div class="wheel wide" id="wDayPick"></div></div>
+  <!-- Monthly: First / Last day shortcuts, then the dates three per row. -->
+  <div id="mdPick" style="display:none">
+    <div class="start-opts"><button class="day-chip" data-md="1">First day</button><button class="day-chip" data-md="last">Last day</button></div>
+    <div class="md-grid" id="mdGrid"></div>
+  </div>
+  <button class="btn btn-primary" id="daySelect">Select</button>
 </div>
 
 <!-- Time sheet -->
@@ -78,48 +90,39 @@
 <script>
 (function () {
   var I = CM.ICON;
+  /* Step 1 of the set-up flow. Entering with ?edit=1 starts a fresh draft
+     from the live configuration (or a blank one the first time). */
+  if (/[?&]edit=1/.test(location.search)) { CM.startDraft(); history.replaceState(null, '', 'cm-schedule.html'); }
   var d = CM.getDraft();
-  document.getElementById('backBtn').innerHTML = I.back;
+  document.getElementById('backBtn').innerHTML = I.close;
   document.querySelectorAll('[data-ico]').forEach(function (el) { el.innerHTML = I[el.dataset.ico]; });
 
   var FREQS = [
-    ['daily', 'Daily', 'Every day at the sweep time', 'clock'],
-    ['weekly', 'Weekly', 'Once a week on the day you choose', 'cal'],
-    ['monthly', 'Monthly', 'Once a month on the date you choose', 'cal']
+    ['daily', 'Daily', 'clock'],
+    ['weekly', 'Weekly', 'cal'],
+    ['monthly', 'Monthly', 'cal']
   ];
 
   function render() {
     document.getElementById('freqVal').textContent = d.freq.toUpperCase();
 
+    /* Weekly and monthly pick their day from a bottom-sheet wheel, the same
+       as sweep time and start date. Days 29–31 are left out so a monthly
+       sweep runs every month; "Last day" covers month end. */
     var wrap = document.getElementById('dayWrap');
-    if (d.freq === 'weekly') {
-      wrap.innerHTML = '<div class="field-label">Sweep day</div><div class="day-chips">' +
-        [1, 2, 3, 4, 5, 6, 0].map(function (i) {
-          return '<button class="day-chip' + (d.weekday === i ? ' on' : '') + '" data-wd="' + i + '">' +
-            CM.WEEKDAYS[i].slice(0, 3) + '</button>';
-        }).join('') + '</div>';
-    } else if (d.freq === 'monthly') {
-      var days = [];
-      for (var i = 1; i <= 28; i++) days.push(i);
-      days.push('last');
-      wrap.innerHTML = '<div class="field-label">Day of the month</div><div class="day-chips">' +
-        days.map(function (n) {
-          return '<button class="day-chip' + (d.monthday === n ? ' on' : '') + '" data-md="' + n + '">' +
-            (n === 'last' ? 'Last day' : n) + '</button>';
-        }).join('') + '</div><div class="field-note">Days 29–31 are left out so the sweep runs every month; pick “Last day” for month end.</div>';
+    if (d.freq === 'weekly' || d.freq === 'monthly') {
+      var label = d.freq === 'weekly' ? 'Sweep day' : 'Day of the month';
+      var val = d.freq === 'weekly' ? CM.WEEKDAYS[d.weekday].toUpperCase()
+        : d.monthday === 'last' ? 'LAST DAY' : CM.ordinal(d.monthday).toUpperCase();
+      wrap.innerHTML = '<div class="field-label">' + label + '</div>' +
+        '<button class="field" id="dayBtn"><span class="val">' + val + '</span><span class="suffix">' + I.cal + '</span></button>';
+      document.getElementById('dayBtn').onclick = openDay;
     } else wrap.innerHTML = '';
-    wrap.querySelectorAll('[data-wd]').forEach(function (b) {
-      b.onclick = function () { d.weekday = +b.dataset.wd; save(); };
-    });
-    wrap.querySelectorAll('[data-md]').forEach(function (b) {
-      b.onclick = function () { d.monthday = b.dataset.md === 'last' ? 'last' : +b.dataset.md; save(); };
-    });
 
     var tv = document.getElementById('timeVal');
     tv.textContent = d.time ? CM.time12(d.time) : 'Choose time';
     tv.classList.toggle('placeholder', !d.time);
     document.getElementById('dateVal').textContent = CM.dateLabel(d.start);
-    document.getElementById('autoToggle').checked = d.enabled !== false;
 
     var note = document.getElementById('nextNote');
     if (!d.time) note.innerHTML = '<div class="notice">' + I.info + '<span>Choose a sweep time to see when the first sweep runs.</span></div>';
@@ -134,13 +137,47 @@
   document.getElementById('freqBtn').onclick = function () {
     document.getElementById('freqList').innerHTML = FREQS.map(function (f) {
       return '<button class="opt' + (d.freq === f[0] ? ' on' : '') + '" data-f="' + f[0] + '">' +
-        '<span class="opt-ico">' + I[f[3]] + '</span><span><span class="opt-title" style="display:block">' + f[1] +
-        '</span><span class="opt-sub" style="display:block">' + f[2] + '</span></span><span class="radio"></span></button>';
+        '<span class="opt-ico">' + I[f[2]] + '</span><span><span class="opt-title" style="display:block">' + f[1] +
+        '</span></span><span class="radio"></span></button>';
     }).join('');
     document.querySelectorAll('[data-f]').forEach(function (b) {
       b.onclick = function () { d.freq = b.dataset.f; CM.closeSheet(); save(); };
     });
     CM.openSheet('freqSheet');
+  };
+
+  /* ---- Day (weekly / monthly) ---- */
+  var wDayPick, mdChoice;
+  function markMd() {
+    document.querySelectorAll('#mdPick [data-md]').forEach(function (b) {
+      var v = b.dataset.md === 'last' ? 'last' : +b.dataset.md;
+      /* "First day" and the 1 in the grid are the same choice. */
+      b.classList.toggle('on', v === mdChoice);
+    });
+  }
+  function openDay() {
+    var weekly = d.freq === 'weekly';
+    document.getElementById('daySheetTitle').textContent = weekly ? 'Sweep day' : 'Day of the month';
+    document.getElementById('dayWheelWrap').style.display = weekly ? '' : 'none';
+    document.getElementById('mdPick').style.display = weekly ? 'none' : '';
+    CM.openSheet('daySheet');
+    if (weekly) {
+      var items = [1, 2, 3, 4, 5, 6, 0].map(function (i) { return { label: CM.WEEKDAYS[i], value: i }; });
+      wDayPick = CM.wheel(document.getElementById('wDayPick'), items, d.weekday);
+    } else {
+      mdChoice = d.monthday;
+      var g = '';
+      for (var i = 1; i <= 28; i++) g += '<button class="day-chip" data-md="' + i + '">' + i + '</button>';
+      document.getElementById('mdGrid').innerHTML = g;
+      document.querySelectorAll('#mdPick [data-md]').forEach(function (b) {
+        b.onclick = function () { mdChoice = b.dataset.md === 'last' ? 'last' : +b.dataset.md; markMd(); };
+      });
+      markMd();
+    }
+  }
+  document.getElementById('daySelect').onclick = function () {
+    if (d.freq === 'weekly') d.weekday = wDayPick.get(); else d.monthday = mdChoice;
+    CM.closeSheet(); save();
   };
 
   /* ---- Time ---- */
@@ -196,8 +233,7 @@
     CM.closeSheet(); save();
   };
 
-  document.getElementById('autoToggle').onchange = function (e) { d.enabled = e.target.checked; save(); };
-  document.getElementById('continueBtn').onclick = function () { CM.saveDraft(d); location.href = 'cm-review.html'; };
+  document.getElementById('continueBtn').onclick = function () { CM.saveDraft(d); location.href = 'cm-allocation.html'; };
 
   render();
 })();

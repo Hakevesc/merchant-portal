@@ -8,8 +8,8 @@
 var CM = (function () {
   'use strict';
 
-  var KEY = 'cm_state_v1';
-  var DRAFT_KEY = 'cm_draft_v1';
+  var KEY = 'cm_state_v3';
+  var DRAFT_KEY = 'cm_draft_v3';
 
   var MERCHANT = { name: 'London Cafe', initials: 'LC', shortCode: '344100' };
   /* Same figure the Home screen shows as the Working Account Balance. */
@@ -19,12 +19,12 @@ var CM = (function () {
   /* Accounts are added and validated by the M-PESA Onboarding team; the
      merchant can only use the validated ones. */
   var SEED_BANKS = [
-    { id: 'b1', bank: 'Commercial Bank of Ethiopia', short: 'CBE', color: '#6b2c91',
+    { id: 'b1', bank: 'CBE', short: 'CBE', color: '#6b2c91',
       acct: '1000244127788', holder: 'London Cafe PLC', status: 'active', validatedAt: '02 Sep 2026' },
     { id: 'b2', bank: 'Awash Bank', short: 'AB', color: '#f26b21',
       acct: '01320412447881', holder: 'London Cafe PLC', status: 'active', validatedAt: '02 Sep 2026' },
     { id: 'b3', bank: 'Dashen Bank', short: 'DB', color: '#1e4fa8',
-      acct: '5012339988201', holder: 'London Cafe PLC', status: 'pending', requestedAt: '24 Oct 2026' },
+      acct: '5012339988201', holder: 'London Cafe PLC', status: 'active', validatedAt: '24 Oct 2026' },
     { id: 'b4', bank: 'Bank of Abyssinia', short: 'BOA', color: '#c59a1c',
       acct: '22091877350', holder: 'London Cafe', status: 'failed',
       reason: 'Account holder name does not match the merchant profile.' }
@@ -256,8 +256,16 @@ var CM = (function () {
     var s = STATUS[status] || [status, 'idle'];
     return '<span class="chip ' + s[1] + '">' + s[0] + '</span>';
   }
+  /* Real bank logos (assets/banks); banks without one fall back to initials. */
+  var LOGO = {
+    'CBE': 'cbe-logo.png', 'Commercial Bank of Ethiopia': 'cbe-logo.png', 'Awash Bank': 'awass-bank.png', 'Dashen Bank': 'dashen-bank.png',
+    'Bank of Abyssinia': 'abyssinya-bank.png', 'Cooperative Bank of Oromia': 'coop-bank.png', 'Wegagen Bank': 'wegagen-bank.png',
+    'Hibret Bank': 'Hibret-bank.png', 'Nib International Bank': 'nib-bank.png', 'Zemen Bank': 'zemen-bank.png',
+    'Amhara Bank': 'amhara-bank.png', 'Oromia International Bank': 'oromia-i-bank.png'
+  };
   function bankAv(b, small) {
     if (!b) return '<span class="bank-av' + (small ? ' sm' : '') + '" style="background:#9aa0a6">?</span>';
+    if (LOGO[b.bank]) return '<span class="bank-av logo' + (small ? ' sm' : '') + '"><img src="assets/banks/' + LOGO[b.bank] + '" alt="' + esc(b.bank) + '"></span>';
     return '<span class="bank-av' + (small ? ' sm' : '') + '" style="background:' + b.color + '">' + esc(b.short) + '</span>';
   }
 
@@ -276,6 +284,11 @@ var CM = (function () {
     var label = (!full && PILL_LABEL[status]) || (STATUS[status] ? STATUS[status][0] : status);
     if (status === 'invalid') label = 'Invalid';
     return '<span class="st ' + p[0] + '">' + ICON[p[1]] + label + '</span>';
+  }
+  function emptySweeps(title, text) {
+    return '<div class="empty-state"><span class="es-ico">' + ICON.swap + '</span>' +
+      '<div class="es-title">' + (title || 'No sweep activity yet') + '</div>' +
+      '<div class="es-text">' + (text || 'Your transfer history will appear here once you start using Cash Sweep.') + '</div></div>';
   }
   function tone(status) { var p = PILL[status]; return p ? (p[0] === 'ok' ? '' : p[0]) : 'idle'; }
   function sweepRow(b) {
@@ -382,7 +395,43 @@ var CM = (function () {
     return { get: function () { return items[index()].value; }, set: set };
   }
 
+  /* ---------- Prototype flows ----------
+     A panel beside the phone (desktop only) switches the demo between the
+     two journeys: a merchant setting up Cash Sweep for the first time, and
+     one whose sweep is already active. */
+  var SCENARIOS = {
+    first: function () { return { banks: clone(SEED_BANKS), config: null, history: [] }; },
+    active: function () { return { banks: clone(SEED_BANKS), config: clone(SEED_CONFIG), history: clone(SEED_HISTORY) }; }
+  };
+  function scenario(name) {
+    try { sessionStorage.setItem(KEY, JSON.stringify(SCENARIOS[name]())); } catch (e) {}
+    clearDraft();
+    location.href = 'cm-home.html';
+  }
+  function demoPanel() {
+    if (document.getElementById('demoPanel')) return;
+    var cur = state.config ? 'active' : 'first';
+    var el = document.createElement('aside');
+    el.id = 'demoPanel';
+    el.className = 'demo-panel';
+    el.innerHTML = '<div class="dp-title">Prototype flows</div>' +
+      [['first', '1', 'First time', 'No cash sweep set up yet'],
+       ['active', '2', 'Active sweep', 'Sweep running, with history']].map(function (f) {
+        return '<button class="dp-flow' + (cur === f[0] ? ' on' : '') + '" data-flow="' + f[0] + '">' +
+          '<span class="dp-num">' + f[1] + '</span><span><b>' + f[2] + '</b><small>' + f[3] + '</small></span></button>';
+      }).join('') +
+      '<div class="dp-note">Switching resets the demo data and opens Cash Management.</div>';
+    /* On <html>, not <body>: body is the phone frame and clips its children. */
+    document.documentElement.appendChild(el);
+    el.querySelectorAll('[data-flow]').forEach(function (b) {
+      b.onclick = function () { scenario(b.dataset.flow); };
+    });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', demoPanel);
+  else demoPanel();
+
   return {
+    scenario: scenario,
     MERCHANT: MERCHANT, WORKING_BALANCE: WORKING_BALANCE, MAX_ACCOUNTS: MAX_ACCOUNTS,
     WEEKDAYS: WEEKDAYS, MONTHS: MONTHS, ICON: ICON, STATUS: STATUS,
     state: state, save: save, bank: bank, activeBanks: activeBanks, batch: batch,
@@ -391,7 +440,7 @@ var CM = (function () {
     money: money, moneyHtml: moneyHtml, mask: mask, esc: esc, time12: time12, ordinal: ordinal,
     freqLabel: freqLabel, dateLabel: dateLabel, nextRun: nextRun, runLabel: runLabel, stamp: stamp,
     split: split, problems: problems, batchTotals: batchTotals, chip: chip, bankAv: bankAv,
-    pill: pill, tone: tone, sweepRow: sweepRow,
+    pill: pill, tone: tone, sweepRow: sweepRow, emptySweeps: emptySweeps,
     goBack: goBack, openSheet: openSheet, closeSheet: closeSheet, toast: toast, copy: copy, wheel: wheel
   };
 })();

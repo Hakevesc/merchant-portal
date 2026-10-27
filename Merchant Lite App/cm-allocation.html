@@ -6,61 +6,111 @@
 <title>Allocation</title>
 <link rel="stylesheet" href="cm.css">
 <style>
-  .acct{padding:12px 14px;border-radius:14px;background:var(--field);border:1.5px solid transparent}
-  .acct + .acct{margin-top:10px}
-  .acct-head{display:flex;align-items:center;gap:10px}
-  .pick{display:flex;align-items:center;gap:7px;flex-shrink:0;background:none;border:none;padding:4px 0 4px 6px;cursor:pointer}
-  .pick-lbl{font-size:10.5px;font-weight:700;color:var(--muted);letter-spacing:.2px}
-  .pick.on .pick-lbl{color:var(--green-d)}
-  .pick .radio{margin-left:0}
-  .acct .field{margin-top:10px;background:#fff}
-  .acct.primary{background:#fff;border-color:var(--green)}
-  .acct.primary .remainder{
-    margin-top:10px;padding:10px 12px;border-radius:10px;background:var(--green-l);
-    font-size:12px;font-weight:600;color:var(--green-d);
+  .h2{display:flex;align-items:baseline;justify-content:space-between;margin:20px 2px 10px}
+  .h2:first-child{margin-top:4px}
+  .h2 b{font-size:15.5px;font-weight:800;color:var(--ink)}
+  .h2 span{font-size:12px;font-weight:600;color:var(--muted)}
+
+  /* Allocation method: one segmented control, two options. */
+  .seg{display:flex;padding:4px;border-radius:999px;background:var(--field);border:1px solid var(--line)}
+  .seg button{
+    flex:1;display:flex;align-items:center;justify-content:center;gap:9px;height:52px;
+    border:1.5px solid transparent;border-radius:999px;background:transparent;cursor:pointer;
+    font-size:14px;font-weight:700;color:var(--muted);
   }
-  .meter-row{display:flex;align-items:center;justify-content:space-between;font-size:11.5px;margin-top:12px}
-  .meter-row b{font-weight:800}
-  .meter{height:8px;border-radius:4px;background:var(--line);overflow:hidden;margin-top:6px}
-  .meter i{display:block;height:100%;border-radius:4px;background:var(--green);transition:width .2s}
-  .meter.over i{background:var(--red)}
-  .preview .alloc-line .amt.short{color:#b45309}
-  .preview .total{display:flex;justify-content:space-between;margin-top:12px;padding-top:10px;border-top:1px dashed var(--field-line);font-size:12px}
-  .preview .total b{font-weight:800}
-  .problems{margin-top:14px}
+  .seg button.on{background:var(--green);border-color:var(--green);color:#fff;box-shadow:0 3px 10px rgba(31,168,86,.25)}
+  .seg .ic{
+    width:32px;height:32px;border-radius:50%;background:#e9ecef;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .seg .on .ic{background:rgba(255,255,255,.22)}
+  .seg .ic svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+  /* Accounts: one card, each row ends in its amount (or the remainder pill). */
+  /* Fixed amount: the ETB field gets its own full-width line under the name.
+     Percentage: a small % field sits on the bank's line, before the arrow. */
+  .acct-row{
+    position:relative;display:grid;align-items:center;column-gap:12px;row-gap:10px;
+    padding:13px 12px 14px 14px;
+    grid-template-columns:auto 1fr;grid-template-areas:"av name" ". amt";
+  }
+  .acct-row > .bank-av{grid-area:av}
+  .acct-row > .acct-name{grid-area:name}
+  .acct-row > .row-go{grid-area:go}
+  .acct-row > .amt-box,.acct-row > .rem-pill{grid-area:amt}
+  .acct-row > .amt-box{width:auto}
+  /* The remainder account has no field, so its pill sits on the bank's line. */
+  .acct-row.is-rem{grid-template-columns:auto 1fr auto auto;grid-template-areas:"av name amt go"}
+  .acct-row > .rem-pill{justify-self:end;padding:0 14px;font-size:12px}
+  .pct .acct-row{grid-template-columns:auto 1fr auto;grid-template-areas:"av name amt"}
+  .pct .acct-row.is-rem{grid-template-columns:auto 1fr auto auto;grid-template-areas:"av name amt go"}
+  .pct .acct-row > .amt-box{width:82px;padding:0 10px 0 12px}
+  .pct .acct-row > .rem-pill{justify-self:end;width:82px;justify-content:center;padding:0;font-size:11.5px}
+  .acct-row + .acct-row::before{content:'';position:absolute;top:0;left:14px;right:14px;height:1px;background:var(--line)}
+  .acct-row .bank-av{width:42px;height:42px}
+  .acct-name{flex:1;min-width:0}
+  .acct-name b{display:block;font-size:13.5px;font-weight:700;color:var(--ink);line-height:1.25}
+  .acct-name small{display:block;font-size:11.5px;color:var(--muted);margin-top:2px}
+  .amt-box{
+    flex-shrink:0;display:flex;align-items:center;width:118px;height:42px;padding:0 10px 0 12px;
+    border:1px solid var(--field-line);border-radius:12px;background:#fff;
+  }
+  .amt-box:focus-within{border-color:var(--green)}
+  .amt-box input{
+    flex:1;min-width:0;border:none;outline:none;background:transparent;
+    font-family:inherit;font-size:14.5px;font-weight:700;color:var(--ink);
+  }
+  .amt-box span{font-size:11.5px;font-weight:600;color:var(--muted)}
+  .rem-pill{
+    flex-shrink:0;display:flex;align-items:center;height:42px;padding:0 12px;border-radius:12px;
+    background:var(--green-l);font-size:12.5px;font-weight:700;color:var(--green-d);white-space:nowrap;
+  }
+  /* Only the remainder account has a control: a pencil to choose another one. */
+  .row-go{
+    flex-shrink:0;width:34px;height:34px;border:none;border-radius:10px;background:var(--red-l);cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .row-go svg{width:16px;height:16px;stroke:var(--red);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+  /* Allocation summary */
+  .summary{margin-top:16px;padding:16px;border-radius:18px;background:#f7f9fa;border:1px solid var(--line)}
+  .summary-head{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+  .summary-head .ic{
+    width:38px;height:38px;border-radius:50%;background:var(--green-l);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .summary-head .ic svg{width:19px;height:19px;stroke:var(--green-d);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .summary-head b{font-size:15px;font-weight:800}
+  .s-row{display:flex;justify-content:space-between;gap:10px;padding:6px 0;font-size:13px}
+  .s-row span{color:var(--muted)}
+  .s-row b{font-weight:700;color:var(--ink)}
+  .s-row.total{margin-top:6px;padding-top:12px;border-top:1px solid var(--line)}
+  .s-row.total span,.s-row.total b{color:var(--green-d);font-weight:800;font-size:14px}
+  .s-row.total.over span,.s-row.total.over b{color:var(--red-d)}
+
+  .problems{margin-top:12px}
   .problems .notice + .notice{margin-top:8px}
 </style>
 </head>
 <body>
 <div class="phone-scroll">
   <div class="header">
-    <button class="icon-btn" onclick="location.href='cm-home.html'" aria-label="Close" id="closeBtn"></button>
+    <button class="icon-btn" onclick="location.href='cm-schedule.html'" aria-label="Back" id="closeBtn"></button>
     <div class="header-title">ALLOCATION</div>
-    <div class="step-dots"><i class="on"></i><i></i><i></i></div>
+    <div class="step-dots"><i class="done"></i><i class="on"></i><i></i></div>
   </div>
 
   <div class="page">
-    <div class="section-label">Choose how to allocate</div>
-    <button class="opt" data-type="fixed">
-      <span class="opt-ico" data-ico="lock"></span>
-      <span><span class="opt-title" style="display:block">Fixed Amount</span>
-      <span class="opt-sub" style="display:block">Send a set amount to each bank account</span></span>
-      <span class="radio"></span>
-    </button>
-    <button class="opt" data-type="percent">
-      <span class="opt-ico" data-ico="percent"></span>
-      <span><span class="opt-title" style="display:block">Percentage Allocation</span>
-      <span class="opt-sub" style="display:block">Split your eligible balance by percentage</span></span>
-      <span class="radio"></span>
-    </button>
+    <div class="h2"><b>Allocation method</b></div>
+    <div class="seg">
+      <button data-type="fixed"><span class="ic" data-ico="coins"></span>Fixed amount</button>
+      <button data-type="percent"><span class="ic" data-ico="percent"></span>Percentage</button>
+    </div>
 
-    <div class="section-label" id="amountsLabel">Amount per account</div>
-    <div id="acctList"></div>
-    <div id="meterWrap"></div>
+    <div class="h2"><b>Allocate to accounts</b><span id="acctCount"></span></div>
+    <div class="hist" id="acctList"></div>
 
-    <div class="section-label">If the sweep ran now</div>
-    <div class="card card-pad preview" id="preview"></div>
-
+    <div class="summary" id="summary"></div>
     <div class="problems" id="problems"></div>
   </div>
 </div>
@@ -70,96 +120,102 @@
 </div>
 <div class="gesture-bar"></div>
 
+<!-- Which account receives the remainder -->
+<div class="sheet-backdrop" onclick="CM.closeSheet()"></div>
+<div class="sheet" id="remSheet">
+  <div class="sheet-title">Receives remainder</div>
+  <div class="sheet-list" id="remList"></div>
+</div>
+
 <script src="cm.js"></script>
 <script>
 (function () {
   var I = CM.ICON;
+  var COINS = '<svg viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="7" ry="2.8"/><path d="M5 6v4c0 1.5 3.1 2.8 7 2.8s7-1.3 7-2.8V6M5 10v4c0 1.5 3.1 2.8 7 2.8s7-1.3 7-2.8v-4M5 14v4c0 1.5 3.1 2.8 7 2.8s7-1.3 7-2.8v-4"/></svg>';
+  var CALC = '<svg viewBox="0 0 24 24"><rect x="5" y="2.5" width="14" height="19" rx="2.5"/><path d="M8.5 6.5h7v3h-7zM8.5 13h.01M12 13h.01M15.5 13h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"/></svg>';
   if (/[?&]edit=1/.test(location.search)) { CM.startDraft(); history.replaceState(null, '', 'cm-allocation.html'); }
   var d = CM.getDraft();
   var banks = CM.activeBanks();
-  document.getElementById('closeBtn').innerHTML = I.close;
-  document.querySelectorAll('[data-ico]').forEach(function (el) { el.innerHTML = I[el.dataset.ico]; });
+  document.getElementById('closeBtn').innerHTML = I.back;
+  document.querySelectorAll('[data-ico]').forEach(function (el) {
+    el.innerHTML = el.dataset.ico === 'coins' ? COINS : I[el.dataset.ico];
+  });
+  document.getElementById('acctCount').textContent = banks.length + ' account' + (banks.length === 1 ? '' : 's');
 
   /* Never leave the remainder unassigned if there is an obvious default. */
   if (!d.primary && banks.length) d.primary = banks[banks.length - 1].id;
 
+  function fmt(n) { return Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+
   function render() {
-    document.querySelectorAll('.opt[data-type]').forEach(function (o) {
+    document.querySelectorAll('.seg [data-type]').forEach(function (o) {
       o.classList.toggle('on', o.dataset.type === d.type);
     });
-
     var unit = d.type === 'fixed' ? 'ETB' : '%';
-    document.getElementById('amountsLabel').textContent = d.type === 'fixed' ? 'Amount per account' : 'Percentage per account';
+    document.getElementById('acctList').classList.toggle('pct', d.type === 'percent');
     document.getElementById('acctList').innerHTML = banks.map(function (b) {
-      var isP = d.primary === b.id;
-      var v = d.alloc[b.id];
-      return '<div class="acct' + (isP ? ' primary' : '') + '">' +
-        '<div class="acct-head">' + CM.bankAv(b, true) +
-          '<div class="row-main"><div class="row-title" style="font-size:13px">' + CM.esc(b.bank) + '</div>' +
-          '<div class="row-sub">' + CM.mask(b.acct) + '</div></div>' +
-          /* One list does both jobs: the radio picks the Primary/Remainder
-             account, every other account gets its amount field. */
-          '<button class="pick' + (isP ? ' on' : '') + '" data-primary="' + b.id + '" aria-pressed="' + isP + '" aria-label="Make ' + CM.esc(b.bank) + ' the primary account">' +
-            '<span class="pick-lbl">Primary</span><span class="radio' + (isP ? ' on' : '') + '"></span></button>' + '</div>' +
-        (isP ? '<div class="remainder">Gets the remaining eligible balance</div>'
-             : '<div class="field"><input inputmode="decimal" data-acct="' + b.id + '" placeholder="0" value="' +
-                 (v ? v : '') + '"><span class="suffix">' + unit + '</span></div>') +
+      var isP = d.primary === b.id, v = d.alloc[b.id];
+      return '<div class="acct-row' + (isP ? ' is-rem' : '') + '">' + CM.bankAv(b) +
+        '<div class="acct-name"><b>' + CM.esc(b.bank) + '</b><small>' + CM.mask(b.acct) + '</small></div>' +
+        (isP ? '<button class="row-go" data-rem="' + b.id + '" aria-label="Change remainder account">' + I.edit + '</button>' : '') +
+        /* The amount (or the remainder pill) sits on its own line under the name. */
+        (isP ? '<span class="rem-pill">Remainder</span>'
+             : '<label class="amt-box"><input inputmode="decimal" data-acct="' + b.id + '" placeholder="' + (d.type === 'fixed' ? '0.00' : '0') + '" value="' + (v ? (d.type === 'fixed' ? fmt(v) : v) : '') + '">' +
+               '<span>' + unit + '</span></label>') +
       '</div>';
     }).join('');
 
     document.querySelectorAll('[data-acct]').forEach(function (inp) {
       inp.addEventListener('input', function () {
         var clean = inp.value.replace(d.type === 'fixed' ? /[^\d.]/g : /[^\d]/g, '');
+        /* Amounts take one decimal point and at most two decimals. */
+        if (d.type === 'fixed') clean = clean.replace(/\.(?=.*\.)/g, '').replace(/(\.\d{2})\d+$/, '$1');
         if (clean !== inp.value) inp.value = clean;
         var n = parseFloat(clean);
         if (n > 0) d.alloc[inp.dataset.acct] = n; else delete d.alloc[inp.dataset.acct];
         CM.saveDraft(d);
         refresh();
       });
+      /* Show the amount as money (5,000.00) once the merchant leaves the field. */
+      if (d.type === 'fixed') {
+        inp.addEventListener('focus', function () { inp.value = inp.value.replace(/,/g, ''); });
+        inp.addEventListener('blur', function () { var n = d.alloc[inp.dataset.acct]; inp.value = n ? fmt(n) : ''; });
+      }
     });
-    document.querySelectorAll('[data-primary]').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        /* The amount typed for an account is kept when it becomes Primary,
-           so switching back restores it; split() ignores the Primary's own value. */
-        d.primary = btn.dataset.primary;
-        CM.saveDraft(d);
-        render();
-      });
-    });
+    document.querySelectorAll('[data-rem]').forEach(function (btn) { btn.onclick = openRemainder; });
     refresh();
   }
 
-  /* Everything that changes as the merchant types, without re-rendering the
-     inputs (which would steal focus). */
+  /* Pick the account that takes whatever is left. Its typed amount is kept,
+     so switching back restores it; split() ignores the remainder's own value. */
+  function openRemainder() {
+    document.getElementById('remList').innerHTML = banks.map(function (b) {
+      return '<button class="opt' + (d.primary === b.id ? ' on' : '') + '" data-pick="' + b.id + '">' + CM.bankAv(b) +
+        '<span><span class="opt-title" style="display:block;font-size:13.5px">' + CM.esc(b.bank) + '</span>' +
+        '<span class="opt-sub" style="display:block">' + CM.mask(b.acct) + '</span></span><span class="radio"></span></button>';
+    }).join('');
+    document.querySelectorAll('[data-pick]').forEach(function (b) {
+      b.onclick = function () { d.primary = b.dataset.pick; CM.saveDraft(d); CM.closeSheet(); render(); };
+    });
+    CM.openSheet('remSheet');
+  }
+
+  /* Totals change as the merchant types, without re-rendering the inputs. */
   function refresh() {
-    var others = banks.filter(function (b) { return b.id !== d.primary; });
-    var total = others.reduce(function (s, b) { return s + (+d.alloc[b.id] || 0); }, 0);
-
-    var meter = '';
-    if (d.type === 'percent') {
-      var over = total > 100;
-      meter = '<div class="meter-row"><span>' + total + '% allocated</span>' +
-        '<b style="color:' + (over ? 'var(--red-d)' : 'var(--green-d)') + '">' +
-        (over ? (total - 100) + '% over' : (100 - total) + '% to remainder') + '</b></div>' +
-        '<div class="meter' + (over ? ' over' : '') + '"><i style="width:' + Math.min(100, total) + '%"></i></div>';
+    var total = banks.filter(function (b) { return b.id !== d.primary; })
+      .reduce(function (s, b) { return s + (+d.alloc[b.id] || 0); }, 0);
+    var html = '<div class="summary-head"><span class="ic">' + CALC + '</span><b>Allocation summary</b></div>';
+    if (d.type === 'fixed') {
+      var left = CM.WORKING_BALANCE - total;
+      html += '<div class="s-row"><span>Working balance</span><b>' + CM.money(CM.WORKING_BALANCE) + ' ETB</b></div>' +
+        '<div class="s-row"><span>Total fixed allocation</span><b>' + CM.money(total) + ' ETB</b></div>' +
+        '<div class="s-row total' + (left < 0 ? ' over' : '') + '"><span>Remaining to allocate</span><b>' + CM.money(Math.max(0, left)) + ' ETB</b></div>';
     } else {
-      meter = '<div class="field-note">Working balance: <b>' +
-        CM.money(CM.WORKING_BALANCE) + ' ETB</b></div>';
+      html += '<div class="s-row"><span>Total percentage</span><b>' + total + '%</b></div>' +
+        '<div class="s-row total' + (total > 100 ? ' over' : '') + '"><span>' + (total > 100 ? 'Over by' : 'Remaining to allocate') + '</span><b>' +
+        Math.abs(100 - total) + '%</b></div>';
     }
-    document.getElementById('meterWrap').innerHTML = meter;
-
-    var rows = CM.split(d, CM.WORKING_BALANCE), sum = 0;
-    document.getElementById('preview').innerHTML =
-      rows.map(function (r) {
-        sum += r.amount;
-        var b = CM.bank(r.id);
-        return '<div class="alloc-line">' + CM.bankAv(b, true) +
-          '<div class="nm">' + (r.unallocated ? 'Stays in M-PESA' : CM.esc(b.bank)) +
-          (r.primary ? '<span class="tag">REMAINDER</span>' : '') +
-          '</div>' +
-          '<div class="amt' + (r.short ? ' short' : '') + '">' + CM.money(r.amount) + '</div></div>';
-      }).join('') +
-      '<div class="total"><span>Total swept</span><b>' + CM.money(sum) + ' ETB</b></div>';
+    document.getElementById('summary').innerHTML = html;
 
     var probs = CM.problems(d);
     document.getElementById('problems').innerHTML = probs.map(function (p) {
@@ -168,7 +224,7 @@
     document.getElementById('continueBtn').disabled = probs.length > 0;
   }
 
-  document.querySelectorAll('.opt[data-type]').forEach(function (o) {
+  document.querySelectorAll('.seg [data-type]').forEach(function (o) {
     o.addEventListener('click', function () {
       if (d.type === o.dataset.type) return;
       d.type = o.dataset.type;
@@ -180,7 +236,7 @@
 
   document.getElementById('continueBtn').addEventListener('click', function () {
     CM.saveDraft(d);
-    location.href = 'cm-schedule.html';
+    location.href = 'cm-review.html';
   });
 
   render();

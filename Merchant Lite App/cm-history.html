@@ -52,7 +52,8 @@
       ? '<div class="group">OCTOBER 2026</div><div class="hist">' + rows.map(function (b) {
           return '<a class="tile" href="cm-sweep.html?ref=' + b.ref + '">' + CM.sweepRow(b) + '</a>';
         }).join('') + '</div>'
-      : '<div class="empty-list">No sweeps with this status.</div>';
+      : (S.history.length ? '<div class="hist" style="margin-top:14px">' + CM.emptySweeps('No sweeps here', 'There are no sweeps with this status.') + '</div>'
+                          : '<div class="hist" style="margin-top:14px">' + CM.emptySweeps() + '</div>');
   }
   render();
 })();

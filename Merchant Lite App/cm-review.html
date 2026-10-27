@@ -13,7 +13,7 @@
 <body>
 <div class="phone-scroll">
   <div class="header">
-    <button class="icon-btn" onclick="location.href='cm-schedule.html'" aria-label="Back" id="backBtn"></button>
+    <button class="icon-btn" onclick="location.href='cm-allocation.html'" aria-label="Back" id="backBtn"></button>
     <div class="header-title">REVIEW &amp; CONFIRM</div>
     <div class="step-dots"><i class="done"></i><i class="done"></i><i class="on"></i></div>
   </div>
@@ -21,6 +21,8 @@
   <div class="page">
     <div class="watermark"></div>
     <div class="sum-card" id="summary"></div>
+    <!-- Bank accounts get their own card under the summary. -->
+    <div class="sum-card banks-card" id="banksCard"></div>
     <div style="margin-top:14px" class="notice">
       <span id="infoIco"></span>
       <span>At each sweep the eligible balance is worked out first, then each transfer is sent separately and gets its own reference. If one bank fails, the others still go through.</span>
@@ -49,7 +51,8 @@
   document.getElementById('backBtn').innerHTML = I.back;
   document.getElementById('infoIco').outerHTML = I.info;
 
-  if (CM.problems(d).length || !d.time) { location.replace('cm-allocation.html'); return; }
+  if (!d.time) { location.replace('cm-schedule.html'); return; }
+  if (CM.problems(d).length) { location.replace('cm-allocation.html'); return; }
 
   function item(label, value, edit) {
     return '<div class="sum-item"><div class="grow"><div class="k">' + label + '</div><div class="v">' + value + '</div></div>' +
@@ -65,13 +68,15 @@
       '<div class="amt">' + (r.primary ? 'Remainder' : d.type === 'fixed' ? CM.money(r.value) + ' ETB' : r.value + '%') + '</div></div>';
   }).join('');
 
+  document.getElementById('banksCard').innerHTML =
+    '<div class="sum-banks-head"><div class="k">Bank accounts</div>' +
+      '<a class="edit-btn" href="cm-allocation.html" aria-label="Edit bank accounts">' + I.edit + '</a></div>' +
+    '<div class="bank-lines">' + alloc + '</div>';
+
   document.getElementById('summary').innerHTML =
     '<div class="sum-av">' + CM.MERCHANT.initials + '</div>' +
     '<div class="sum-name">' + CM.MERCHANT.name + ' · ' + CM.MERCHANT.shortCode + '</div>' +
     item('Allocation type', d.type === 'fixed' ? 'Fixed amount' : 'Percentage', 'cm-allocation.html') +
-    '<div class="sum-item sum-banks"><div class="grow"><div class="sum-banks-head"><div class="k">Bank accounts</div>' +
-      '<a class="edit-btn" href="cm-allocation.html" aria-label="Edit bank accounts">' + I.edit + '</a></div>' +
-      '<div class="bank-lines">' + alloc + '</div></div></div>' +
     item('Frequency', CM.freqLabel(d).toUpperCase(), 'cm-schedule.html') +
     item('Sweep time', CM.time12(d.time), 'cm-schedule.html') +
     item('Start date', CM.dateLabel(d.start).toUpperCase(), 'cm-schedule.html') +
