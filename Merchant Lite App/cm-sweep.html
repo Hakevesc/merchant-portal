@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Sweep Details</title>
+<link rel="stylesheet" href="cm.css">
+<style>
+  .bal .st{background:rgba(255,255,255,.95)}
+  .bal-top{display:flex;align-items:center;justify-content:space-between;gap:10px;position:relative;z-index:1}
+  .trf-amt{text-align:right;flex-shrink:0}
+  .trf-amt b{display:block;font-size:14px;font-weight:800;white-space:nowrap}
+  .trf-amt b .cur{font-size:.6em}
+  .trf-amt .st{margin-top:5px}
+  #transfers .tile{align-items:flex-start}
+  #transfers .bank-av{margin-top:2px}
+  #transfers .tile-title{font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ref-line{display:flex;align-items:center;gap:6px;margin-top:4px;font-size:11px;color:var(--muted)}
+  .ref-line b{color:var(--ink-2);font-weight:700;letter-spacing:.2px}
+  .ref-line .copy-btn{width:24px;height:24px}
+  .ref-line .copy-btn svg{width:13px;height:13px}
+  .footer .btn{height:48px}
+</style>
+</head>
+<body>
+<div class="phone-scroll">
+  <div class="top">
+    <button class="icon-btn" onclick="CM.goBack('cm-history.html')" aria-label="Back" id="backBtn"></button>
+    <h1>Sweep Details</h1>
+  </div>
+  <div class="page-simple">
+    <div class="bal" id="summary"></div>
+    <div class="hist-head"><h2 id="trfLabel">Transfers</h2></div>
+    <div class="hist" id="transfers"></div>
+    <div class="hist-head"><h2>Details</h2></div>
+    <div class="hist kv-list" id="details"></div>
+  </div>
+</div>
+<div class="footer"><div class="btn-row" id="actions"></div></div>
+<div class="gesture-bar"></div>
+
+<script src="cm.js"></script>
+<script>
+(function () {
+  var I = CM.ICON, S = CM.state, c = S.config;
+  document.getElementById('backBtn').innerHTML = I.back;
+  var q = new URLSearchParams(location.search);
+  var upcoming = q.get('next') && c;
+  var b, rows;
+
+  if (upcoming) {
+    b = { status: 'scheduled', eligible: CM.WORKING_BALANCE };
+    rows = CM.split(c, CM.WORKING_BALANCE).filter(function (r) { return !r.unallocated; })
+      .map(function (r) { return { bank: r.id, amount: r.amount, status: 'scheduled', primary: r.primary }; });
+  } else {
+    b = CM.batch(q.get('ref')) || S.history[0];
+    rows = b.transfers;
+  }
+  var t = upcoming ? { ok: 0, bad: 0, nOk: 0, nBad: 0 } : CM.batchTotals(b);
+
+  /* ---- Summary: the amount that reached the bank, and the status ---- */
+  document.getElementById('summary').innerHTML =
+    '<div class="bal-top"><div class="bal-label">' + (upcoming ? 'Estimated sweep' : 'Transferred') + '</div>' + CM.pill(b.status, true) + '</div>' +
+    '<div class="bal-big">' + CM.money(upcoming ? CM.WORKING_BALANCE : t.ok) + '<span class="cur">ETB</span></div>' +
+    '<div class="bal-foot">' + I.clock + '<div><div class="k">' + (upcoming ? 'Runs' : 'Sweep date') + '</div><div class="v">' +
+      (upcoming ? CM.runLabel(CM.nextRun(c)) : b.date + ', ' + b.time) + '</div></div></div>';
+
+  /* ---- Transfers ---- */
+  document.getElementById('trfLabel').textContent = upcoming ? 'Planned transfers' : 'Transfers';
+  document.getElementById('transfers').innerHTML = rows.length ? rows.map(function (x) {
+    var bk = CM.bank(x.bank);
+    return '<div class="tile">' + CM.bankAv(bk) +
+      '<div class="tile-main"><div class="tile-title">' + CM.esc(bk.bank) + (x.primary ? '<span class="tag">REMAINDER</span>' : '') + '</div>' +
+        '<div class="tile-sub">' + CM.mask(bk.acct) + '</div>' +
+        (x.ref ? '<div class="ref-line">Ref <b>' + x.ref + '</b><button class="copy-btn" data-copy="' + x.ref + '" aria-label="Copy transfer reference">' + I.copy + '</button></div>' : '') +
+        (x.reason ? '<div class="reason">' + CM.esc(x.reason) + '</div>' : '') +
+      '</div>' +
+      '<div class="trf-amt"><b>' + CM.money(x.amount) + '<span class="cur">ETB</span></b>' + CM.pill(x.status) + '</div></div>';
+  }).join('') : '<div class="tile"><div class="tile-sub">' + CM.esc(b.note || 'No transfers were made.') + '</div></div>';
+
+  /* ---- Details ---- */
+  function kv(k, v) { return '<div class="kv"><span>' + k + '</span><b>' + v + '</b></div>'; }
+  document.getElementById('details').innerHTML = upcoming
+    ? kv('Frequency', CM.freqLabel(c)) + kv('Allocation', c.type === 'fixed' ? 'Fixed amount' : 'Percentage') +
+      kv('Note', 'Uses the eligible balance at sweep time')
+    : kv('Eligible balance', CM.money(b.eligible) + ' ETB') +
+      kv('Failed', CM.money(t.bad) + ' ETB') +
+      kv('Transfers', t.nOk + ' successful · ' + t.nBad + ' failed') +
+      kv('Sweep reference', b.ref + '<button class="copy-btn" data-copy="' + b.ref + '" aria-label="Copy sweep reference">' + I.copy + '</button>');
+
+  document.getElementById('actions').innerHTML = upcoming
+    ? '<a class="btn btn-ghost" href="cm-allocation.html?edit=1">' + I.sliders + 'Edit setup</a><a class="btn btn-primary" href="cm-home.html">Done</a>'
+    : '<button class="btn btn-primary" id="dl">' + I.download + 'Download</button><button class="btn btn-ghost" id="sh">' + I.share + 'Share</button>';
+  var dl = document.getElementById('dl'), sh = document.getElementById('sh');
+  if (dl) dl.onclick = function () { CM.toast('Sweep receipt saved to your downloads.'); };
+  if (sh) sh.onclick = function () {
+    var text = 'M-PESA cash sweep ' + b.ref + ' on ' + b.date + ': ' + CM.STATUS[b.status][0] + '. Transferred ETB ' + CM.money(t.ok) +
+      (t.bad ? ', failed ETB ' + CM.money(t.bad) : '') + '.';
+    if (navigator.share) navigator.share({ title: 'Cash sweep', text: text }).catch(function () {});
+    else CM.copy(text, 'Sweep summary');
+  };
+  document.querySelectorAll('[data-copy]').forEach(function (btn) {
+    btn.onclick = function () { CM.copy(btn.dataset.copy, 'Reference'); };
+  });
+})();
+</script>
+</body>
+</html>

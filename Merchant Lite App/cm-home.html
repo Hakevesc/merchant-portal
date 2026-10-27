@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Cash Management</title>
+<link rel="stylesheet" href="cm.css">
+<style>
+  /* Home-only: balance hide toggle and the wallet drawing. */
+  .eye{background:none;border:none;padding:0;cursor:pointer;display:flex}
+  .eye svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;opacity:.9}
+  .wallet{position:absolute;right:14px;top:16px;width:84px;height:72px;filter:drop-shadow(0 6px 10px rgba(0,0,0,.18))}
+</style>
+</head>
+<body>
+<div class="phone-scroll">
+  <div class="top">
+    <button class="icon-btn" onclick="CM.goBack('2.html')" aria-label="Go back" id="backBtn"></button>
+    <h1>Cash Management</h1>
+  </div>
+
+  <div class="page" style="padding-bottom:40px">
+    <div class="bal">
+      <div class="bal-label">Working Account Balance
+        <button class="eye" id="eyeBtn" aria-label="Hide balance"></button></div>
+      <div class="bal-amt" id="balance"></div>
+      <svg class="wallet" viewBox="0 0 84 72" aria-hidden="true">
+        <!-- solid wallet: a note tucked behind, white body, clasp -->
+        <rect x="14" y="6" width="46" height="26" rx="4" transform="rotate(-8 37 19)" fill="#ffd95e"/>
+        <rect x="6" y="18" width="70" height="48" rx="11" fill="#ffffff"/>
+        <rect x="6" y="18" width="70" height="12" rx="6" fill="#fde2e4"/>
+        <rect x="50" y="35" width="32" height="20" rx="8" fill="#fbd0d4"/>
+        <circle cx="60" cy="45" r="4" fill="#c41e2a"/>
+      </svg>
+      <div class="bal-foot" id="nextRow"></div>
+    </div>
+
+    <div class="tiles">
+      <a class="tile" id="sweepTile"></a>
+      <a class="tile" href="cm-banks.html" id="bankTile"></a>
+    </div>
+
+    <div class="hist-head"><h2>Sweep History</h2><a href="cm-history.html">See all</a></div>
+    <div class="hist" id="hist"></div>
+  </div>
+</div>
+<div class="gesture-bar"></div>
+
+<script src="cm.js"></script>
+<script>
+(function () {
+  var I = CM.ICON, S = CM.state, c = S.config;
+  var on = !!(c && c.enabled);
+  document.getElementById('backBtn').innerHTML = I.back;
+
+  /* ---- Balance, with the same hide toggle as the Loyalty Point card ---- */
+  var EYE = '<svg viewBox="0 0 24 24"><path d="M2.5 12S6 5.6 12 5.6 21.5 12 21.5 12 18 18.4 12 18.4 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.9"/></svg>';
+  var EYE_OFF = '<svg viewBox="0 0 24 24"><path d="M2.5 12S6 5.6 12 5.6 21.5 12 21.5 12 18 18.4 12 18.4 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.9"/><path d="M3.4 3.4l17.2 17.2"/></svg>';
+  var hidden = false;
+  try { hidden = localStorage.getItem('mlHideBalances') === '1'; } catch (e) {}
+  function paintBalance() {
+    document.getElementById('balance').innerHTML = hidden ? '••••••<span class="cur">ETB</span>' : CM.money(CM.WORKING_BALANCE) + '<span class="cur">ETB</span>';
+    var eb = document.getElementById('eyeBtn');
+    eb.innerHTML = hidden ? EYE_OFF : EYE;
+    eb.setAttribute('aria-label', hidden ? 'Show balance' : 'Hide balance');
+  }
+  document.getElementById('eyeBtn').onclick = function () {
+    hidden = !hidden;
+    try { localStorage.setItem('mlHideBalances', hidden ? '1' : '0'); } catch (e) {}
+    paintBalance();
+  };
+  paintBalance();
+
+  document.getElementById('nextRow').innerHTML = I.clock +
+    '<div><div class="k">Next Cash Sweep</div><div class="v">' +
+      (on ? CM.runLabel(CM.nextRun(c)) : c ? 'Paused' : 'Not set up') + '</div></div>' +
+    '<span class="bal-pill">' + (on ? 'Active' : c ? 'Paused' : 'Off') + '</span>';
+
+  /* ---- Cash Sweep tile ---- */
+  var st = document.getElementById('sweepTile');
+  st.href = c ? 'cm-setup.html' : 'cm-allocation.html?edit=1';
+  st.innerHTML = '<span class="tile-ico' + (on ? '' : ' idle') + '">' + I.bolt + '</span>' +
+    '<div class="tile-main"><div class="tile-title">Cash Sweep</div><div class="tile-sub">' +
+      (c ? (on ? 'Automated' : 'Paused') + ' • ' + CM.freqLabel(c).split(' · ')[0] : 'Not set up — tap to start') +
+    '</div></div>' + I.chev;
+
+  /* ---- Bank Accounts tile ---- */
+  var active = CM.activeBanks();
+  document.getElementById('bankTile').innerHTML = '<span class="tile-ico">' + I.bank + '</span>' +
+    '<div class="tile-main"><div class="tile-title">Bank Accounts</div>' +
+      '<div class="tile-sub">' + active.length + ' linked account' + (active.length === 1 ? '' : 's') + '</div>' +
+      '<div class="banks">' + active.slice(0, 3).map(function (b) {
+        return '<div title="' + CM.esc(b.bank) + '">' + CM.bankAv(b, true) + '<span>' + CM.mask(b.acct) + '</span></div>';
+      }).join('') + '</div></div>' + I.chev;
+
+  /* ---- Five latest sweeps ---- */
+  document.getElementById('hist').innerHTML = S.history.slice(0, 5).map(function (b) {
+    return '<a class="tile" href="cm-sweep.html?ref=' + b.ref + '">' + CM.sweepRow(b) + '</a>';
+  }).join('') || '<div class="tile"><div class="tile-sub">No sweeps yet.</div></div>';
+})();
+</script>
+</body>
+</html>

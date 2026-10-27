@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Bank Account Management</title>
+<link rel="stylesheet" href="cm.css">
+<style>
+  #list .tile-title{font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .det-head{display:flex;flex-direction:column;align-items:center;gap:8px;margin-bottom:12px}
+  .det-head .bank-av{width:52px;height:52px;font-size:14px}
+  .det-head h3{font-size:15px;font-weight:800;text-align:center}
+  .sheet .kv{display:flex;justify-content:space-between;gap:12px;padding:10px 0;font-size:12.5px;border-top:1px solid var(--line)}
+  .sheet .kv span{color:var(--muted)}
+  .sheet .kv b{font-weight:700;text-align:right}
+  .sheet .notice{margin:12px 0 4px}
+  .req .field{background:var(--field)}
+  .req select{
+    flex:1;border:none;background:transparent;outline:none;padding:0 14px;
+    font-family:inherit;font-size:14px;font-weight:600;color:var(--ink);-webkit-appearance:none;appearance:none;
+  }
+</style>
+</head>
+<body>
+<div class="phone-scroll">
+  <div class="top">
+    <button class="icon-btn" onclick="CM.goBack('cm-home.html')" aria-label="Back" id="backBtn"></button>
+    <h1>Bank Accounts</h1>
+  </div>
+
+  <div class="page-simple">
+    <div class="cap" id="usage"></div>
+    <div class="hist" id="list"></div>
+    <div class="cap" style="margin:12px 2px 0" id="onbNote"></div>
+  </div>
+</div>
+
+<div class="footer">
+  <button class="btn btn-primary" id="reqBtn">Request a new account</button>
+</div>
+<div class="gesture-bar"></div>
+
+<div class="sheet-backdrop" onclick="CM.closeSheet()"></div>
+<div class="sheet" id="detSheet"><div id="detBody"></div></div>
+
+<div class="sheet req" id="reqSheet">
+  <div class="sheet-title">Request a bank account</div>
+  <div class="field-label" style="margin-top:0">Bank</div>
+  <div class="field"><select id="reqBank">
+    <option>Commercial Bank of Ethiopia</option><option>Awash Bank</option><option>Dashen Bank</option>
+    <option>Bank of Abyssinia</option><option>Cooperative Bank of Oromia</option><option>Wegagen Bank</option>
+    <option>Hibret Bank</option><option>Nib International Bank</option>
+  </select><span class="suffix" id="selIco"></span></div>
+  <div class="field-label">Account number</div>
+  <div class="field"><input id="reqAcct" inputmode="numeric" placeholder="Enter account number"></div>
+  <div class="field-note" id="reqNote">The account must be in your business name. Onboarding validates it before it can be used.</div>
+  <div style="height:16px"></div>
+  <button class="btn btn-primary" id="reqSend">Send request</button>
+</div>
+
+<script src="cm.js"></script>
+<script>
+(function () {
+  var I = CM.ICON, S = CM.state, c = S.config;
+  document.getElementById('backBtn').innerHTML = I.back;
+  document.getElementById('selIco').innerHTML = I.down;
+  document.getElementById('onbNote').textContent =
+    'Accounts are added and validated by the M-PESA Onboarding team. Only active accounts receive sweeps.';
+
+  function chipFor(b) { return CM.pill(b.status === 'failed' ? 'invalid' : b.status); }
+  function roleOf(b) {
+    if (!c || b.status !== 'active') return 'Not in sweep';
+    if (c.primary === b.id) return 'Primary / Remainder';
+    if (+c.alloc[b.id] > 0) return c.type === 'fixed' ? CM.money(c.alloc[b.id]) + ' ETB fixed' : c.alloc[b.id] + '% of balance';
+    return 'Not in sweep';
+  }
+
+  function render() {
+    var n = S.banks.length;
+    document.getElementById('usage').textContent = CM.activeBanks().length + ' active · ' + n + ' of ' + CM.MAX_ACCOUNTS + ' linked';
+    document.getElementById('list').innerHTML = S.banks.map(function (b) {
+      return '<a class="tile" href="#" data-id="' + b.id + '">' + CM.bankAv(b) +
+        '<div class="tile-main"><div class="tile-title">' + CM.esc(b.bank) + '</div>' +
+        '<div class="tile-sub">' + CM.mask(b.acct) + ' • ' + roleOf(b) + '</div></div>' +
+        chipFor(b) + I.chev + '</a>';
+    }).join('');
+    document.querySelectorAll('#list .tile').forEach(function (el) {
+      el.onclick = function (e) { e.preventDefault(); detail(el.dataset.id); };
+    });
+    var full = n >= CM.MAX_ACCOUNTS;
+    var btn = document.getElementById('reqBtn');
+    btn.disabled = full;
+    btn.textContent = full ? 'Maximum of ' + CM.MAX_ACCOUNTS + ' accounts reached' : 'Request a new account';
+  }
+
+  function detail(id) {
+    var b = CM.bank(id);
+    var extra = b.status === 'active'
+      ? '<div class="kv"><span>Validated</span><b>' + b.validatedAt + '</b></div>'
+      : b.status === 'pending'
+        ? '<div class="notice warn">' + I.clock + '<span>Onboarding is validating this account (requested ' + b.requestedAt + '). You’ll get an SMS when it’s ready.</span></div>'
+        : '<div class="notice bad">' + I.alert + '<span><b>Validation failed.</b> ' + CM.esc(b.reason) + ' Contact the Onboarding team to correct it.</span></div>';
+    document.getElementById('detBody').innerHTML =
+      '<div class="det-head">' + CM.bankAv(b) + '<h3>' + CM.esc(b.bank) + '</h3>' + chipFor(b) + '</div>' +
+      '<div class="kv"><span>Account number</span><b>' + CM.mask(b.acct) + '</b></div>' +
+      '<div class="kv"><span>Account holder</span><b>' + CM.esc(b.holder) + '</b></div>' +
+      '<div class="kv"><span>In cash sweep</span><b>' + roleOf(b) + '</b></div>' + extra +
+      (b.status === 'active' ? '<div style="height:14px"></div><a class="btn btn-ghost" href="cm-allocation.html?edit=1">' + I.sliders + 'Change allocation</a>' : '');
+    CM.openSheet('detSheet');
+  }
+
+  document.getElementById('reqBtn').onclick = function () {
+    document.getElementById('reqAcct').value = '';
+    CM.openSheet('reqSheet');
+  };
+  document.getElementById('reqSend').onclick = function () {
+    var acct = document.getElementById('reqAcct').value.replace(/\D/g, '');
+    var note = document.getElementById('reqNote');
+    if (acct.length < 8) {
+      note.className = 'field-note error';
+      note.textContent = 'Enter the full account number (at least 8 digits).';
+      return;
+    }
+    var name = document.getElementById('reqBank').value;
+    var words = name.split(' ').filter(function (w) { return /^[A-Z]/.test(w); });
+    S.banks.push({
+      id: 'b' + Date.now(), bank: name, short: words.map(function (w) { return w[0]; }).join('').slice(0, 3),
+      color: '#475569', acct: acct, holder: 'London Cafe PLC', status: 'pending', requestedAt: CM.stamp().split(',')[0]
+    });
+    CM.save();
+    CM.closeSheet();
+    render();
+    CM.toast('Request sent to the M-PESA Onboarding team. You’ll get an SMS once the account is validated.');
+  };
+
+  render();
+  if (location.hash) { var id = location.hash.slice(1); if (CM.bank(id)) setTimeout(function () { detail(id); }, 150); }
+})();
+</script>
+</body>
+</html>

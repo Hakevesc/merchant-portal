@@ -1,0 +1,422 @@
+/* ==========================================================================
+   Cash Management (Automated Cash Sweep) — shared styles
+   Same phone shell, header and type as the rest of the Merchant Lite App;
+   the flow screens follow the concept frames: grey fields, option cards
+   that turn white with a green ring when picked, and a green pill CTA.
+   ========================================================================== */
+
+@font-face{font-family:'Switzer';src:url('assets/fonts/switzer-400.woff2') format('woff2');font-weight:400;font-display:swap}
+@font-face{font-family:'Switzer';src:url('assets/fonts/switzer-500.woff2') format('woff2');font-weight:500;font-display:swap}
+@font-face{font-family:'Switzer';src:url('assets/fonts/switzer-600.woff2') format('woff2');font-weight:600;font-display:swap}
+@font-face{font-family:'Switzer';src:url('assets/fonts/switzer-700.woff2') format('woff2');font-weight:700;font-display:swap}
+@font-face{font-family:'Switzer';src:url('assets/fonts/switzer-800.woff2') format('woff2');font-weight:800;font-display:swap}
+
+:root{
+  --green:#1fa856; --green-d:#1b7341; --green-l:#e8f7ee; --green-grad:linear-gradient(135deg,#1c9b52 0%,#2ec56d 100%);
+  --red:#e8343e; --red-d:#c41e2a; --red-l:#fdecee;
+  --amber:#e8912a; --amber-l:#fff4e5;
+  --ink:#16181d; --ink-2:#374151; --muted:#6b7280; --faint:#9aa0a6;
+  --line:#eef0f3; --field:#f3f4f6; --field-line:#e5e7eb;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{
+  background:linear-gradient(45deg,#1c9b52 0%,#c41e2a 58%,#e8343e 100%);
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+}
+body{
+  font-family:'Switzer','Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+  background:#fff;color:var(--ink);-webkit-font-smoothing:antialiased;
+  width:390px;max-width:100%;height:844px;max-height:100vh;margin:0 auto;
+  overflow:hidden;position:relative;transform:translateZ(0);
+  box-shadow:0 18px 50px rgba(0,0,0,.32);
+}
+@media (max-width:500px){
+  html{background:#fff;display:block;min-height:0}
+  body{width:100%;max-width:none;height:100vh;height:100dvh;max-height:none;margin:0;box-shadow:none}
+}
+button{font-family:inherit}
+a{color:inherit}
+
+.phone-scroll{height:calc(100% - 24px);overflow-y:auto;overflow-x:hidden;scrollbar-width:none}
+.phone-scroll::-webkit-scrollbar{display:none}
+body.sheet-open .phone-scroll{overflow:hidden}
+.gesture-bar{
+  position:fixed;left:0;right:0;bottom:0;height:24px;background:#fff;z-index:400;
+  display:flex;align-items:center;justify-content:center;pointer-events:none;
+}
+.gesture-bar::after{content:'';width:134px;height:5px;border-radius:3px;background:#1a1a1a}
+
+/* ---------- Header ---------- */
+.header{
+  display:grid;grid-template-columns:auto 1fr auto;align-items:center;
+  background:#fff;position:sticky;top:0;z-index:50;padding:10px 16px 26px;
+}
+.icon-btn{
+  width:32px;height:32px;margin-left:-6px;border:none;background:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;border-radius:50%;
+}
+.icon-btn svg{width:22px;height:22px;stroke:#1a1a1a;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.icon-btn.right{grid-column:3;margin:0 -6px 0 0}
+.header-title{
+  grid-column:1/-1;grid-row:2;text-align:center;margin-top:12px;
+  font-size:22px;font-weight:500;color:#000;letter-spacing:.4px;line-height:1.18;
+}
+.step-dots{grid-column:1/-1;grid-row:3;display:flex;justify-content:center;gap:6px;margin-top:10px}
+.step-dots i{width:6px;height:6px;border-radius:3px;background:#e5e7eb;transition:width .2s}
+.step-dots i.on{width:18px;background:var(--green)}
+.step-dots i.done{background:#9fd8b5}
+
+.page{padding:0 16px 130px}
+.section-label{
+  font-size:12.5px;font-weight:800;color:var(--ink);letter-spacing:.3px;
+  text-transform:uppercase;margin:18px 0 10px;
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+}
+.section-label:first-child{margin-top:4px}
+.section-label a,.section-label button{
+  font-size:11.5px;font-weight:700;color:var(--green);text-decoration:none;text-transform:none;
+  letter-spacing:0;background:none;border:none;cursor:pointer;
+}
+.hint{font-size:11.5px;color:var(--muted);line-height:1.45}
+.cur{font-size:.55em;font-weight:700;margin-left:3px;letter-spacing:0}
+
+/* ---------- Cards ---------- */
+.card{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,.05)}
+.card-pad{padding:14px 16px}
+.row{position:relative;display:flex;align-items:center;gap:12px;padding:13px 16px}
+.row + .row::before{content:'';position:absolute;top:0;left:16px;right:16px;height:1px;background:var(--line)}
+.row-main{flex:1;min-width:0}
+.row-title{font-size:13.5px;font-weight:700;color:var(--ink)}
+.row-sub{font-size:11.5px;color:var(--muted);margin-top:2px}
+.chev{width:18px;height:18px;flex-shrink:0;stroke:var(--ink-2);fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+a.row{text-decoration:none;color:inherit;cursor:pointer}
+
+/* Bank avatar: brand-coloured initials until real logos are supplied. */
+.bank-av{
+  width:40px;height:40px;flex-shrink:0;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:800;color:#fff;letter-spacing:.2px;
+  box-shadow:inset 0 0 0 2px rgba(255,255,255,.35);
+}
+.bank-av.sm{width:32px;height:32px;font-size:10.5px}
+
+/* ---------- Status chips ---------- */
+.chip{
+  display:inline-flex;align-items:center;gap:5px;flex-shrink:0;
+  padding:3px 9px;border-radius:999px;font-size:9.5px;font-weight:800;
+  letter-spacing:.4px;text-transform:uppercase;white-space:nowrap;
+}
+.chip::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor}
+.chip.ok{background:var(--green-l);color:var(--green-d)}
+.chip.warn{background:var(--amber-l);color:#b45309}
+.chip.bad{background:var(--red-l);color:var(--red-d)}
+.chip.info{background:#e8f1fd;color:#1d4ed8}
+.chip.idle{background:#f1f2f4;color:#4b5563}
+
+/* ---------- Option cards (allocation type etc.) ---------- */
+.opt{
+  display:flex;align-items:center;gap:12px;width:100%;text-align:left;
+  padding:13px 14px;border-radius:14px;background:var(--field);
+  border:1.5px solid transparent;cursor:pointer;transition:background .15s,border-color .15s;
+}
+.opt + .opt{margin-top:10px}
+.opt.on{background:#fff;border-color:var(--green);box-shadow:0 4px 14px rgba(31,168,86,.10)}
+.opt-ico{
+  width:36px;height:36px;flex-shrink:0;border-radius:50%;background:var(--green);
+  display:flex;align-items:center;justify-content:center;
+}
+.opt-ico svg{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.opt-title{font-size:14.5px;font-weight:700;color:var(--ink)}
+.opt-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.radio{
+  width:22px;height:22px;flex-shrink:0;margin-left:auto;border-radius:50%;
+  border:1.5px solid #d1d5db;background:#fff;position:relative;
+}
+.on > .radio,.radio.on{border-color:#d1d5db}
+.on > .radio::after,.radio.on::after{
+  content:'';position:absolute;inset:4px;border-radius:50%;background:#2ec56d;
+}
+
+/* ---------- Fields ---------- */
+.field{
+  display:flex;align-items:stretch;height:46px;border-radius:12px;
+  background:var(--field);border:1px solid var(--field-line);overflow:hidden;
+}
+.field.error{border-color:var(--red);background:#fff7f7}
+.field input,.field .val{
+  flex:1;min-width:0;border:none;background:transparent;outline:none;
+  padding:0 14px;font-family:inherit;font-size:15px;font-weight:700;color:var(--ink);
+  display:flex;align-items:center;
+}
+.field .val.placeholder{color:var(--faint);font-weight:500}
+.field .suffix{
+  flex-shrink:0;min-width:46px;padding:0 12px;border-left:1px solid var(--field-line);
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;color:var(--muted);
+}
+.field .suffix svg{width:20px;height:20px;stroke:var(--ink);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+button.field{width:100%;text-align:left;cursor:pointer;font-family:inherit;padding:0}
+.field-label{font-size:12.5px;font-weight:800;letter-spacing:.3px;text-transform:uppercase;margin:16px 0 8px}
+.field-note{font-size:11.5px;color:var(--muted);margin-top:7px}
+.field-note b{color:var(--green);font-weight:800}
+.field-note.error{color:var(--red-d);font-weight:600}
+
+/* ---------- Toggle row ---------- */
+.toggle-card{
+  display:flex;align-items:center;gap:12px;margin-top:18px;padding:14px;
+  border-radius:14px;background:#f3fbf6;border:1.5px solid #bfe7cf;
+}
+.toggle-card .opt-title{font-size:13.5px}
+.switch{position:relative;width:42px;height:24px;flex-shrink:0;margin-left:auto}
+.switch input{position:absolute;opacity:0;inset:0;cursor:pointer;z-index:1;margin:0}
+.switch span{position:absolute;inset:0;border-radius:12px;background:#d1d5db;transition:background .2s}
+.switch span::after{
+  content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;
+  background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:transform .2s;
+}
+.switch input:checked + span{background:#2ec56d}
+.switch input:checked + span::after{transform:translateX(18px)}
+
+/* ---------- Day chips (weekly / monthly) ---------- */
+.day-chips{display:flex;flex-wrap:wrap;gap:7px}
+.day-chip{
+  min-width:40px;height:36px;padding:0 10px;border-radius:10px;cursor:pointer;
+  background:var(--field);border:1.5px solid transparent;
+  font-size:12px;font-weight:700;color:var(--ink-2);
+}
+.day-chip.on{background:#fff;border-color:var(--green);color:var(--green-d)}
+
+/* ---------- Footer CTA ---------- */
+.footer{
+  position:fixed;left:0;right:0;bottom:24px;z-index:60;
+  padding:12px 16px;background:#fff;box-shadow:0 -10px 18px -14px rgba(0,0,0,.18);
+}
+.footer .hint{text-align:center;margin-bottom:9px}
+.btn{
+  display:flex;align-items:center;justify-content:center;gap:8px;width:100%;height:52px;
+  border:none;border-radius:26px;cursor:pointer;text-decoration:none;
+  font-size:13.5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;
+  transition:transform .15s,box-shadow .15s,opacity .15s;
+}
+.btn:active{transform:translateY(1px)}
+.btn-primary{background:var(--green-grad);color:#fff;box-shadow:0 8px 18px rgba(31,168,86,.28)}
+.btn-primary:disabled{opacity:.45;box-shadow:none;cursor:not-allowed}
+.btn-ghost{background:#fff;color:var(--green-d);border:1.5px solid #cfeedd}
+.btn-danger{background:#fff;color:var(--red-d);border:1.5px solid #f6cdd1}
+.btn svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.btn-row{display:flex;gap:10px}
+.btn-row .btn{flex:1}
+
+/* ---------- Bottom sheet ---------- */
+.sheet-backdrop{
+  position:fixed;inset:0;z-index:300;background:rgba(17,24,39,.45);
+  opacity:0;pointer-events:none;transition:opacity .2s;
+}
+.sheet{
+  position:fixed;left:0;right:0;bottom:0;z-index:310;background:#fff;
+  border-radius:22px 22px 0 0;padding:10px 20px 40px;
+  transform:translateY(105%);transition:transform .25s ease;
+}
+.sheet::before{content:'';display:block;width:40px;height:4px;border-radius:2px;background:#d1d5db;margin:0 auto 14px}
+.sheet-title{text-align:center;font-size:14px;font-weight:600;color:var(--ink-2);letter-spacing:.4px;text-transform:uppercase;margin-bottom:14px}
+body.sheet-open .sheet-backdrop{opacity:1;pointer-events:auto}
+.sheet.open{transform:translateY(0)}
+
+/* Scroll-snap wheel picker */
+.wheels{display:flex;justify-content:center;gap:10px;position:relative;margin-bottom:18px}
+.wheels::before{
+  content:'';position:absolute;left:0;right:0;top:50%;height:40px;margin-top:-20px;
+  border-top:1px solid var(--line);border-bottom:1px solid var(--line);pointer-events:none;
+}
+.wheel{
+  width:82px;height:200px;overflow-y:auto;scroll-snap-type:y mandatory;scrollbar-width:none;
+  -webkit-mask-image:linear-gradient(transparent,#000 35%,#000 65%,transparent);
+  mask-image:linear-gradient(transparent,#000 35%,#000 65%,transparent);
+}
+.wheel::-webkit-scrollbar{display:none}
+.wheel div{
+  height:40px;display:flex;align-items:center;justify-content:center;scroll-snap-align:center;
+  font-size:15px;font-weight:600;color:var(--faint);
+}
+.wheel div.sel{color:var(--ink);font-weight:800}
+.wheel .pad{pointer-events:none}
+
+.sheet-list .opt{background:#fff;border:1.5px solid var(--line)}
+.sheet-list .opt.on{border-color:var(--green)}
+
+/* ---------- PIN ---------- */
+.pin-dots{display:flex;justify-content:center;gap:14px;margin:6px 0 20px}
+.pin-dots i{width:14px;height:14px;border-radius:50%;border:2px solid #cbd5e1}
+.pin-dots i.fill{background:var(--ink);border-color:var(--ink)}
+.keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.keypad button{
+  height:52px;border:none;border-radius:14px;background:var(--field);cursor:pointer;
+  font-size:20px;font-weight:700;color:var(--ink);
+}
+.keypad button.blank{background:none;pointer-events:none}
+.keypad button svg{width:22px;height:22px;stroke:var(--ink);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.pin-error{text-align:center;font-size:12px;font-weight:600;color:var(--red-d);min-height:16px;margin:-10px 0 10px}
+
+/* ---------- Toast ---------- */
+.toast{
+  position:fixed;left:16px;right:16px;bottom:110px;z-index:500;
+  padding:12px 14px;border-radius:14px;background:#1f2429;color:#fff;
+  font-size:12.5px;line-height:1.45;display:flex;gap:9px;align-items:flex-start;
+  opacity:0;transform:translateY(8px);pointer-events:none;transition:opacity .2s,transform .2s;
+}
+.toast.show{opacity:1;transform:translateY(0)}
+.toast svg{width:18px;height:18px;flex-shrink:0;stroke:#7ee2a8;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;margin-top:1px}
+
+/* ---------- Summary card (review / receipts) ---------- */
+.sum-card{
+  position:relative;background:#fff;border-radius:20px;padding:20px 18px 8px;
+  box-shadow:0 10px 30px rgba(15,23,42,.10);border:1px solid var(--line);
+}
+.sum-av{
+  width:56px;height:56px;border-radius:50%;margin:0 auto 6px;background:var(--green-l);
+  display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:800;color:var(--green);
+}
+.sum-name{text-align:center;font-size:13px;font-weight:700;margin-bottom:6px}
+.sum-item{position:relative;display:flex;align-items:center;gap:10px;padding:13px 0}
+.sum-item + .sum-item::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:var(--line)}
+.sum-item .k{font-size:10.5px;font-weight:600;color:var(--muted);letter-spacing:.5px;text-transform:uppercase}
+.sum-item .v{font-size:14px;font-weight:600;color:var(--ink);margin-top:3px}
+.sum-item .grow{flex:1;min-width:0}
+.edit-btn,.copy-btn{
+  width:34px;height:34px;flex-shrink:0;border-radius:50%;border:none;cursor:pointer;
+  background:var(--field);display:flex;align-items:center;justify-content:center;text-decoration:none;
+}
+.edit-btn svg,.copy-btn svg{width:16px;height:16px;stroke:var(--ink-2);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.alloc-line{display:flex;align-items:center;gap:10px;margin-top:9px}
+.alloc-line .nm{flex:1;min-width:0;font-size:13px;font-weight:600}
+.alloc-line .nm small{display:block;font-size:10.5px;color:var(--muted);font-weight:500;margin-top:1px}
+.alloc-line .amt{font-size:13.5px;font-weight:800;white-space:nowrap}
+.tag{
+  display:inline-block;margin-left:6px;padding:1px 6px;border-radius:6px;vertical-align:1px;
+  background:var(--green-l);color:var(--green-d);font-size:8.5px;font-weight:800;letter-spacing:.4px;
+}
+
+/* Faint M-PESA pattern behind receipts, as in the concept frames. */
+.watermark{
+  position:absolute;right:-90px;bottom:-40px;width:340px;height:420px;z-index:-1;
+  background:url('assets/mpesa-pattern.png') no-repeat center/contain;opacity:.10;pointer-events:none;
+}
+.result-ico{
+  width:58px;height:58px;margin:0 auto 8px;border-radius:50%;border:2.5px solid var(--green);
+  display:flex;align-items:center;justify-content:center;
+}
+.result-ico svg{width:28px;height:28px;stroke:var(--green);fill:none;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.result-ico.warn{border-color:var(--amber)} .result-ico.warn svg{stroke:var(--amber)}
+.result-ico.bad{border-color:var(--red)} .result-ico.bad svg{stroke:var(--red)}
+.result-ico.info{border-color:#3b82f6} .result-ico.info svg{stroke:#3b82f6}
+.result-title{text-align:center;font-size:14px;font-weight:700;color:var(--green);margin-bottom:12px}
+.result-title.warn{color:#b45309} .result-title.bad{color:var(--red-d)} .result-title.info{color:#1d4ed8}
+
+/* ---------- Notices ---------- */
+.notice{
+  display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:14px;
+  background:#f3fbf6;border:1px solid #d3efdd;font-size:11.5px;color:var(--ink-2);line-height:1.5;
+}
+.notice svg{width:18px;height:18px;flex-shrink:0;stroke:var(--green);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;margin-top:1px}
+.notice.warn{background:var(--amber-l);border-color:#fde2bd}
+.notice.warn svg{stroke:var(--amber)}
+.notice.bad{background:#fff5f5;border-color:#fbd5d8;color:#7f1d1d}
+.notice.bad svg{stroke:var(--red)}
+.notice b{color:var(--ink)}
+
+/* ==========================================================================
+   Simple-screen language (Cash Management home and the pages it opens)
+   ========================================================================== */
+  /* ---------- Simple screens: left-aligned title ---------- */
+  .top{background:#fff;position:sticky;top:0;z-index:50;padding:10px 16px 14px}
+  .top h1{font-size:22px;font-weight:800;color:var(--ink);margin-top:10px;letter-spacing:-.2px}
+  .top p{font-size:12px;color:var(--muted);margin-top:3px}
+
+  /* ---------- Red summary card (.bal) ---------- */
+  .bal{
+    position:relative;overflow:hidden;border-radius:20px;padding:18px 18px 14px;color:#fff;
+    background:linear-gradient(135deg,#e8343e 0%,#c41e2a 45%,#a81520 100%);
+    box-shadow:0 10px 22px rgba(168,21,32,.28);
+  }
+  .bal-label{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:500;color:rgba(255,255,255,.9)}
+  .bal-amt{font-size:30px;font-weight:800;letter-spacing:-.8px;margin:4px 0 16px;position:relative;z-index:1}
+  .bal-amt .cur{font-size:.52em}
+  .bal-foot{
+    position:relative;z-index:1;display:flex;align-items:center;gap:10px;
+    padding-top:12px;border-top:1px solid rgba(255,255,255,.22);
+  }
+  .bal-foot svg{width:20px;height:20px;flex-shrink:0;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .bal-foot .k{font-size:11px;color:rgba(255,255,255,.85)}
+  .bal-foot .v{font-size:13.5px;font-weight:700}
+  .bal-pill{
+    margin-left:auto;padding:5px 12px;border-radius:999px;background:rgba(255,255,255,.2);
+    font-size:11px;font-weight:700;
+  }
+
+  /* ---------- Tile cards ---------- */
+  .tiles{display:flex;flex-direction:column;gap:10px;margin-top:14px}
+  .tile{
+    display:flex;align-items:center;gap:14px;padding:14px;border-radius:16px;
+    background:#fff;border:1px solid var(--line);box-shadow:0 2px 10px rgba(0,0,0,.05);
+    text-decoration:none;color:inherit;
+  }
+  .tile-ico{
+    width:46px;height:46px;flex-shrink:0;border-radius:50%;background:var(--green-l);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .tile-ico svg{width:22px;height:22px;stroke:var(--green-d);fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+  .tile-ico.warn{background:var(--amber-l)} .tile-ico.warn svg{stroke:#b45309}
+  .tile-ico.bad{background:var(--red-l)} .tile-ico.bad svg{stroke:var(--red-d)}
+  .tile-ico.idle{background:#f1f2f4} .tile-ico.idle svg{stroke:#6b7280}
+  .tile-main{flex:1;min-width:0}
+  .tile-title{font-size:14.5px;font-weight:800;color:var(--ink)}
+  .tile-sub{font-size:11.5px;color:var(--muted);margin-top:2px}
+  .tile-amt{font-size:17px;font-weight:800;margin-top:4px;letter-spacing:-.3px}
+  .tile-amt .cur{font-size:.6em}
+  .tile .chev{margin-left:2px}
+
+  /* One horizontal row of small bank chips. */
+  .banks{display:flex;flex-wrap:nowrap;gap:6px;margin-top:9px;min-width:0}
+  .banks div{
+    display:flex;align-items:center;gap:5px;min-width:0;flex:0 1 auto;
+    padding:3px 9px 3px 3px;border-radius:999px;background:#f6f7f9;
+    font-size:10.5px;font-weight:600;color:var(--ink-2);white-space:nowrap;
+  }
+  .banks div span{overflow:hidden;text-overflow:ellipsis}
+  .banks .bank-av{width:20px;height:20px;font-size:7px;box-shadow:none}
+
+  /* Status pill with an icon, as in the mock. */
+  .st{
+    display:inline-flex;align-items:center;gap:5px;flex-shrink:0;padding:5px 10px;border-radius:999px;
+    font-size:11px;font-weight:700;white-space:nowrap;
+  }
+  .st svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+  .st.ok{background:var(--green-l);color:var(--green-d)}
+  .st.warn{background:var(--amber-l);color:#b45309}
+  .st.bad{background:var(--red-l);color:var(--red-d)}
+  .st.idle{background:#f1f2f4;color:#4b5563}
+  .st.info{background:#e8f1fd;color:#1d4ed8}
+
+  /* ---------- Sweep history ---------- */
+  .hist-head{display:flex;align-items:center;justify-content:space-between;margin:22px 2px 10px}
+  .hist-head h2{font-size:15px;font-weight:800}
+  .hist-head a{font-size:12px;font-weight:700;color:var(--green);text-decoration:none}
+  .hist{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,.05)}
+  .hist .tile{border:none;box-shadow:none;border-radius:0;position:relative;background:transparent}
+  .hist .tile + .tile::before{content:'';position:absolute;top:0;left:14px;right:14px;height:1px;background:var(--line)}
+  .hist .tile-ico{width:42px;height:42px}
+  .hist .tile-title{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .hist .tile-amt{font-size:15px;margin-top:2px}
+
+.top .icon-btn{margin-left:-6px}
+.page-simple{padding:0 16px 120px}
+.cap{font-size:11.5px;color:var(--muted);margin:-6px 2px 12px}
+.kv-list .kv{display:flex;justify-content:space-between;gap:12px;padding:12px 14px;font-size:12.5px}
+.kv-list .kv + .kv{border-top:1px solid var(--line)}
+.kv-list .kv span{color:var(--muted)}
+.kv-list .kv b{font-weight:700;text-align:right;display:flex;align-items:center;gap:8px}
+.kv-list .copy-btn{width:28px;height:28px;margin:-4px 0}
+.reason{font-size:11px;color:var(--red-d);margin-top:3px;line-height:1.4}
+.bal-big{font-size:28px;font-weight:800;letter-spacing:-.7px;margin:4px 0 14px;position:relative;z-index:1}
+.bal-big .cur{font-size:.52em}

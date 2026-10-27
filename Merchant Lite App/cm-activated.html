@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Sweep Activated</title>
+<link rel="stylesheet" href="cm.css">
+<style>
+  .page{position:relative;z-index:0;padding-bottom:170px}
+  .footer .btn-row{margin-bottom:10px}
+  .footer .btn{height:48px}
+</style>
+</head>
+<body>
+<div class="phone-scroll">
+  <div class="header">
+    <button class="icon-btn" onclick="location.href='cm-home.html'" aria-label="Close" id="closeBtn"></button>
+    <div class="header-title">SWEEP DETAILS</div>
+  </div>
+  <div class="page">
+    <div class="watermark"></div>
+    <div class="sum-card" id="summary"></div>
+  </div>
+</div>
+
+<div class="footer">
+  <div class="btn-row">
+    <button class="btn btn-primary" id="dlBtn"></button>
+    <button class="btn btn-ghost" id="shareBtn"></button>
+  </div>
+  <a class="btn btn-ghost" href="cm-home.html" style="border:none;height:40px">Back to Cash Management</a>
+</div>
+<div class="gesture-bar"></div>
+
+<script src="cm.js"></script>
+<script>
+(function () {
+  var I = CM.ICON, c = CM.state.config;
+  document.getElementById('closeBtn').innerHTML = I.close;
+  document.getElementById('dlBtn').innerHTML = I.download + 'Download';
+  document.getElementById('shareBtn').innerHTML = I.share + 'Share';
+  if (!c) { location.replace('cm-home.html'); return; }
+
+  function item(label, value, copy) {
+    return '<div class="sum-item"><div class="grow"><div class="k">' + label + '</div><div class="v">' + value + '</div></div>' +
+      (copy ? '<button class="copy-btn" data-copy="' + value + '" aria-label="Copy ' + label + '">' + I.copy + '</button>' : '') + '</div>';
+  }
+  var rows = CM.split(c, CM.WORKING_BALANCE).filter(function (r) { return !r.unallocated; });
+  var alloc = rows.map(function (r) {
+    var b = CM.bank(r.id);
+    return '<div class="alloc-line">' + CM.bankAv(b, true) +
+      '<div class="nm">' + CM.esc(b.bank) + (r.primary ? '<span class="tag">PRIMARY</span>' : '') +
+      '<small>' + CM.mask(b.acct) + '</small></div>' +
+      '<div class="amt">' + (r.primary ? 'Remainder' : c.type === 'fixed' ? CM.money(r.value) + ' ETB' : r.value + '%') + '</div></div>';
+  }).join('');
+
+  var on = c.enabled !== false;
+  document.getElementById('summary').innerHTML =
+    '<div class="result-ico">' + I.check + '</div>' +
+    '<div class="result-title">' + (on ? 'Cash sweep activated successfully!' : 'Cash sweep saved — automatic sweep is off') + '</div>' +
+    '<div class="sum-av">' + CM.MERCHANT.initials + '</div>' +
+    item('Allocation type', c.type === 'fixed' ? 'Fixed amount' : 'Percentage') +
+    '<div class="sum-item"><div class="grow"><div class="k">Bank accounts</div>' + alloc + '</div></div>' +
+    item('Frequency', CM.freqLabel(c).toUpperCase()) +
+    item('Sweep time', CM.time12(c.time)) +
+    item('Start date', CM.dateLabel(c.start).toUpperCase()) +
+    item('First sweep', on ? CM.runLabel(CM.nextRun(c)) : 'Not scheduled') +
+    item('Date', c.activatedAt.toUpperCase()) +
+    item('Transaction ID', c.ref, true);
+
+  document.querySelectorAll('[data-copy]').forEach(function (b) {
+    b.onclick = function () { CM.copy(b.dataset.copy, 'Transaction ID'); };
+  });
+  document.getElementById('dlBtn').onclick = function () { CM.toast('Confirmation saved to your downloads.'); };
+  document.getElementById('shareBtn').onclick = function () {
+    var text = 'M-PESA cash sweep activated. ' + CM.freqLabel(c) + ' at ' + CM.time12(c.time) + '. Ref ' + c.ref + '.';
+    if (navigator.share) navigator.share({ title: 'Cash sweep', text: text }).catch(function () {});
+    else CM.copy(text, 'Confirmation');
+  };
+})();
+</script>
+</body>
+</html>

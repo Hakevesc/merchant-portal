@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Sweep Schedule</title>
+<link rel="stylesheet" href="cm.css">
+<style>
+  .start-opts{display:flex;gap:8px;margin-bottom:14px}
+  .start-opts .day-chip{flex:1}
+  #nextNote{margin-top:16px}
+</style>
+</head>
+<body>
+<div class="phone-scroll">
+  <div class="header">
+    <button class="icon-btn" onclick="location.href='cm-allocation.html'" aria-label="Back" id="backBtn"></button>
+    <div class="header-title">SWEEP SCHEDULE</div>
+    <div class="step-dots"><i class="done"></i><i class="on"></i><i></i></div>
+  </div>
+
+  <div class="page">
+    <div class="section-label">When and how often</div>
+
+    <div class="field-label" style="margin-top:0">Frequency</div>
+    <button class="field" id="freqBtn"><span class="val" id="freqVal"></span><span class="suffix" data-ico="down"></span></button>
+
+    <div id="dayWrap"></div>
+
+    <div class="field-label">Sweep time</div>
+    <button class="field" id="timeBtn"><span class="val placeholder" id="timeVal">Choose time</span><span class="suffix" data-ico="clock"></span></button>
+
+    <div class="field-label">Start date</div>
+    <button class="field" id="dateBtn"><span class="val" id="dateVal"></span><span class="suffix" data-ico="cal"></span></button>
+
+    <div class="toggle-card">
+      <span class="opt-ico" data-ico="bolt"></span>
+      <div class="row-main"><div class="opt-title">Enable Automatic Sweep</div>
+        <div class="opt-sub">Turn off to save the setup without running it</div></div>
+      <label class="switch"><input type="checkbox" id="autoToggle"><span></span></label>
+    </div>
+
+    <div id="nextNote"></div>
+  </div>
+</div>
+
+<div class="footer">
+  <button class="btn btn-primary" id="continueBtn">Continue</button>
+</div>
+<div class="gesture-bar"></div>
+
+<!-- Frequency sheet -->
+<div class="sheet-backdrop" onclick="CM.closeSheet()"></div>
+<div class="sheet" id="freqSheet">
+  <div class="sheet-title">Frequency</div>
+  <div class="sheet-list" id="freqList"></div>
+</div>
+
+<!-- Time sheet -->
+<div class="sheet" id="timeSheet">
+  <div class="sheet-title">Sweep time</div>
+  <div class="wheels"><div class="wheel" id="wHour"></div><div class="wheel" id="wMin"></div><div class="wheel" id="wAp"></div></div>
+  <button class="btn btn-primary" id="timeSelect">Select</button>
+</div>
+
+<!-- Start date sheet -->
+<div class="sheet" id="dateSheet">
+  <div class="sheet-title">Start date</div>
+  <div class="start-opts">
+    <button class="day-chip" data-start="now">Immediately</button>
+    <button class="day-chip" data-start="pick">Pick a date</button>
+  </div>
+  <div class="wheels" id="dateWheels"><div class="wheel" id="wDay"></div><div class="wheel" id="wMon"></div><div class="wheel" id="wYear"></div></div>
+  <button class="btn btn-primary" id="dateSelect">Select</button>
+</div>
+
+<script src="cm.js"></script>
+<script>
+(function () {
+  var I = CM.ICON;
+  var d = CM.getDraft();
+  document.getElementById('backBtn').innerHTML = I.back;
+  document.querySelectorAll('[data-ico]').forEach(function (el) { el.innerHTML = I[el.dataset.ico]; });
+
+  var FREQS = [
+    ['daily', 'Daily', 'Every day at the sweep time', 'clock'],
+    ['weekly', 'Weekly', 'Once a week on the day you choose', 'cal'],
+    ['monthly', 'Monthly', 'Once a month on the date you choose', 'cal']
+  ];
+
+  function render() {
+    document.getElementById('freqVal').textContent = d.freq.toUpperCase();
+
+    var wrap = document.getElementById('dayWrap');
+    if (d.freq === 'weekly') {
+      wrap.innerHTML = '<div class="field-label">Sweep day</div><div class="day-chips">' +
+        [1, 2, 3, 4, 5, 6, 0].map(function (i) {
+          return '<button class="day-chip' + (d.weekday === i ? ' on' : '') + '" data-wd="' + i + '">' +
+            CM.WEEKDAYS[i].slice(0, 3) + '</button>';
+        }).join('') + '</div>';
+    } else if (d.freq === 'monthly') {
+      var days = [];
+      for (var i = 1; i <= 28; i++) days.push(i);
+      days.push('last');
+      wrap.innerHTML = '<div class="field-label">Day of the month</div><div class="day-chips">' +
+        days.map(function (n) {
+          return '<button class="day-chip' + (d.monthday === n ? ' on' : '') + '" data-md="' + n + '">' +
+            (n === 'last' ? 'Last day' : n) + '</button>';
+        }).join('') + '</div><div class="field-note">Days 29–31 are left out so the sweep runs every month; pick “Last day” for month end.</div>';
+    } else wrap.innerHTML = '';
+    wrap.querySelectorAll('[data-wd]').forEach(function (b) {
+      b.onclick = function () { d.weekday = +b.dataset.wd; save(); };
+    });
+    wrap.querySelectorAll('[data-md]').forEach(function (b) {
+      b.onclick = function () { d.monthday = b.dataset.md === 'last' ? 'last' : +b.dataset.md; save(); };
+    });
+
+    var tv = document.getElementById('timeVal');
+    tv.textContent = d.time ? CM.time12(d.time) : 'Choose time';
+    tv.classList.toggle('placeholder', !d.time);
+    document.getElementById('dateVal').textContent = CM.dateLabel(d.start);
+    document.getElementById('autoToggle').checked = d.enabled !== false;
+
+    var note = document.getElementById('nextNote');
+    if (!d.time) note.innerHTML = '<div class="notice">' + I.info + '<span>Choose a sweep time to see when the first sweep runs.</span></div>';
+    else if (d.enabled === false) note.innerHTML = '<div class="notice warn">' + I.pause.replace('<svg', '<svg') + '<span>Automatic sweep is off. Your setup is saved, but nothing is transferred until you turn it on.</span></div>';
+    else note.innerHTML = '<div class="notice">' + I.clock + '<span>First sweep: <b>' + CM.runLabel(CM.nextRun(d)) +
+      '</b>. The eligible balance is calculated at that moment, then split across your accounts.</span></div>';
+    document.getElementById('continueBtn').disabled = !d.time;
+  }
+  function save() { CM.saveDraft(d); render(); }
+
+  /* ---- Frequency ---- */
+  document.getElementById('freqBtn').onclick = function () {
+    document.getElementById('freqList').innerHTML = FREQS.map(function (f) {
+      return '<button class="opt' + (d.freq === f[0] ? ' on' : '') + '" data-f="' + f[0] + '">' +
+        '<span class="opt-ico">' + I[f[3]] + '</span><span><span class="opt-title" style="display:block">' + f[1] +
+        '</span><span class="opt-sub" style="display:block">' + f[2] + '</span></span><span class="radio"></span></button>';
+    }).join('');
+    document.querySelectorAll('[data-f]').forEach(function (b) {
+      b.onclick = function () { d.freq = b.dataset.f; CM.closeSheet(); save(); };
+    });
+    CM.openSheet('freqSheet');
+  };
+
+  /* ---- Time ---- */
+  var hours = [], mins = [];
+  for (var h = 1; h <= 12; h++) hours.push({ label: String(h).padStart(2, '0'), value: h });
+  for (var m = 0; m < 60; m += 5) mins.push({ label: String(m).padStart(2, '0'), value: m });
+  var wh, wm, wa;
+  document.getElementById('timeBtn').onclick = function () {
+    var cur = (d.time || '18:00').split(':'), H = +cur[0];
+    CM.openSheet('timeSheet');
+    wh = CM.wheel(document.getElementById('wHour'), hours, H % 12 || 12);
+    wm = CM.wheel(document.getElementById('wMin'), mins, Math.round(+cur[1] / 5) * 5 % 60);
+    wa = CM.wheel(document.getElementById('wAp'), [{ label: 'AM', value: 'AM' }, { label: 'PM', value: 'PM' }], H >= 12 ? 'PM' : 'AM');
+  };
+  document.getElementById('timeSelect').onclick = function () {
+    var H = wh.get() % 12 + (wa.get() === 'PM' ? 12 : 0);
+    d.time = String(H).padStart(2, '0') + ':' + String(wm.get()).padStart(2, '0');
+    CM.closeSheet(); save();
+  };
+
+  /* ---- Start date ---- */
+  var wd, wmo, wy, startMode;
+  function setStartMode(mode) {
+    startMode = mode;
+    document.querySelectorAll('[data-start]').forEach(function (b) { b.classList.toggle('on', b.dataset.start === mode); });
+    document.getElementById('dateWheels').style.display = mode === 'pick' ? '' : 'none';
+    if (mode === 'pick' && !wd) buildDateWheels();
+  }
+  function buildDateWheels() {
+    var now = new Date(), base = d.start && d.start !== 'immediately' ? new Date(d.start + 'T00:00:00')
+      : new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+    var days = [], mons = [], years = [];
+    for (var i = 1; i <= 31; i++) days.push({ label: String(i).padStart(2, '0'), value: i });
+    CM.MONTHS.forEach(function (n, k) { mons.push({ label: n.toUpperCase(), value: k }); });
+    for (var y = now.getFullYear(); y <= now.getFullYear() + 1; y++) years.push({ label: String(y), value: y });
+    wd = CM.wheel(document.getElementById('wDay'), days, base.getDate());
+    wmo = CM.wheel(document.getElementById('wMon'), mons, base.getMonth());
+    wy = CM.wheel(document.getElementById('wYear'), years, base.getFullYear());
+  }
+  document.querySelectorAll('[data-start]').forEach(function (b) { b.onclick = function () { setStartMode(b.dataset.start); }; });
+  document.getElementById('dateBtn').onclick = function () {
+    CM.openSheet('dateSheet');
+    setStartMode(d.start && d.start !== 'immediately' ? 'pick' : 'now');
+  };
+  document.getElementById('dateSelect').onclick = function () {
+    if (startMode === 'now') d.start = 'immediately';
+    else {
+      var y = wy.get(), mo = wmo.get(), day = Math.min(wd.get(), new Date(y, mo + 1, 0).getDate());
+      var picked = new Date(y, mo, day), today = new Date(); today.setHours(0, 0, 0, 0);
+      if (picked < today) { CM.toast('Pick today or a later date.'); return; }
+      d.start = y + '-' + String(mo + 1).padStart(2, '0') + '-' + String(day).padStart(2, '0');
+    }
+    CM.closeSheet(); save();
+  };
+
+  document.getElementById('autoToggle').onchange = function (e) { d.enabled = e.target.checked; save(); };
+  document.getElementById('continueBtn').onclick = function () { CM.saveDraft(d); location.href = 'cm-review.html'; };
+
+  render();
+})();
+</script>
+</body>
+</html>

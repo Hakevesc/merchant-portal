@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Review &amp; Confirm</title>
+<link rel="stylesheet" href="cm.css">
+<style>
+  .page{position:relative;z-index:0}
+  .pin-sub{text-align:center;font-size:12px;color:var(--muted);margin:-6px 0 16px}
+</style>
+</head>
+<body>
+<div class="phone-scroll">
+  <div class="header">
+    <button class="icon-btn" onclick="location.href='cm-schedule.html'" aria-label="Back" id="backBtn"></button>
+    <div class="header-title">REVIEW &amp; CONFIRM</div>
+    <div class="step-dots"><i class="done"></i><i class="done"></i><i class="on"></i></div>
+  </div>
+
+  <div class="page">
+    <div class="watermark"></div>
+    <div class="sum-card" id="summary"></div>
+    <div style="margin-top:14px" class="notice">
+      <span id="infoIco"></span>
+      <span>At each sweep the eligible balance is worked out first, then each transfer is sent separately and gets its own reference. If one bank fails, the others still go through.</span>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  <button class="btn btn-primary" id="confirmBtn">Confirm</button>
+</div>
+<div class="gesture-bar"></div>
+
+<div class="sheet-backdrop" onclick="CM.closeSheet()"></div>
+<div class="sheet" id="pinSheet">
+  <div class="sheet-title">Enter M-PESA PIN</div>
+  <div class="pin-sub">To activate the automated cash sweep</div>
+  <div class="pin-dots" id="pinDots"><i></i><i></i><i></i><i></i></div>
+  <div class="pin-error" id="pinError"></div>
+  <div class="keypad" id="keypad"></div>
+</div>
+
+<script src="cm.js"></script>
+<script>
+(function () {
+  var I = CM.ICON, d = CM.getDraft();
+  document.getElementById('backBtn').innerHTML = I.back;
+  document.getElementById('infoIco').outerHTML = I.info;
+
+  if (CM.problems(d).length || !d.time) { location.replace('cm-allocation.html'); return; }
+
+  function item(label, value, edit) {
+    return '<div class="sum-item"><div class="grow"><div class="k">' + label + '</div><div class="v">' + value + '</div></div>' +
+      (edit ? '<a class="edit-btn" href="' + edit + '" aria-label="Edit ' + label + '">' + I.edit + '</a>' : '') + '</div>';
+  }
+
+  var rows = CM.split(d, CM.WORKING_BALANCE).filter(function (r) { return !r.unallocated; });
+  var alloc = rows.map(function (r) {
+    var b = CM.bank(r.id);
+    return '<div class="alloc-line">' + CM.bankAv(b, true) +
+      '<div class="nm">' + CM.esc(b.bank) + (r.primary ? '<span class="tag">PRIMARY</span>' : '') +
+      '<small>' + CM.mask(b.acct) + '</small></div>' +
+      '<div class="amt">' + (r.primary ? 'Remainder' : d.type === 'fixed' ? CM.money(r.value) + ' ETB' : r.value + '%') + '</div></div>';
+  }).join('');
+
+  document.getElementById('summary').innerHTML =
+    '<div class="sum-av">' + CM.MERCHANT.initials + '</div>' +
+    '<div class="sum-name">' + CM.MERCHANT.name + ' · ' + CM.MERCHANT.shortCode + '</div>' +
+    item('Allocation type', d.type === 'fixed' ? 'Fixed amount' : 'Percentage', 'cm-allocation.html') +
+    '<div class="sum-item"><div class="grow"><div class="k">Bank accounts</div>' + alloc + '</div>' +
+      '<a class="edit-btn" href="cm-allocation.html" aria-label="Edit bank accounts" style="align-self:flex-start">' + I.edit + '</a></div>' +
+    item('Frequency', CM.freqLabel(d).toUpperCase(), 'cm-schedule.html') +
+    item('Sweep time', CM.time12(d.time), 'cm-schedule.html') +
+    item('Start date', CM.dateLabel(d.start).toUpperCase(), 'cm-schedule.html') +
+    item('First sweep', d.enabled === false ? 'Off until you turn on automatic sweep' : CM.runLabel(CM.nextRun(d)), null);
+
+  /* ---- PIN ---- */
+  var pin = '';
+  var keys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '', '0', 'del'];
+  document.getElementById('keypad').innerHTML = keys.map(function (k) {
+    return k === '' ? '<button class="blank" tabindex="-1"></button>'
+      : '<button data-k="' + k + '" aria-label="' + (k === 'del' ? 'Delete' : k) + '">' + (k === 'del' ? I.del : k) + '</button>';
+  }).join('');
+  function dots() {
+    document.querySelectorAll('#pinDots i').forEach(function (el, i) { el.classList.toggle('fill', i < pin.length); });
+  }
+  document.querySelectorAll('[data-k]').forEach(function (b) {
+    b.onclick = function () {
+      document.getElementById('pinError').textContent = '';
+      if (b.dataset.k === 'del') pin = pin.slice(0, -1);
+      else if (pin.length < 4) pin += b.dataset.k;
+      dots();
+      if (pin.length === 4) {
+        /* Prototype: any four digits except 0000 are accepted. */
+        if (pin === '0000') {
+          document.getElementById('pinError').textContent = 'Incorrect PIN. Try again.';
+          pin = ''; setTimeout(dots, 250);
+          return;
+        }
+        CM.activate(d);
+        setTimeout(function () { location.href = 'cm-activated.html'; }, 250);
+      }
+    };
+  });
+  document.getElementById('confirmBtn').onclick = function () { pin = ''; dots(); CM.openSheet('pinSheet'); };
+})();
+</script>
+</body>
+</html>

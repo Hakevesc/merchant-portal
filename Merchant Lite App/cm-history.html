@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Sweep History</title>
+<link rel="stylesheet" href="cm.css">
+<style>
+  .filters{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin:16px -16px 12px;padding:0 16px 2px}
+  .filters::-webkit-scrollbar{display:none}
+  .filters button{
+    flex-shrink:0;height:34px;padding:0 15px;border-radius:17px;border:none;cursor:pointer;
+    background:var(--field);font-size:12px;font-weight:600;color:var(--ink-2);
+  }
+  .filters button.on{background:var(--red);color:#fff;font-weight:700}
+  .group{font-size:11px;font-weight:700;color:var(--faint);letter-spacing:.5px;margin:14px 2px 8px}
+  .empty-list{text-align:center;padding:28px 10px;color:var(--muted);font-size:12.5px}
+</style>
+</head>
+<body>
+<div class="phone-scroll">
+  <div class="top">
+    <button class="icon-btn" onclick="CM.goBack('cm-home.html')" aria-label="Back" id="backBtn"></button>
+    <h1>Sweep History</h1>
+  </div>
+  <div class="page-simple" style="padding-bottom:40px">
+    <div class="bal" id="stats"></div>
+    <div class="filters" id="filters"></div>
+    <div id="list"></div>
+  </div>
+</div>
+<div class="gesture-bar"></div>
+
+<script src="cm.js"></script>
+<script>
+(function () {
+  var I = CM.ICON, S = CM.state, c = S.config;
+  document.getElementById('backBtn').innerHTML = I.back;
+
+  var total = 0, failed = 0, runs = 0;
+  S.history.forEach(function (b) {
+    var t = CM.batchTotals(b); total += t.ok; failed += t.bad; if (b.status !== 'cancelled') runs++;
+  });
+  document.getElementById('stats').innerHTML =
+    '<div class="bal-label">Transferred this month</div>' +
+    '<div class="bal-big">' + CM.money(total) + '<span class="cur">ETB</span></div>' +
+    '<div class="bal-foot">' + I.swap + '<div><div class="k">' + runs + ' sweeps run</div>' +
+      '<div class="v">' + CM.money(failed) + ' ETB failed</div></div></div>';
+
+  var FILTERS = [['all', 'All'], ['successful', 'Successful'], ['partial', 'Partial'], ['failed', 'Failed'], ['cancelled', 'Cancelled']];
+  var active = 'all';
+  document.getElementById('filters').innerHTML = FILTERS.map(function (f) {
+    return '<button data-f="' + f[0] + '">' + f[1] + '</button>';
+  }).join('');
+  document.querySelectorAll('[data-f]').forEach(function (b) { b.onclick = function () { active = b.dataset.f; render(); }; });
+
+  function render() {
+    document.querySelectorAll('[data-f]').forEach(function (b) { b.classList.toggle('on', b.dataset.f === active); });
+    var html = '';
+    if (active === 'all' && c && c.enabled) {
+      html += '<div class="group">UPCOMING</div><div class="hist"><a class="tile" href="cm-sweep.html?next=1">' +
+        '<span class="tile-ico info" style="background:#e8f1fd">' + I.clock.replace('<svg', '<svg style="stroke:#1d4ed8"') + '</span>' +
+        '<div class="tile-main"><div class="tile-title">' + CM.runLabel(CM.nextRun(c)) + '</div>' +
+        '<div class="tile-sub">' + CM.freqLabel(c) + '</div></div>' + CM.pill('scheduled') + I.chev + '</a></div>';
+    }
+    var rows = S.history.filter(function (b) { return active === 'all' || b.status === active; });
+    html += rows.length
+      ? '<div class="group">OCTOBER 2026</div><div class="hist">' + rows.map(function (b) {
+          return '<a class="tile" href="cm-sweep.html?ref=' + b.ref + '">' + CM.sweepRow(b) + '</a>';
+        }).join('') + '</div>'
+      : '<div class="empty-list">No sweeps with this status.</div>';
+    document.getElementById('list').innerHTML = html;
+  }
+  render();
+})();
+</script>
+</body>
+</html>

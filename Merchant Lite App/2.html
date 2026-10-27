@@ -440,6 +440,21 @@
       margin:0;box-shadow:none;border-radius:0;
     }
   }
+
+  /* Cash Management entry — the Automated Cash Sweep service. */
+  .cm-entry{
+    display:flex;align-items:center;gap:12px;margin:0 16px 14px;padding:14px;
+    border-radius:16px;text-decoration:none;color:#16181d;
+    background:linear-gradient(160deg,#f3fbf6 0%,#e3f5ea 100%);border:1px solid #cdebd9;
+  }
+  .cm-entry-ico{
+    width:44px;height:44px;flex-shrink:0;border-radius:50%;background:#1fa856;
+    display:flex;align-items:center;justify-content:center;box-shadow:0 5px 12px rgba(31,168,86,.28);
+  }
+  .cm-entry-ico svg{width:21px;height:21px;stroke:#fff;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+  .cm-entry div b{display:block;font-size:14px;font-weight:800}
+  .cm-entry div span{display:block;font-size:11.5px;color:#4b5563;margin-top:2px;line-height:1.35}
+  .cm-entry .cm-go{width:18px;height:18px;flex-shrink:0;stroke:#1b7341;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;margin-left:auto}
 </style>
 </head>
 <body>
@@ -498,6 +513,13 @@
     </div>
   </div>
 </div>
+
+<!-- Cash Management -->
+<a class="cm-entry" href="cm-home.html">
+  <span class="cm-entry-ico"><svg viewBox="0 0 24 24"><path d="M3 10 12 4l9 6M5 10v8M19 10v8M9.5 10v8M14.5 10v8M3 20h18"/></svg></span>
+  <div><b>Cash Management</b><span>Sweep your balance to your bank accounts automatically</span></div>
+  <svg class="cm-go" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg>
+</a>
 
 <!-- Recent Activities -->
 <div class="activities-section">

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Cash Sweep</title>
+<link rel="stylesheet" href="cm.css">
+<style>
+  .alloc-mini{margin-top:8px}
+  .alloc-mini .alloc-line{margin-top:7px}
+  .footer .btn{height:48px}
+</style>
+</head>
+<body>
+<div class="phone-scroll">
+  <div class="top">
+    <button class="icon-btn" onclick="CM.goBack('cm-home.html')" aria-label="Back" id="backBtn"></button>
+    <h1>Cash Sweep</h1>
+  </div>
+
+  <div class="page-simple">
+    <div class="bal" id="statusCard"></div>
+
+    <div class="tiles">
+      <a class="tile" id="schedTile" href="cm-schedule.html"></a>
+      <a class="tile" id="allocTile" href="cm-allocation.html?edit=1"></a>
+      <div class="tile" id="refTile"></div>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  <div class="btn-row">
+    <a class="btn btn-ghost" href="cm-allocation.html?edit=1" id="editBtn"></a>
+    <button class="btn" id="toggleBtn"></button>
+  </div>
+</div>
+<div class="gesture-bar"></div>
+
+<script src="cm.js"></script>
+<script>
+(function () {
+  var I = CM.ICON, c = CM.state.config;
+  document.getElementById('backBtn').innerHTML = I.back;
+  if (!c) { location.replace('cm-allocation.html?edit=1'); return; }
+  var on = c.enabled !== false;
+
+  document.getElementById('statusCard').innerHTML =
+    '<div class="bal-label">Automated Cash Sweep</div>' +
+    '<div class="bal-big">' + (on ? 'Running' : 'Paused') + '</div>' +
+    '<div class="bal-foot">' + I.clock + '<div><div class="k">Next Cash Sweep</div><div class="v">' +
+      (on ? CM.runLabel(CM.nextRun(c)) : 'Not scheduled') + '</div></div>' +
+      '<span class="bal-pill">' + (on ? 'Active' : 'Paused') + '</span></div>';
+
+  /* Schedule edits reuse the same draft as the full set-up flow. */
+  var st = document.getElementById('schedTile');
+  st.onclick = function () { CM.startDraft(); };
+  st.innerHTML = '<span class="tile-ico">' + I.clock + '</span>' +
+    '<div class="tile-main"><div class="tile-title">Schedule</div>' +
+      '<div class="tile-sub">' + CM.freqLabel(c) + ' • ' + CM.time12(c.time) + '</div>' +
+      '<div class="tile-sub">Start: ' + CM.dateLabel(c.start) + '</div></div>' + I.chev;
+
+  var rows = CM.split(c, CM.WORKING_BALANCE).filter(function (r) { return !r.unallocated; });
+  document.getElementById('allocTile').innerHTML = '<span class="tile-ico">' + I.sliders + '</span>' +
+    '<div class="tile-main"><div class="tile-title">Allocation</div>' +
+      '<div class="tile-sub">' + (c.type === 'fixed' ? 'Fixed amount' : 'Percentage') + '</div>' +
+      '<div class="alloc-mini">' + rows.map(function (r) {
+        var b = CM.bank(r.id);
+        return '<div class="alloc-line">' + CM.bankAv(b, true) +
+          '<div class="nm">' + CM.esc(b.short) + ' ' + CM.mask(b.acct) + (r.primary ? '<span class="tag">PRIMARY</span>' : '') + '</div>' +
+          '<div class="amt">' + (r.primary ? 'Remainder' : c.type === 'fixed' ? CM.money(r.value) : r.value + '%') + '</div></div>';
+      }).join('') + '</div></div>' + I.chev;
+
+  document.getElementById('refTile').innerHTML = '<span class="tile-ico">' + I.info + '</span>' +
+    '<div class="tile-main"><div class="tile-title">' + c.ref + '</div>' +
+      '<div class="tile-sub">Set up ' + CM.esc(c.activatedAt || '—') + '</div></div>' +
+    '<button class="copy-btn" id="copyRef" aria-label="Copy reference">' + I.copy + '</button>';
+  document.getElementById('copyRef').onclick = function () { CM.copy(c.ref, 'Reference'); };
+
+  document.getElementById('editBtn').innerHTML = I.sliders + 'Edit setup';
+  var t = document.getElementById('toggleBtn');
+  t.className = 'btn ' + (on ? 'btn-danger' : 'btn-primary');
+  t.innerHTML = on ? I.pause + 'Pause' : I.play + 'Resume';
+  t.onclick = function () {
+    CM.setEnabled(!on);
+    CM.toast(on ? 'Automatic sweep paused. No transfers will run until you resume.' : 'Automatic sweep resumed.');
+    setTimeout(function () { location.reload(); }, 700);
+  };
+})();
+</script>
+</body>
+</html>
