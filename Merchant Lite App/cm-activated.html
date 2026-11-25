@@ -6,8 +6,7 @@
 <title>Sweep Activated</title>
 <link rel="stylesheet" href="cm.css">
 <style>
-  .page{position:relative;z-index:0;padding-bottom:170px}
-  .footer .btn-row{margin-bottom:10px}
+  .page{position:relative;z-index:0;padding-bottom:120px}
   .footer .btn{height:48px}
 </style>
 </head>
@@ -29,7 +28,6 @@
     <button class="btn btn-primary" id="dlBtn"></button>
     <button class="btn btn-ghost" id="shareBtn"></button>
   </div>
-  <a class="btn btn-ghost" href="cm-home.html" style="border:none;height:40px">Back to Cash Management</a>
 </div>
 <div class="gesture-bar"></div>
 
@@ -75,7 +73,8 @@
   document.querySelectorAll('[data-copy]').forEach(function (b) {
     b.onclick = function () { CM.copy(b.dataset.copy, 'Transaction ID'); };
   });
-  document.getElementById('dlBtn').onclick = function () { CM.toast('Confirmation saved to your downloads.'); };
+  var dl = document.getElementById('dlBtn');
+  dl.onclick = function () { CM.downloadReceipt('setup=1', dl); };
   document.getElementById('shareBtn').onclick = function () {
     var text = 'M-PESA cash sweep activated. ' + CM.freqLabel(c) + ' at ' + CM.time12(c.time) + '. Ref ' + c.ref + '.';
     if (navigator.share) navigator.share({ title: 'Cash sweep', text: text }).catch(function () {});

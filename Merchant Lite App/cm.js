@@ -233,6 +233,21 @@ var CM = (function () {
     return out;
   }
 
+  /* History date filter: { from, to } as yyyy-mm-dd, or null for all time.
+     Kept for the session so it survives opening a sweep and coming back. */
+  var RANGE_KEY = 'cm_hist_range';
+  function histRange(v) {
+    try {
+      if (arguments.length) { if (v) sessionStorage.setItem(RANGE_KEY, JSON.stringify(v)); else sessionStorage.removeItem(RANGE_KEY); }
+      return JSON.parse(sessionStorage.getItem(RANGE_KEY) || 'null');
+    } catch (e) { return null; }
+  }
+  /* "26 Oct 2026" -> "2026-10-26" */
+  function isoDate(label) {
+    var p = String(label).split(' ');
+    return p[2] + '-' + String(MONTHS.indexOf(p[1]) + 1).padStart(2, '0') + '-' + String(p[0]).padStart(2, '0');
+  }
+
   function batchTotals(b) {
     var ok = 0, bad = 0, nOk = 0, nBad = 0;
     b.transfers.forEach(function (x) {
@@ -395,6 +410,29 @@ var CM = (function () {
     return { get: function () { return items[index()].value; }, set: set };
   }
 
+  /* Save an M-PESA PDF receipt. cm-receipt.html draws itself to a PDF in a
+     hidden frame (A4 width so the layout matches the other M-PESA receipts)
+     and reports back; if that fails the receipt opens to print instead. */
+  function downloadReceipt(query, btn) {
+    if (btn && btn.disabled) return;
+    if (btn) btn.disabled = true;
+    toast('Preparing your receipt…');
+    var f = document.createElement('iframe');
+    f.style.cssText = 'position:fixed;left:-10000px;top:0;width:834px;height:1200px;border:0;visibility:hidden';
+    f.src = 'cm-receipt.html?dl=1&' + query;
+    function finish(ok) {
+      window.removeEventListener('message', onMsg);
+      if (btn) btn.disabled = false;
+      setTimeout(function () { f.remove(); }, 1500);
+      if (ok) toast('Receipt saved to your downloads.');
+      else window.open('cm-receipt.html?' + query, '_blank');
+    }
+    function onMsg(e) { if (e.source === f.contentWindow && e.data && e.data.cmReceipt) finish(e.data.cmReceipt === 'saved'); }
+    window.addEventListener('message', onMsg);
+    /* Appended to <html>: body is the transformed phone frame. */
+    document.documentElement.appendChild(f);
+  }
+
   /* ---------- Prototype flows ----------
      A panel beside the phone (desktop only) switches the demo between the
      journeys: a merchant with no bank account linked yet, one setting up
@@ -443,8 +481,8 @@ var CM = (function () {
     activate: activate, setEnabled: setEnabled,
     money: money, moneyHtml: moneyHtml, mask: mask, esc: esc, time12: time12, ordinal: ordinal,
     freqLabel: freqLabel, dateLabel: dateLabel, nextRun: nextRun, runLabel: runLabel, stamp: stamp,
-    split: split, problems: problems, batchTotals: batchTotals, chip: chip, bankAv: bankAv,
+    split: split, problems: problems, batchTotals: batchTotals, histRange: histRange, isoDate: isoDate, chip: chip, bankAv: bankAv,
     pill: pill, tone: tone, sweepRow: sweepRow, emptySweeps: emptySweeps,
-    goBack: goBack, openSheet: openSheet, closeSheet: closeSheet, toast: toast, copy: copy, wheel: wheel
+    goBack: goBack, downloadReceipt: downloadReceipt, openSheet: openSheet, closeSheet: closeSheet, toast: toast, copy: copy, wheel: wheel
   };
 })();

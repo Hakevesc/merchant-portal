@@ -92,14 +92,22 @@
 </div>
 
 <script src="cm.js"></script>
+<script src="df.js"></script>
 <script>
 (function () {
   var S = CM.state, M = CM.MERCHANT;
   var q = new URLSearchParams(location.search);
-  var b = CM.batch(q.get('ref')) || S.history[0];
-  if (!b) { document.body.textContent = 'Sweep not found.'; return; }
-  var t = CM.batchTotals(b);
   var c = S.config;
+  /* ?setup=1 is the confirmation for the sweep set-up itself; otherwise the
+     receipt is for one sweep run (?ref=). */
+  var setup = q.get('setup') === '1';
+  /* ?float=1 is the receipt for the last Distribute Float transfer. */
+  var fl = q.get('float') === '1' ? DF.last() : null;
+  if (q.get('float') === '1' && !fl) { document.body.textContent = 'No float transfer found.'; return; }
+  var b = setup || fl ? null : CM.batch(q.get('ref')) || S.history[0];
+  if (!fl && (setup ? !c : !b)) { document.body.textContent = setup ? 'No cash sweep set up.' : 'Sweep not found.'; return; }
+  var t = b && CM.batchTotals(b);
+  var ref = fl ? fl.ref : setup ? c.ref : b.ref;
 
   function birr(n) { return CM.money(n) + ' BIRR'; }
   function label(am, en) { return '<span class="amharic">' + am + ' /</span> ' + en; }
@@ -137,8 +145,67 @@
     return words(whole) + ' Birr' + (rest ? ' and ' + words(rest) + ' Cents' : '') + ' Only';
   }
 
-  document.title = 'M-PESA Cash Sweep Receipt ' + b.ref;
+  document.title = (fl ? 'M-PESA Distribute Float Receipt ' : 'M-PESA Cash Sweep Receipt ') + ref;
 
+  if (fl) renderFloat(); else if (setup) renderSetup(); else renderSweep();
+
+  /* Distribute Float: same fields as the M-PESA Distribute Float receipt. */
+  function renderFloat() {
+    document.getElementById('info').innerHTML =
+      row('የላኪ ስም', 'SENDER NAME', CM.esc(fl.sender.name)) +
+      row('የላኪ አጭር ኮድ', 'SENDER SHORT CODE', fl.sender.number) +
+      row('የተቀባይ ስም', 'RECEIVER NAME', CM.esc(fl.receiver.name)) +
+      row('የተቀባይ አጭር ኮድ', 'RECEIVER SHORT CODE', fl.receiver.number) +
+      row('መጠን', 'AMOUNT', birr(fl.amount)) +
+      row('የግብይት መታወቂያ', 'TRANSACTION ID', fl.ref) +
+      row('የግብይት ዝርዝር', 'TRANSACTION DETAIL', 'Float Distribution within Organisation');
+    document.getElementById('table').innerHTML =
+      '<thead><tr><th style="width:33%">' + label('ደረሰኝ ቁጥር', 'RECEIPT NO') + '</th><th style="width:33%">' + label('የግብይት ቀንና ሰዓት', 'TRANSACTION DATE &amp; TIME') + '</th>' +
+        '<th style="width:34%">' + label('የዝውውር መጠን', 'TRANSFER AMOUNT') + '</th></tr></thead><tbody>' +
+      '<tr><td>' + fl.ref + '</td><td>' + stampDate(fl.date, fl.time) + '</td><td class="amount-cell">' + birr(fl.amount) + '</td></tr>' +
+      '<tr class="sum"><td colspan="2">15% VAT</td><td class="amount-cell">' + birr(0) + '</td></tr>' +
+      '<tr class="total-row sum"><td colspan="2">ጠቅላላ / TOTAL AMOUNT</td><td class="amount-cell">' + birr(fl.amount) + '</td></tr></tbody>';
+    document.getElementById('extra').innerHTML =
+      group('ጠቅላላ መጠን በቃላት', 'TOTAL AMOUNT IN WORD', amountWords(fl.amount), 'amount-words') +
+      group('የተቀናሽ ሂሳብ', 'DEBIT ACCOUNT', 'M-PESA Working Account - ' + fl.sender.number) +
+      group('የግብይት ዓይነት', 'TRANSACTION TYPE', 'Distribute Float') +
+      group('የግብይት መነሻ', 'USED CHANNEL', 'M-PESA Merchant App') +
+      group('የግብይት ምክንያት', 'TRANSACTION REASON', CM.esc(fl.description));
+  }
+
+  /* Set-up confirmation: the rules that were activated and the accounts they pay. */
+  function renderSetup() {
+    var on = c.enabled !== false, at = String(c.activatedAt).split(', ');
+    document.getElementById('info').innerHTML =
+      row('የላኪ ስም', 'SENDER NAME', CM.esc(M.name)) +
+      row('የላኪ አጭር ኮድ', 'SENDER SHORT CODE', M.shortCode) +
+      row('የግብይት መታወቂያ', 'TRANSACTION ID', c.ref) +
+      row('የግብይት ቀን', 'TRANSACTION DATE', stampDate(at[0], at[1])) +
+      row('ሁኔታ', 'STATUS', on ? 'Active' : 'Paused') +
+      row('የግብይት ዝርዝር', 'TRANSACTION DETAIL', 'Cash Sweep Set-up');
+
+    var rows = CM.split(c, CM.WORKING_BALANCE).filter(function (r) { return !r.unallocated; });
+    document.getElementById('table').innerHTML =
+      '<thead><tr><th style="width:38%">' + label('ተቀባይ ባንክ', 'RECEIVING BANK') + '</th><th style="width:30%">' + label('የሂሳብ ቁጥር', 'ACCOUNT NO') + '</th>' +
+        '<th style="width:32%">' + label('ድርሻ', 'ALLOCATION') + '</th></tr></thead><tbody>' +
+      rows.map(function (r) {
+        var bk = CM.bank(r.id);
+        return '<tr><td>' + CM.esc(bk.bank) + '</td><td>**** **** ' + String(bk.acct).slice(-4) + '</td><td class="amount-cell">' +
+          (r.primary ? 'Remainder' : c.type === 'fixed' ? birr(r.value) : r.value + '%') + '</td></tr>';
+      }).join('') +
+      '<tr class="total-row sum"><td colspan="2">የክፍፍል ዘዴ / ALLOCATION METHOD</td><td class="amount-cell">' + (c.type === 'fixed' ? 'Fixed amount' : 'Percentage') + '</td></tr></tbody>';
+
+    document.getElementById('extra').innerHTML =
+      group('ድግግሞሽ', 'FREQUENCY', CM.freqLabel(c)) +
+      group('የስዊፕ ሰዓት', 'SWEEP TIME', CM.time12(c.time)) +
+      group('የመጀመሪያ ቀን', 'START DATE', CM.dateLabel(c.start)) +
+      group('የመጀመሪያ ስዊፕ', 'FIRST SWEEP', on ? CM.runLabel(CM.nextRun(c)) : 'Not scheduled') +
+      group('የተቀናሽ ሂሳብ', 'DEBIT ACCOUNT', 'M-PESA Merchant Account ' + M.shortCode) +
+      group('የግብይት ዓይነት', 'TRANSACTION TYPE', 'Cash Sweep - Set-up') +
+      group('የግብይት መነሻ', 'USED CHANNEL', 'M-PESA Merchant App');
+  }
+
+  function renderSweep() {
   document.getElementById('info').innerHTML =
     row('የላኪ ስም', 'SENDER NAME', CM.esc(M.name)) +
     row('የላኪ አጭር ኮድ', 'SENDER SHORT CODE', M.shortCode) +
@@ -170,6 +237,7 @@
     group('የግብይት ዓይነት', 'TRANSACTION TYPE', 'Cash Sweep - Automated') +
     group('የግብይት መነሻ', 'USED CHANNEL', 'M-PESA Merchant App') +
     group('የግብይት ምክንያት', 'TRANSACTION REASON', 'Scheduled Cash Sweep');
+  }
 
   /* ?dl=1: draw the page to an A4 PDF and save it, then tell the opener. */
   if (q.get('dl') !== '1') return;
@@ -184,7 +252,7 @@
       var page = document.getElementById('page'), h = Math.max(1123, Math.ceil(page.offsetHeight));
       return html2pdf().set({
         margin: 0,
-        filename: 'M-PESA_Cash_Sweep_' + b.ref + '.pdf',
+        filename: (fl ? 'M-PESA_Distribute_Float_' : 'M-PESA_Cash_Sweep_') + ref + '.pdf',
         image: { type: 'jpeg', quality: 0.96 },
         html2canvas: { scale: 2, useCORS: true, width: 794, height: h, windowWidth: 794 },
         jsPDF: { unit: 'px', format: [794, h], orientation: 'portrait', hotfixes: ['px_scaling'] }

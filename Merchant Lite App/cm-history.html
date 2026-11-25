@@ -19,6 +19,18 @@
   .search svg{width:18px;height:18px;flex-shrink:0;stroke:var(--faint);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
   .search input{flex:1;min-width:0;border:none;outline:none;background:transparent;font-family:inherit;font-size:14px;color:var(--ink);caret-color:var(--green)}
   .search input::placeholder{color:var(--faint)}
+  /* Title on the left, date range pill on the right (as on My Draw Codes). */
+  .title-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px}
+  .title-row h1{margin-top:0}
+  .range-pill{
+    display:flex;align-items:center;gap:7px;height:32px;padding:0 10px 0 12px;border-radius:16px;border:none;cursor:pointer;
+    background:var(--field);font-family:inherit;font-size:11.5px;font-weight:700;color:var(--ink-2);letter-spacing:.4px;text-transform:uppercase;
+    text-decoration:none;white-space:nowrap;
+  }
+  .range-pill svg{width:15px;height:15px;stroke:var(--muted);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .range-pill .chev{width:13px;height:13px}
+  .range-pill.on{background:var(--green-l);color:var(--green-d)}
+  .range-pill.on svg{stroke:var(--green-d)}
   .empty-list{text-align:center;padding:28px 10px;color:var(--muted);font-size:12.5px}
 </style>
 </head>
@@ -26,7 +38,8 @@
 <div class="phone-scroll">
   <div class="top">
     <button class="icon-btn" onclick="CM.goBack('cm-home.html')" aria-label="Back" id="backBtn"></button>
-    <h1>Sweep History</h1>
+    <div class="title-row"><h1>Sweep History</h1>
+      <a class="range-pill" id="rangePill" href="cm-history-dates.html" onclick="location.replace(this.href);return false"></a></div>
   </div>
   <div class="page-simple" style="padding-bottom:40px">
     <label class="search">
@@ -54,23 +67,39 @@
   }).join('');
   document.querySelectorAll('[data-f]').forEach(function (b) { b.onclick = function () { active = b.dataset.f; render(); }; });
 
+  var range = CM.histRange();
+  function iso(label) { return CM.isoDate(label); }
+  function short(d) { var p = d.split('-'); return +p[2] + ' ' + CM.MONTHS[+p[1] - 1]; }
+  function monthOf(label) { var p = label.split(' '); return (FULL[CM.MONTHS.indexOf(p[1])] + ' ' + p[2]).toUpperCase(); }
+  var FULL = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+  /* Range pill: "All time", or the chosen dates, e.g. "21 Oct – 26 Oct".
+     The date screen replaces this page so Back never stacks two histories. */
+  var DOWN = '<svg class="chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>';
+  var pill = document.getElementById('rangePill');
+  pill.classList.toggle('on', !!range);
+  pill.innerHTML = I.cal + (range ? short(range.from) + (range.to !== range.from ? ' – ' + short(range.to) : '') : 'All time') + DOWN;
+
   function render() {
     document.querySelectorAll('[data-f]').forEach(function (b) { b.classList.toggle('on', b.dataset.f === active); });
     var q = document.getElementById('q').value.trim().toLowerCase().replace(/,/g, '');
     var rows = S.history.filter(function (b) {
       if (active !== 'all' && b.status !== active) return false;
+      if (range && (iso(b.date) < range.from || iso(b.date) > range.to)) return false;
       if (!q) return true;
       /* Match what the row shows (date, time, amount, status) plus the reference. */
       var text = (b.ref + ' ' + CM.sweepRow(b).replace(/<[^>]+>/g, ' ')).toLowerCase().replace(/,/g, '');
       return text.indexOf(q) !== -1;
     });
-    document.getElementById('list').innerHTML = rows.length
-      ? '<div class="group">OCTOBER 2026</div><div class="hist">' + rows.map(function (b) {
+    var head = rows.length ? '<div class="group">' + monthOf(rows[0].date) + '</div>' : '<div style="height:14px"></div>';
+    document.getElementById('list').innerHTML = head + (rows.length
+      ? '<div class="hist">' + rows.map(function (b) {
           return '<a class="tile" href="cm-sweep.html?ref=' + b.ref + '">' + CM.sweepRow(b) + '</a>';
         }).join('') + '</div>'
-      : (S.history.length ? '<div class="hist" style="margin-top:14px">' + (q ? CM.emptySweeps('No results', 'No sweeps match your search.')
-                                                                               : CM.emptySweeps('No sweeps here', 'There are no sweeps with this status.')) + '</div>'
-                          : '<div class="hist" style="margin-top:14px">' + CM.emptySweeps() + '</div>');
+      : '<div class="hist">' + (!S.history.length ? CM.emptySweeps()
+          : q ? CM.emptySweeps('No results', 'No sweeps match your search.')
+          : range ? CM.emptySweeps('No sweeps in this period', 'Try a different date range.')
+          : CM.emptySweeps('No sweeps here', 'There are no sweeps with this status.')) + '</div>');
   }
   document.getElementById('q').addEventListener('input', render);
   render();

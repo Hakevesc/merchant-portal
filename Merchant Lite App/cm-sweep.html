@@ -87,27 +87,7 @@
     ? '<a class="btn btn-ghost" href="cm-schedule.html?edit=1">' + I.sliders + 'Edit setup</a><a class="btn btn-primary" href="cm-home.html">Done</a>'
     : '<button class="btn btn-primary" id="dl">' + I.download + 'Download</button><button class="btn btn-ghost" id="sh">' + I.share + 'Share</button>';
   var dl = document.getElementById('dl'), sh = document.getElementById('sh');
-  /* The receipt page draws itself to a PDF in a hidden frame (A4 width so
-     the layout matches the other M-PESA receipts) and reports back. */
-  if (dl) dl.onclick = function () {
-    if (dl.disabled) return;
-    dl.disabled = true;
-    CM.toast('Preparing your receipt…');
-    var f = document.createElement('iframe');
-    f.style.cssText = 'position:fixed;left:-10000px;top:0;width:834px;height:1200px;border:0;visibility:hidden';
-    f.src = 'cm-receipt.html?dl=1&ref=' + encodeURIComponent(b.ref);
-    function finish(ok) {
-      window.removeEventListener('message', onMsg);
-      dl.disabled = false;
-      setTimeout(function () { f.remove(); }, 1500);
-      if (ok) CM.toast('Receipt saved to your downloads.');
-      else window.open('cm-receipt.html?ref=' + encodeURIComponent(b.ref), '_blank');
-    }
-    function onMsg(e) { if (e.source === f.contentWindow && e.data && e.data.cmReceipt) finish(e.data.cmReceipt === 'saved'); }
-    window.addEventListener('message', onMsg);
-    /* Appended to <html>: body is the transformed phone frame. */
-    document.documentElement.appendChild(f);
-  };
+  if (dl) dl.onclick = function () { CM.downloadReceipt('ref=' + encodeURIComponent(b.ref), dl); };
   if (sh) sh.onclick = function () {
     var text = 'M-PESA cash sweep ' + b.ref + ' on ' + b.date + ': ' + CM.STATUS[b.status][0] + '. Transferred ETB ' + CM.money(t.ok) +
       (t.bad ? ', failed ETB ' + CM.money(t.bad) : '') + '.';

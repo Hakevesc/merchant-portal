@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en" data-no-demo>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Distribute Float</title>
+<link rel="stylesheet" href="cm.css">
+<style>
+  .page{position:relative;z-index:0;padding-bottom:120px}
+  .footer .btn{height:48px}
+</style>
+</head>
+<body>
+<div class="phone-scroll">
+  <div class="header">
+    <button class="icon-btn" onclick="location.href='self-service.html'" aria-label="Back" id="backBtn"></button>
+    <div class="header-title">DISTRIBUTE FLOAT</div>
+  </div>
+  <div class="page">
+    <div class="watermark"></div>
+    <div class="sum-card" id="summary"></div>
+  </div>
+</div>
+
+<div class="footer">
+  <div class="btn-row">
+    <button class="btn btn-primary" id="dlBtn"></button>
+    <button class="btn btn-ghost" id="shareBtn"></button>
+  </div>
+</div>
+<div class="gesture-bar"></div>
+
+<script src="cm.js"></script>
+<script src="df.js"></script>
+<script>
+(function () {
+  var I = CM.ICON, t = DF.last();
+  document.getElementById('backBtn').innerHTML = I.back;
+  if (!t) { location.replace('df-form.html'); return; }
+  document.getElementById('dlBtn').innerHTML = I.download + 'Download';
+  document.getElementById('shareBtn').innerHTML = I.share + 'Share';
+
+  function item(label, value, copy) {
+    return '<div class="sum-item"><div class="grow"><div class="k">' + label + '</div><div class="v">' + value + '</div></div>' +
+      (copy ? '<button class="copy-btn" data-copy="' + value + '" aria-label="Copy ' + label + '">' + I.copy + '</button>' : '') + '</div>';
+  }
+  document.getElementById('summary').innerHTML =
+    '<div class="result-ico">' + I.check + '</div>' +
+    '<div class="result-title">Float Distribution Successful.</div>' +
+    '<div class="sum-av">' + DF.initials(t.sender.name) + '</div>' +
+    item('Sender name', CM.esc(t.sender.name)) +
+    item('Sender business number', DF.spaced(t.sender.number)) +
+    item('Receiver name', CM.esc(t.receiver.name)) +
+    item('Business number', t.receiver.number) +
+    item('Amount', CM.money(t.amount) + ' ETB') +
+    item('Description', CM.esc(t.description.toUpperCase())) +
+    item('Transaction or RTP ID', t.ref, true);
+
+  document.querySelectorAll('[data-copy]').forEach(function (b) {
+    b.onclick = function () { CM.copy(b.dataset.copy, 'Transaction ID'); };
+  });
+  var dl = document.getElementById('dlBtn');
+  dl.onclick = function () { CM.downloadReceipt('float=1', dl); };
+  document.getElementById('shareBtn').onclick = function () {
+    var text = 'M-PESA float distribution: ' + CM.money(t.amount) + ' ETB from ' + t.sender.name + ' to ' + t.receiver.name +
+      ' (' + t.receiver.number + '). Transaction ID ' + t.ref + '.';
+    if (navigator.share) navigator.share({ title: 'Distribute Float', text: text }).catch(function () {});
+    else CM.copy(text, 'Transaction details');
+  };
+})();
+</script>
+</body>
+</html>

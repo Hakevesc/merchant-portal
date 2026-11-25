@@ -3,10 +3,10 @@
 
   const state = {
     category: 'customer',
-    method: 'msisdn',
     accounts: [],
-    selectedAccount: null,
     rows: [],
+    page: 1,
+    report: null,
     currentReceipt: null
   };
 
@@ -36,41 +36,25 @@
     day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true, timeZone: 'Africa/Addis_Ababa'
   }).format(date).replace(',', ' at');
 
-  function updateSearchMethods() {
-    const partner = state.category === 'partner';
-    const methods = $$('#methodChoices .method-card');
-    methods.forEach((button) => {
-      const method = button.dataset.method;
-      const visible = partner ? method === 'shortcode' : method !== 'shortcode';
-      button.classList.toggle('hidden', !visible);
-      button.setAttribute('aria-pressed', String(method === state.method));
-      button.classList.toggle('selected', method === state.method);
-    });
-    const input = $('#accountSearchInput');
-    const label = $('#searchLabel');
-    const hint = $('#searchHint');
-    const icon = $('#searchInputIcon');
-    const copy = {
-      msisdn: ['Customer mobile number', 'e.g. 2517XXXXXXX or 12345678', 'Enter the customer\'s mobile number. Use a registered number for account lookup.', '☎'],
-      identity: ['Customer Identity ID', 'Enter National ID or approved identity number', 'For identity search, use the customer\'s registered identity number.', '▣'],
-      shortcode: ['Partner short code', 'e.g. 400522', 'Enter the partner\'s registered M-PESA short code.', '▥']
-    }[state.method];
-    label.textContent = copy[0];
-    input.placeholder = copy[1];
-    hint.lastChild.textContent = copy[2];
-    icon.textContent = copy[3];
-  }
 
+  const PAGE_SIZE = 20;
+  const METHODS = {
+    customer: [['msisdn', 'MSISDN', 'Mobile number, e.g. 2517XXXXXXXX'], ['identity', 'Customer Identity ID', 'National ID or registered identity number']],
+    partner: [['shortcode', 'Partner Short Code', 'Short code, e.g. 400522']]
+  };
+  const icons = () => { if (window.lucide && lucide.createIcons) lucide.createIcons(); };
+
+  /* Customer / Partner tabs drive which search methods are offered. */
   function setCategory(category) {
     state.category = category;
-    state.method = category === 'partner' ? 'shortcode' : 'msisdn';
-    $$('.category-grid .choice-card').forEach((button) => {
-      const selected = button.dataset.category === category;
-      button.classList.toggle('selected', selected);
-      button.setAttribute('aria-pressed', String(selected));
-    });
-    updateSearchMethods();
+    $$('[data-category]').forEach((b) => b.classList.toggle('active', b.dataset.category === category));
+    $('#searchMethod').innerHTML = METHODS[category].map((m) => '<option value="' + m[0] + '">Search by ' + m[1] + '</option>').join('');
+    updatePlaceholder();
+    $('#accountResult').classList.add('hidden');
+    $('#statementPreview').classList.add('hidden');
   }
+  function method() { return METHODS[state.category].find((m) => m[0] === $('#searchMethod').value) || METHODS[state.category][0]; }
+  function updatePlaceholder() { $('#accountSearchInput').placeholder = method()[2]; }
 
   function accountList() {
     if (state.category === 'partner') {
@@ -89,117 +73,152 @@
   }
 
   function revealAccountResult(query) {
-    const result = $('#accountResult');
-    const isPartner = state.category === 'partner';
-    const display = isPartner ? 'Safaricom Ethiopia Demo Partner' : 'Demo Customer';
-    const idLabel = state.method === 'identity' ? 'Customer Identity ID' : (isPartner ? 'Short code' : 'MSISDN');
-    const safeQuery = state.method === 'identity' ? '••••••••' : (query.length > 5 ? query.slice(0, 4) + '••••••' : '••••••');
-    $('#resultHeading').textContent = display;
-    $('#resultIdentifier').textContent = idLabel + ': ' + safeQuery;
-    $('#statementHolder').textContent = display;
-    $('#statementDetailsHeading').textContent = isPartner ? 'Partner Details' : 'Customer Details';
-    $('#statementIdLabel').textContent = isPartner ? 'Short Code' : 'MSISDN';
-    $('#statementMsisdn').textContent = isPartner ? 'Short code ' + safeQuery : (state.method === 'identity' ? '••••••••' : safeQuery);
-    $('#statementIdentityLabel').classList.toggle('hidden', isPartner);
-    $('#statementIdentityValue').classList.toggle('hidden', isPartner);
+    const m = method();
+    const holder = state.category === 'partner' ? 'Safaricom Ethiopia Demo Partner' : 'Demo Customer';
+    const masked = m[0] === 'identity' ? '••••••••' : (query.length > 5 ? query.slice(0, 4) + '••••••' : '••••••');
+    state.holder = holder;
+    state.idLabel = m[1];
+    state.identifier = masked;
+    $('#resultHeading').textContent = holder;
+    $('#resultIdentifier').textContent = m[1] + ': ' + masked;
     state.accounts = accountList();
-    state.selectedAccount = state.accounts[0];
-    $('#accountOptions').replaceChildren();
-    state.accounts.forEach((account, index) => {
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.className = 'account-choice' + (index === 0 ? ' selected' : '');
-      button.setAttribute('aria-pressed', String(index === 0));
-      button.innerHTML = '<span class="account-radio" aria-hidden="true"></span><strong>' + html(account.name) + '</strong><small>' + html(account.type + ' account · ' + account.suffix) + '</small>';
-      button.addEventListener('click', () => {
-        state.selectedAccount = account;
-        $$('.account-choice').forEach((item) => {
-          const selected = item === button;
-          item.classList.toggle('selected', selected);
-          item.setAttribute('aria-pressed', String(selected));
-        });
-      });
-      $('#accountOptions').append(button);
-    });
-    result.classList.remove('hidden');
+    $('#accountSelect').innerHTML = state.accounts.map((a, i) => '<option value="' + i + '">' + html(a.name + ' · ' + a.suffix) + '</option>').join('');
+    $('#accountResult').classList.remove('hidden');
     $('#statementPreview').classList.add('hidden');
-    result.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    $('#accountResult').scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
-  function makeDemoRows(endDate) {
+  /* ── Demo transactions ─────────────────────────────────────
+     A mix of the transaction types a statement really carries. Each type
+     says which way the money moves, its fee, and the fields its receipt
+     shows, so every receipt matches its own transaction. */
+  const PEOPLE = ['Abebe Kebede', 'Hana Tesfaye', 'Dawit Bekele', 'Selam Girma', 'Yonas Alemu', 'Meron Haile', 'Biruk Tadesse', 'Liya Mekonnen'];
+  const MERCHANTS = [['Kaldi\'s Coffee Bole', '512244'], ['Shoa Supermarket', '508831'], ['Lucy Pharmacy', '531907'], ['Bambis Mart', '544120']];
+  const BILLERS = [['Ethiopian Electric Utility', '400200'], ['Ethio telecom Postpaid', '400100'], ['DSTV Ethiopia', '400310'], ['AAWSA Water', '400420']];
+  const AGENTS = [['Betty Merhat Agency', '876543'], ['Kidus Shop Agent', '871204'], ['Tana Mobile Agent', '879932']];
+  const BANKS = ['CBE', 'Awash Bank', 'Dashen Bank', 'Cooperative Bank of Oromia'];
+  const phoneOf = (i) => '09••••••' + String(10 + (i * 37) % 89);
+  const acctOf = (i) => '••••' + String(1000 + (i * 733) % 9000);
+
+  /* in: true = paid in. fields(i, who) returns the receipt's own lines. */
+  const CUSTOMER_TYPES = [
+    { key: 'receive', name: 'Receive Money', in: true, fee: 0, amounts: [500, 1500, 2000, 750], reason: 'Money Received',
+      details: (i) => 'Received from ' + PEOPLE[i % 8] + ' ' + phoneOf(i),
+      fields: (i, who) => [['SENDER NAME', PEOPLE[i % 8]], ['SENDER PHONE NUMBER', phoneOf(i)], ['RECEIVER NAME', who.name], ['RECEIVER PHONE NUMBER', who.phone]] },
+    { key: 'send', name: 'Send Money', in: false, fee: 5, amounts: [200, 350, 1000, 450], reason: 'Send Money',
+      details: (i) => 'Sent to ' + PEOPLE[(i + 3) % 8] + ' ' + phoneOf(i + 5),
+      fields: (i, who) => [['SENDER NAME', who.name], ['SENDER PHONE NUMBER', who.phone], ['RECEIVER NAME', PEOPLE[(i + 3) % 8]], ['RECEIVER PHONE NUMBER', phoneOf(i + 5)]] },
+    { key: 'buygoods', name: 'Buy Goods', in: false, fee: 0, amounts: [85, 240, 560, 130], reason: 'Payment for goods and services',
+      details: (i) => 'Paid to ' + MERCHANTS[i % 4][0] + ' · Till ' + MERCHANTS[i % 4][1],
+      fields: (i, who) => [['CUSTOMER NAME', who.name], ['CUSTOMER PHONE NUMBER', who.phone], ['MERCHANT NAME', MERCHANTS[i % 4][0]], ['TILL NUMBER', MERCHANTS[i % 4][1]]] },
+    { key: 'paybill', name: 'Pay Bill', in: false, fee: 2, amounts: [320, 650, 899, 180], reason: 'Utility Bill Payment',
+      details: (i) => BILLERS[i % 4][0] + ' · Acc ' + acctOf(i),
+      fields: (i, who) => [['CUSTOMER NAME', who.name], ['CUSTOMER PHONE NUMBER', who.phone], ['BILLER NAME', BILLERS[i % 4][0]], ['BUSINESS NUMBER', BILLERS[i % 4][1]], ['BILL ACCOUNT NUMBER', acctOf(i)]] },
+    { key: 'airtime', name: 'Buy Airtime', in: false, fee: 0, amounts: [50, 100, 25, 200], reason: 'Airtime Purchase',
+      details: (i) => 'Airtime for ' + phoneOf(i + 2),
+      fields: (i, who) => [['CUSTOMER NAME', who.name], ['CUSTOMER PHONE NUMBER', who.phone], ['RECIPIENT PHONE NUMBER', phoneOf(i + 2)], ['OPERATOR', 'Safaricom Ethiopia']] },
+    { key: 'cashin', name: 'Cash In', in: true, fee: 0, amounts: [1000, 2500, 5000, 800], reason: 'Cash Deposit',
+      details: (i) => 'Deposit at ' + AGENTS[i % 3][0] + ' · ' + AGENTS[i % 3][1],
+      fields: (i, who) => [['CUSTOMER NAME', who.name], ['CUSTOMER PHONE NUMBER', who.phone], ['AGENT NAME', AGENTS[i % 3][0]], ['AGENT SHORT CODE', AGENTS[i % 3][1]]] },
+    { key: 'cashout', name: 'Cash Out', in: false, fee: 10, amounts: [500, 1000, 2000, 300], reason: 'Cash Withdrawal',
+      details: (i) => 'Withdrawal at ' + AGENTS[(i + 1) % 3][0] + ' · ' + AGENTS[(i + 1) % 3][1],
+      fields: (i, who) => [['CUSTOMER NAME', who.name], ['CUSTOMER PHONE NUMBER', who.phone], ['AGENT NAME', AGENTS[(i + 1) % 3][0]], ['AGENT SHORT CODE', AGENTS[(i + 1) % 3][1]]] },
+    { key: 'bankin', name: 'Bank to M-PESA', in: true, fee: 0, amounts: [3000, 1200, 4500, 2000], reason: 'Bank Transfer to Wallet',
+      details: (i) => 'From ' + BANKS[i % 4] + ' A/C ' + acctOf(i + 7),
+      fields: (i, who) => [['CUSTOMER NAME', who.name], ['CUSTOMER PHONE NUMBER', who.phone], ['SENDER BANK', BANKS[i % 4]], ['SENDER BANK ACCOUNT', acctOf(i + 7)]] },
+    { key: 'bankout', name: 'M-PESA to Bank', in: false, fee: 3, amounts: [1500, 700, 2200, 1000], reason: 'Wallet Transfer to Bank',
+      details: (i) => 'To ' + BANKS[(i + 1) % 4] + ' A/C ' + acctOf(i + 3),
+      fields: (i, who) => [['CUSTOMER NAME', who.name], ['CUSTOMER PHONE NUMBER', who.phone], ['RECEIVER BANK', BANKS[(i + 1) % 4]], ['RECEIVER BANK ACCOUNT', acctOf(i + 3)]] },
+    { key: 'savings', name: 'Deposit to Savings account', in: false, fee: 0, amounts: [300, 1200, 500, 800], reason: 'M-PESA Savings · Money Deposited',
+      details: () => 'Savings deposit · Rainy Day',
+      fields: (i, who) => [['NAME', who.name], ['PHONE NUMBER', who.phone], ['PARTNER BANK', 'Cooperative Bank of Oromia'], ['SAVING ACCOUNT NUMBER', 'IS••••2501'], ['SAVING A/C NAME', 'Rainy Day'], ['INTEREST', '7% Interest']] }
+  ];
+  const PARTNER_TYPES = [
+    { key: 'c2b', name: 'Customer Payment', in: true, fee: 0, amounts: [240, 1350, 560, 85, 2100], reason: 'Payment for goods and services',
+      details: (i) => 'Payment from ' + PEOPLE[i % 8] + ' ' + phoneOf(i),
+      fields: (i, who) => [['CUSTOMER NAME', PEOPLE[i % 8]], ['CUSTOMER PHONE NUMBER', phoneOf(i)], ['RECEIVER NAME', who.name], ['RECEIVER SHORT CODE', who.phone]] },
+    { key: 'm2b', name: 'Merchant to Bank', in: false, fee: 0, amounts: [8000, 15000, 5000], reason: 'Settlement to Bank Account',
+      details: (i) => 'Transfer to ' + BANKS[i % 4] + ' A/C ' + acctOf(i + 4),
+      fields: (i, who) => [['SENDER NAME', who.name], ['SENDER SHORT CODE', who.phone], ['RECEIVER BANK', BANKS[i % 4]], ['RECEIVER BANK ACCOUNT', acctOf(i + 4)]] },
+    { key: 'm2m', name: 'Merchant to Merchant Transfer', in: false, fee: 0, amounts: [2500, 4000, 1800], reason: 'Business Payment',
+      details: (i) => 'Paid ' + MERCHANTS[i % 4][0] + ' · ' + MERCHANTS[i % 4][1],
+      fields: (i, who) => [['SENDER NAME', who.name], ['SENDER SHORT CODE', who.phone], ['RECEIVER NAME', MERCHANTS[i % 4][0]], ['RECEIVER SHORT CODE', MERCHANTS[i % 4][1]]] },
+    { key: 'commission', name: 'Commission Payment', in: true, fee: 0, amounts: [420, 615, 280], reason: 'Partner Commission',
+      details: () => 'Commission payout · Safaricom M-PESA',
+      fields: (i, who) => [['PARTNER NAME', who.name], ['PARTNER SHORT CODE', who.phone], ['PAID BY', 'Safaricom M-PESA Mobile Financial Services PLC']] }
+  ];
+
+  function makeDemoRows(endDate, who) {
     const total = 333;
+    const types = who.partner ? PARTNER_TYPES : CUSTOMER_TYPES;
     const end = new Date(endDate + 'T00:00:00');
     let balance = 100000;
     return Array.from({ length: total }, (_, index) => {
-      const paidIn = index % 3 === 0;
-      const creditAmounts = [300, 1200, 500, 2500, 800];
-      const debitAmounts = [75, 125, 300, 800, 120];
-      const amount = paidIn ? creditAmounts[index % creditAmounts.length] : debitAmounts[index % debitAmounts.length];
-      const credit = paidIn ? amount : 0;
-      const debit = paidIn ? 0 : amount;
-      balance += credit - debit;
+      /* Weighted so money in roughly keeps pace with money out. */
+      const type = types[(index * 7 + Math.floor(index / types.length)) % types.length];
+      const amount = type.amounts[index % type.amounts.length];
+      const paidIn = type.in ? amount : 0;
+      const withdrawn = type.in ? 0 : amount + type.fee;
+      balance += paidIn - withdrawn;
       const date = addDays(end, -6 + Math.floor(index * 7 / total));
       date.setHours(7 + (index * 5) % 16, (index * 17) % 60, (index * 31) % 60, 0);
-      const receipt = 'DEMO-RCPT-' + String(index + 1).padStart(4, '0');
-      const savingTransaction = paidIn;
-      const recipientSuffix = String(20 + (index * 13) % 79);
       return {
-        receipt,
-        details: savingTransaction ? 'Savings deposit · Demo Customer' : 'Payment to 09••••••' + recipientSuffix + ' · DEMO',
+        receipt: 'DEMO-RCPT-' + String(index + 1).padStart(4, '0'),
+        details: type.details(index),
         status: 'Completed',
-        paidIn: credit,
-        withdrawn: debit,
-        bill: savingTransaction ? 'RAINY DAY' : 'DEMO-' + String(100 + index % 900),
-        type: savingTransaction ? 'Deposit to Savings account' : 'Payment from account',
-        channel: 'M-PESA App',
-        reason: savingTransaction ? 'M-PESA Savings · Money Deposited' : 'Customer initiated payment',
-        bank: savingTransaction ? 'Cooperative Bank of Oromia' : '—',
-        savingNumber: savingTransaction ? 'IS••••2501' : '—',
-        savingName: savingTransaction ? 'Rainy Day' : '—',
-        interest: savingTransaction ? '7% Interest' : '—',
+        paidIn, withdrawn, amount, fee: type.fee,
+        type: type.name,
+        channel: who.partner ? 'M-PESA Business App' : 'M-PESA App',
+        reason: type.reason,
+        fields: type.fields(index, who),
         date,
-        balance,
-        name: 'Demo Customer',
-        phone: '09••••••15'
+        balance
       };
     });
   }
 
+  /* "1,250.50" -> "One Thousand Two Hundred Fifty Birr and Fifty Cents Only" */
   function makeAmountWords(value) {
-    const ones = ['Zero', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+    const ones = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
     const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
-    function underThousand(number) {
-      let words = '';
-      if (number >= 100) { words += ones[Math.floor(number / 100)] + ' Hundred'; number %= 100; if (number) words += ' '; }
-      if (number >= 20) { words += tens[Math.floor(number / 10)]; number %= 10; if (number) words += ' ' + ones[number]; }
-      else if (number) words += ones[number];
-      return words;
+    function underThousand(n) {
+      const out = [];
+      if (n >= 100) { out.push(ones[Math.floor(n / 100)] + ' Hundred'); n %= 100; }
+      if (n >= 20) out.push(tens[Math.floor(n / 10)] + (n % 10 ? '-' + ones[n % 10] : ''));
+      else if (n) out.push(ones[n]);
+      return out.join(' ');
     }
-    const amount = Math.floor(value);
-    if (amount < 1000) return underThousand(amount) + ' Birr Only';
-    const thousands = Math.floor(amount / 1000);
-    const remainder = amount % 1000;
-    return underThousand(thousands) + ' Thousand' + (remainder ? ' ' + underThousand(remainder) : '') + ' Birr Only';
+    function words(n) {
+      if (!n) return 'Zero';
+      const parts = [];
+      [[1e9, 'Billion'], [1e6, 'Million'], [1e3, 'Thousand']].forEach(([unit, label]) => {
+        if (n >= unit) { parts.push(underThousand(Math.floor(n / unit)) + ' ' + label); n %= unit; }
+      });
+      if (n) parts.push(underThousand(n));
+      return parts.join(' ');
+    }
+    const cents = Math.round(value * 100);
+    const rest = cents % 100;
+    return words(Math.floor(cents / 100)) + ' Birr' + (rest ? ' and ' + words(rest) + ' Cents' : '') + ' Only';
+  }
+
+  /* The receipt's lines for one row: its own fields, then amount, type and ID. */
+  function receiptFields(row) {
+    return row.fields.concat([['AMOUNT', money(row.amount) + ' ETB'], ['TRANSACTION TYPE', row.type], ['TRANSACTION ID', row.receipt]]);
+  }
+  function receiptExtras(row) {
+    return [['TOTAL AMOUNT IN WORD', makeAmountWords(row.amount + row.fee)], ['USED CHANNEL', row.channel], ['TRANSACTION REASON', row.reason]];
   }
 
   function renderReceipt(row) {
     state.currentReceipt = row;
-    const amount = row.paidIn || row.withdrawn;
-    const receiptId = row.receipt;
-    $('#receiptName').textContent = row.name;
-    $('#receiptPhone').textContent = row.phone;
-    $('#receiptBank').textContent = row.bank;
-    $('#receiptSavingNumber').textContent = row.savingNumber;
-    $('#receiptSavingName').textContent = row.savingName;
-    $('#receiptAmount').textContent = money(amount) + ' ETB';
-    $('#receiptInterest').textContent = row.interest;
-    $('#receiptType').textContent = row.type;
-    $('#receiptId').textContent = receiptId;
-    $('#receiptNo').textContent = receiptId;
-    $('#receiptDate').textContent = receiptDate(row.date);
-    $('#receiptDetailAmount').textContent = money(amount) + ' BIRR';
-    $('#receiptTotal').textContent = money(amount) + ' BIRR';
-    $('#receiptWords').textContent = makeAmountWords(amount);
+    const pair = (f) => '<dt>' + html(f[0]) + '</dt><dd>' + html(f[1]) + '</dd>';
+    $('#receiptFields').innerHTML = receiptFields(row).map(pair).join('');
+    $('#receiptDetailBody').innerHTML =
+      '<tr><td>' + html(row.receipt) + '</td><td>' + html(receiptDate(row.date)) + '</td><td>' + money(row.amount) + ' BIRR</td></tr>' +
+      (row.fee ? '<tr><td colspan="2" class="receipt-sub">SERVICE FEE</td><td>' + money(row.fee) + ' BIRR</td></tr>' : '') +
+      '<tr class="receipt-total"><td colspan="2">TOTAL AMOUNT</td><td>' + money(row.amount + row.fee) + ' BIRR</td></tr>';
+    $('#receiptExtra').innerHTML = receiptExtras(row).map(pair).join('');
   }
 
   function setCanvasFont(context, size, weight) {
@@ -231,14 +250,6 @@
     return lines;
   }
 
-  function drawLogo(context, x, y, width, height) {
-    const logo = document.querySelector('.receipt-company img');
-    if (logo && logo.complete && logo.naturalWidth) context.drawImage(logo, x, y, width, height);
-    else {
-      drawText(context, 'M-PESA', x, y + height - 5, { size: 24, weight: '700', color: '#138e4a' });
-    }
-  }
-
   function makeCanvas(width, height) {
     const canvas = document.createElement('canvas');
     canvas.width = width * 2;
@@ -252,182 +263,275 @@
 
   function drawReceiptCanvas(row) {
     const { canvas, context: ctx } = makeCanvas(794, 1123);
-    const amount = row.paidIn || row.withdrawn;
+    const total = row.amount + row.fee;
     ctx.save();
-    ctx.translate(380, 670);
+    ctx.translate(397, 600);
     ctx.rotate(-Math.PI / 7);
-    ctx.globalAlpha = 0.11;
-    drawText(ctx, 'SAMPLE PREVIEW', -275, 0, { size: 82, weight: '700', color: '#aeb4b7' });
+    ctx.globalAlpha = 0.07;
+    drawText(ctx, 'M-PESA', 0, 50, { size: 150, weight: '900', align: 'center', color: '#8a8a8a' });
     ctx.restore();
 
-    drawLogo(ctx, 54, 42, 220, 51);
-    drawText(ctx, 'Safaricom M-PESA Mobile Financial Services PLC', 54, 119, { size: 15, weight: '700' });
-    drawText(ctx, 'TIN NO:', 54, 150, { size: 13, color: '#74777a' });
-    drawText(ctx, '0084242753', 110, 150, { size: 13, weight: '700' });
-    drawText(ctx, 'VAT REG NO:', 54, 180, { size: 13, color: '#74777a' });
-    drawText(ctx, '22371880003', 135, 180, { size: 13, weight: '700' });
-    drawText(ctx, 'Address:', 54, 210, { size: 13, color: '#74777a' });
-    drawText(ctx, 'Addis Ababa, Kirkos Woreda 1', 110, 210, { size: 13, weight: '700' });
-    drawText(ctx, 'Tel:', 54, 240, { size: 13, color: '#74777a' });
-    drawText(ctx, '+251 756 765434', 83, 240, { size: 13, weight: '700' });
-    ctx.strokeStyle = '#d9dddf'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(54, 263); ctx.lineTo(740, 263); ctx.stroke();
+    drawFittedLogo(ctx, 54, 40, 54);
+    drawText(ctx, 'Safaricom M-PESA Mobile Financial Services PLC', 54, 125, { size: 15, weight: '700' });
+    [['TIN NO: ', '0084242753'], ['VAT REG NO: ', '22371880003'], ['Address: ', 'Addis Ababa, Kirkos Woreda 1'], ['Tel: ', '+251 756 765434']].forEach((pair, i) => {
+      const y = 155 + i * 28;
+      drawText(ctx, pair[0], 54, y, { size: 13, color: '#74777a' });
+      setCanvasFont(ctx, 13, '400');
+      drawText(ctx, pair[1], 54 + ctx.measureText(pair[0]).width, y, { size: 13, weight: '700' });
+    });
+    if (ready(PDF_IMAGES.qr)) ctx.drawImage(PDF_IMAGES.qr, 642, 40, 98, 98);
+    drawText(ctx, 'SCAN TO VERIFY', 691, 154, { size: 9, weight: '700', align: 'center' });
+    ctx.strokeStyle = '#e0e0e0'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(54, 268); ctx.lineTo(740, 268); ctx.stroke();
 
-    const qrX = 635, qrY = 49, qrSize = 86, cell = 7;
-    ctx.fillStyle = '#fff'; ctx.fillRect(qrX - 3, qrY - 3, qrSize + 6, qrSize + 6);
-    ctx.strokeStyle = '#1d272b'; ctx.lineWidth = 1.5; ctx.strokeRect(qrX - 3, qrY - 3, qrSize + 6, qrSize + 6);
-    for (let rowIndex = 0; rowIndex < 12; rowIndex++) {
-      for (let colIndex = 0; colIndex < 12; colIndex++) {
-        const finder = (rowIndex < 4 && colIndex < 4) || (rowIndex < 4 && colIndex > 7) || (rowIndex > 7 && colIndex < 4);
-        const dark = finder ? (rowIndex % 3 !== 1 && colIndex % 3 !== 1) : ((rowIndex * 7 + colIndex * 11 + rowIndex * colIndex) % 4 < 2);
-        if (dark) { ctx.fillStyle = '#15191b'; ctx.fillRect(qrX + colIndex * cell, qrY + rowIndex * cell, cell - 1, cell - 1); }
-      }
-    }
-    drawText(ctx, 'DEMO QR · NOT SCANNABLE', qrX + qrSize / 2, qrY + qrSize + 20, { size: 8, weight: '700', align: 'center', color: '#43484b' });
-
-    ctx.strokeStyle = '#f3434f'; ctx.lineWidth = 2; ctx.strokeRect(54, 290, 686, 44);
-    drawText(ctx, 'TRANSACTION INFORMATION', 397, 318, { size: 17, weight: '700', align: 'center', color: '#f3434f' });
-    const fields = [
-      ['NAME', row.name], ['PHONE NUMBER', row.phone], ['PARTNER BANK', row.bank],
-      ['SAVING ACCOUNT NUMBER', row.savingNumber], ['SAVING A/C NAME', row.savingName],
-      ['AMOUNT', money(amount) + ' ETB'], ['INTEREST', row.interest], ['TRANSACTION TYPE', row.type], ['TRANSACTION ID', row.receipt]
-    ];
+    ctx.strokeStyle = '#fe353d'; ctx.lineWidth = 2; ctx.strokeRect(54, 292, 686, 44);
+    drawText(ctx, 'TRANSACTION INFORMATION', 397, 320, { size: 17, weight: '700', align: 'center', color: '#fe353d' });
+    const fields = receiptFields(row);
     fields.forEach((field, index) => {
       const y = 375 + index * 28;
       drawText(ctx, field[0], 54, y, { size: 12 });
       drawText(ctx, field[1], 350, y, { size: 12, weight: '700', maxWidth: 385 });
     });
 
-    ctx.fillStyle = '#f0f0f0'; ctx.fillRect(54, 650, 686, 32);
-    drawText(ctx, 'TRANSACTION DETAIL', 397, 671, { size: 14, weight: '700', align: 'center' });
-    const colX = [54, 282, 514, 740];
-    ctx.fillStyle = '#fafafa'; ctx.fillRect(54, 690, 686, 31);
-    ctx.strokeStyle = '#d6d6d6'; ctx.lineWidth = 1;
-    ctx.strokeRect(54, 690, 686, 31);
-    colX.slice(1, -1).forEach((x) => { ctx.beginPath(); ctx.moveTo(x, 690); ctx.lineTo(x, 785); ctx.stroke(); });
-    ctx.beginPath(); ctx.moveTo(54, 721); ctx.lineTo(740, 721); ctx.moveTo(54, 753); ctx.lineTo(740, 753); ctx.moveTo(54, 785); ctx.lineTo(740, 785); ctx.stroke();
-    drawText(ctx, 'RECEIPT NO', 64, 710, { size: 11, weight: '700' });
-    drawText(ctx, 'TRANSACTION DATE AND TIME', 292, 710, { size: 11, weight: '700' });
-    drawText(ctx, 'AMOUNT', 730, 710, { size: 11, weight: '700', align: 'right' });
-    drawText(ctx, row.receipt, 64, 742, { size: 11 });
-    drawText(ctx, receiptDate(row.date), 292, 742, { size: 11 });
-    drawText(ctx, money(amount) + ' BIRR', 730, 742, { size: 11, align: 'right' });
-    ctx.fillStyle = '#fff0f1'; ctx.fillRect(55, 754, 684, 30);
-    drawText(ctx, 'TOTAL AMOUNT', 500, 774, { size: 12, weight: '700', align: 'right', color: '#f13f49' });
-    drawText(ctx, money(amount) + ' BIRR', 730, 774, { size: 12, weight: '700', align: 'right', color: '#f13f49' });
-    ctx.strokeStyle = '#d6d6d6'; ctx.strokeRect(54, 753, 686, 32);
-
-    ctx.strokeStyle = '#d9dddf'; ctx.beginPath(); ctx.moveTo(54, 811); ctx.lineTo(740, 811); ctx.stroke();
-    const extras = [
-      ['TOTAL AMOUNT IN WORD', makeAmountWords(amount)],
-      ['USED CHANNEL', row.channel],
-      ['TRANSACTION REASON', row.reason]
-    ];
-    extras.forEach((field, index) => {
-      const y = 848 + index * 30;
-      drawText(ctx, field[0], 54, y, { size: 12 });
-      drawText(ctx, field[1], 350, y, { size: 12, weight: '700', maxWidth: 380 });
+    /* Detail table: amount, then the fee when there is one, then the total. */
+    let y = 375 + fields.length * 28 + 6;
+    ctx.fillStyle = '#f0f0f0'; ctx.fillRect(54, y, 686, 32);
+    drawText(ctx, 'TRANSACTION DETAIL', 397, y + 21, { size: 14, weight: '700', align: 'center' });
+    y += 40;
+    const lines = [[row.receipt, receiptDate(row.date), money(row.amount) + ' BIRR']];
+    if (row.fee) lines.push(['', 'SERVICE FEE', money(row.fee) + ' BIRR']);
+    ctx.strokeStyle = '#d9d9d9'; ctx.lineWidth = 1;
+    ctx.fillStyle = '#fafafa'; ctx.fillRect(54, y, 686, 32); ctx.strokeRect(54, y, 686, 32);
+    drawText(ctx, 'RECEIPT NO', 64, y + 21, { size: 11, weight: '700' });
+    drawText(ctx, 'TRANSACTION DATE AND TIME', 292, y + 21, { size: 11, weight: '700' });
+    drawText(ctx, 'AMOUNT', 730, y + 21, { size: 11, weight: '700', align: 'right' });
+    y += 32;
+    lines.forEach((line) => {
+      ctx.strokeRect(54, y, 686, 32);
+      drawText(ctx, line[0], 64, y + 21, { size: 11 });
+      drawText(ctx, line[1], line[0] ? 292 : 500, y + 21, { size: 11, align: line[0] ? 'left' : 'right' });
+      drawText(ctx, line[2], 730, y + 21, { size: 11, align: 'right' });
+      y += 32;
     });
-    ctx.strokeStyle = '#5478d9'; ctx.lineWidth = 3; ctx.globalAlpha = 0.56; ctx.beginPath(); ctx.arc(642, 721, 55, 0, Math.PI * 2); ctx.stroke(); ctx.beginPath(); ctx.arc(642, 721, 46, 0, Math.PI * 2); ctx.stroke(); ctx.globalAlpha = 1;
-    drawText(ctx, 'M-PESA', 642, 718, { size: 16, weight: '700', align: 'center', color: '#5478d9' });
-    drawText(ctx, 'DEMO RECEIPT', 642, 736, { size: 8, weight: '700', align: 'center', color: '#5478d9' });
-    ctx.strokeStyle = '#d9dddf'; ctx.beginPath(); ctx.moveTo(54, 1030); ctx.lineTo(740, 1030); ctx.stroke();
-    drawText(ctx, 'SAMPLE LAYOUT ONLY · NOT AN OFFICIAL RECEIPT · NOT VALID FOR VERIFICATION', 397, 1052, { size: 8, align: 'center', color: '#8c3239' });
-    drawText(ctx, 'THANK YOU FOR USING M-PESA', 397, 1073, { size: 12, align: 'center' });
-    ctx.fillStyle = '#f53c4c'; ctx.fillRect(0, 1090, 794, 33);
-    drawText(ctx, 'm-PESA', 730, 1113, { size: 19, weight: '700', align: 'right', color: '#fff' });
+    ctx.fillStyle = '#fff1f2'; ctx.fillRect(54, y, 686, 32); ctx.strokeRect(54, y, 686, 32);
+    drawText(ctx, 'TOTAL AMOUNT', 500, y + 21, { size: 12, weight: '700', align: 'right', color: '#fe353d' });
+    drawText(ctx, money(total) + ' BIRR', 730, y + 21, { size: 12, weight: '700', align: 'right', color: '#fe353d' });
+    if (ready(PDF_IMAGES.stamp)) { ctx.save(); ctx.translate(630, y - 20); ctx.rotate(-12 * Math.PI / 180); ctx.drawImage(PDF_IMAGES.stamp, -80, -80, 160, 160); ctx.restore(); }
+    y += 58;
+
+    ctx.strokeStyle = '#e0e0e0'; ctx.beginPath(); ctx.moveTo(54, y - 18); ctx.lineTo(740, y - 18); ctx.stroke();
+    receiptExtras(row).forEach((field, index) => {
+      drawText(ctx, field[0], 54, y + 12 + index * 30, { size: 12 });
+      drawText(ctx, field[1], 350, y + 12 + index * 30, { size: 12, weight: '700', maxWidth: 385 });
+    });
+
+    ctx.strokeStyle = '#e0e0e0'; ctx.beginPath(); ctx.moveTo(54, 1030); ctx.lineTo(740, 1030); ctx.stroke();
+    drawText(ctx, 'SAMPLE LAYOUT ONLY · NOT AN OFFICIAL RECEIPT', 397, 1050, { size: 8, align: 'center', color: '#8a8f94' });
+    drawText(ctx, 'THANK YOU FOR USING M-PESA', 397, 1068, { size: 12, align: 'center' });
+    ctx.fillStyle = '#fe353d'; ctx.fillRect(0, 1079, 794, 44);
+    const white = PDF_IMAGES.white;
+    if (ready(white)) { const w = 26 * white.naturalWidth / white.naturalHeight; ctx.drawImage(white, 740 - w, 1088, w, 26); }
     return canvas;
   }
 
-  function drawStatementPage(rows, pageIndex, pageCount, pageRows, report) {
-    const { canvas, context: ctx } = makeCanvas(842, 595);
-    const firstPage = pageIndex === 0;
-    drawLogo(ctx, 32, 10, 100, 28);
-    drawText(ctx, 'Safaricom Ethiopia PLC', 810, 24, { size: 9, weight: '700', align: 'right', color: '#078248' });
-    drawText(ctx, 'Operator: Demo Operator', 810, 39, { size: 7, align: 'right', color: '#607166' });
-    ctx.fillStyle = '#078b47'; ctx.fillRect(32, 44, 778, 27);
-    drawText(ctx, firstPage ? 'M-PESA TRANSACTION STATEMENT' : 'M-PESA TRANSACTION STATEMENT · CONTINUED', 421, 62, { size: 14, weight: '700', align: 'center', color: '#fff' });
-    if (firstPage) {
-      ctx.fillStyle = '#f2f8f2'; ctx.strokeStyle = '#b8dbc3'; ctx.lineWidth = 1; ctx.fillRect(32, 80, 778, 58); ctx.strokeRect(32, 80, 778, 58);
-      ctx.beginPath(); ctx.moveTo(421, 87); ctx.lineTo(421, 132); ctx.stroke();
-      drawText(ctx, 'ACCOUNT HOLDER', 45, 94, { size: 7, weight: '700', color: '#42624d' });
-      drawText(ctx, report.holder, 143, 94, { size: 8, weight: '700', maxWidth: 260 });
-      drawText(ctx, report.idLabel, 45, 111, { size: 7, weight: '700', color: '#42624d' });
-      drawText(ctx, report.identifier, 143, 111, { size: 8, weight: '700', maxWidth: 260 });
-      drawText(ctx, 'ACCOUNT', 45, 128, { size: 7, weight: '700', color: '#42624d' });
-      drawText(ctx, report.account, 143, 128, { size: 8, weight: '700', maxWidth: 260 });
-      drawText(ctx, 'TIME PERIOD', 435, 94, { size: 7, weight: '700', color: '#42624d' });
-      drawText(ctx, report.period, 520, 94, { size: 8, weight: '700', maxWidth: 275 });
-      drawText(ctx, 'DATE OF REPORT', 435, 111, { size: 7, weight: '700', color: '#42624d' });
-      drawText(ctx, report.reportDate, 520, 111, { size: 8, weight: '700', maxWidth: 275 });
-      drawText(ctx, 'STATEMENT REF.', 435, 128, { size: 7, weight: '700', color: '#42624d' });
-      drawText(ctx, report.reference, 520, 128, { size: 8, weight: '700', maxWidth: 275 });
-      ctx.fillStyle = '#f6fbf7'; ctx.strokeStyle = '#cde4d2'; ctx.fillRect(32, 145, 778, 30); ctx.strokeRect(32, 145, 778, 30);
-      const summaries = [
-        ['OPENING BALANCE', report.opening], ['TOTAL PAID IN', report.paidIn], ['TOTAL WITHDRAWN', report.withdrawn], ['CLOSING BALANCE', report.closing]
-      ];
-      summaries.forEach((item, index) => {
-        const x = 42 + index * 192;
-        drawText(ctx, item[0], x, 157, { size: 6.5, weight: '700', color: '#607166' });
-        drawText(ctx, money(item[1]) + ' ETB', x, 169, { size: 8, weight: '700', color: index === 3 ? '#087b3e' : '#26313a' });
-      });
-    } else {
-      drawText(ctx, report.reference + ' · ' + report.account, 32, 86, { size: 8, weight: '700', color: '#46545c' });
-      drawText(ctx, 'Period: ' + report.period, 810, 86, { size: 8, align: 'right', color: '#46545c' });
-    }
+  /* ── Statement PDF ─────────────────────────────────────────
+     Portrait A4 in the M-PESA receipt layout (company header and QR,
+     red-outlined title, grey section bars, pink total row, stamp, red
+     footer bar) carrying the statement: holder and period details, the
+     transaction table over as many pages as it needs, then the account
+     summary and important information on the last page. */
+  const PAGE_W = 794, PAGE_H = 1123, LEFT = 46, RIGHT = 748;
+  const RED = '#fe353d', INK = '#1c1c21', MUTED = '#74777a', LINE = '#d9d9d9';
+  const TABLE_BOTTOM = 1010, CLOSING_H = 330, HEAD_H = 34;
+  const COLUMNS = [
+    { key: 'no', label: ['NO.'], width: 34, center: true },
+    { key: 'receipt', label: ['RECEIPT NO.'], width: 100 },
+    { key: 'time', label: ['COMPLETION', 'TIME'], width: 108 },
+    { key: 'details', label: ['DETAILS'], width: 162 },
+    { key: 'status', label: ['TRANSACTION', 'STATUS'], width: 78 },
+    { key: 'paidIn', label: ['PAID IN', '(ETB)'], width: 73, right: true },
+    { key: 'withdrawn', label: ['WITHDRAWN', '(ETB)'], width: 74, right: true },
+    { key: 'balance', label: ['BALANCE', '(ETB)'], width: 73, right: true }
+  ];
+  const pdfImage = (src) => { const img = new Image(); img.src = src; return img; };
+  const ASSETS = window.STATEMENT_ASSETS || {};
+  const PDF_IMAGES = { logo: pdfImage(ASSETS.logo || 'M-Pesa-Logo.png'), white: pdfImage(ASSETS.white || 'assets/M-PESA-white-logo.svg'), stamp: pdfImage(ASSETS.stamp || 'assets/M-PESA-official_stamp.png'), qr: pdfImage(ASSETS.qr || 'assets/qr-placeholder.svg') };
+  const ready = (img) => img.complete && img.naturalWidth;
 
-    const columns = [
-      { key: 'number', label: 'No.', width: 28 }, { key: 'receipt', label: 'Receipt No.', width: 76 },
-      { key: 'time', label: 'Completion Time', width: 95 }, { key: 'details', label: 'Details', width: 193 },
-      { key: 'status', label: 'Transaction Status', width: 63 }, { key: 'paidIn', label: 'Paid In (ETB)', width: 75 },
-      { key: 'withdrawn', label: 'Withdrawn (ETB)', width: 75 }, { key: 'balance', label: 'Balance (ETB)', width: 75 },
-      { key: 'bill', label: 'Bill reference', width: 98 }
-    ];
-    const tableX = 32;
-    const tableY = firstPage ? 184 : 100;
-    const headerH = 24;
-    const rowH = firstPage ? 16.8 : 19.2;
-    ctx.fillStyle = '#078b47'; ctx.fillRect(tableX, tableY, 778, headerH);
-    let columnX = tableX;
-    columns.forEach((column) => {
-      const labelLines = wrapText(ctx, column.label, column.width - 8, '700 7px Arial');
-      labelLines.slice(0, 2).forEach((line, lineIndex) => drawText(ctx, line, columnX + 4, tableY + 9 + lineIndex * 8, { size: 7, weight: '700', color: '#fff', maxWidth: column.width - 7 }));
-      ctx.strokeStyle = '#ffffff60'; ctx.beginPath(); ctx.moveTo(columnX + column.width, tableY); ctx.lineTo(columnX + column.width, tableY + headerH); ctx.stroke();
-      columnX += column.width;
+  function drawFittedLogo(ctx, x, y, height) {
+    const logo = PDF_IMAGES.logo;
+    if (!ready(logo)) { drawText(ctx, 'M-PESA', x, y + height - 6, { size: 26, weight: '700', color: '#1fa855' }); return; }
+    ctx.drawImage(logo, x, y, height * logo.naturalWidth / logo.naturalHeight, height);
+  }
+  function hr(ctx, y, color) { ctx.strokeStyle = color || '#e0e0e0'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(LEFT, y); ctx.lineTo(RIGHT, y); ctx.stroke(); }
+  function greyBar(ctx, y, title) {
+    ctx.fillStyle = '#f0f0f0'; ctx.fillRect(LEFT, y, RIGHT - LEFT, 32);
+    drawText(ctx, title, PAGE_W / 2, y + 21, { size: 14, weight: '700', align: 'center', color: INK });
+    return y + 40;
+  }
+
+  function drawWatermark(ctx) {
+    ctx.save(); ctx.translate(PAGE_W / 2, PAGE_H / 2); ctx.rotate(-25 * Math.PI / 180); ctx.globalAlpha = 0.1;
+    drawText(ctx, 'M-PESA', 0, 50, { size: 140, weight: '900', align: 'center', color: '#b4b4b4' });
+    ctx.restore();
+  }
+
+  /* Company header, QR and the red-outlined title; returns where content starts. */
+  function drawHeader(ctx) {
+    drawFittedLogo(ctx, LEFT, 36, 54);
+    drawText(ctx, 'Safaricom M-PESA Mobile Financial Services PLC', LEFT, 122, { size: 15, weight: '700', color: INK });
+    [['TIN NO: ', '0084242753'], ['VAT REG NO: ', '22371880003'], ['Address: ', 'Addis Ababa, Kirkos Woreda 1'], ['Tel: ', '+251 756 765434']].forEach((pair, i) => {
+      const y = 152 + i * 28;
+      drawText(ctx, pair[0], LEFT, y, { size: 13, color: MUTED });
+      setCanvasFont(ctx, 13, '400');
+      drawText(ctx, pair[1], LEFT + ctx.measureText(pair[0]).width, y, { size: 13, weight: '700', color: INK });
     });
-    let y = tableY + headerH;
-    if (!pageRows.length) {
-      ctx.fillStyle = '#fff'; ctx.fillRect(tableX, y, 778, rowH * 2);
-      ctx.strokeStyle = '#d8dee1'; ctx.strokeRect(tableX, y, 778, rowH * 2);
-      drawText(ctx, 'No demonstration transactions fall within this selected period.', tableX + 9, y + 21, { size: 9, color: '#5b6671' });
-      y += rowH * 2;
-    } else {
-      pageRows.forEach((row, localIndex) => {
-        const rowNumber = rows.indexOf(row) + 1;
-        ctx.fillStyle = localIndex % 2 ? '#f7faf8' : '#fff'; ctx.fillRect(tableX, y, 778, rowH);
-        ctx.strokeStyle = '#d8dee1'; ctx.lineWidth = .5; ctx.strokeRect(tableX, y, 778, rowH);
-        let x = tableX;
-        const time = new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: 'Africa/Addis_Ababa' }).format(row.date);
-        const values = [
-          String(rowNumber), row.receipt, time, row.details, row.status,
-          row.paidIn ? money(row.paidIn) : '—', row.withdrawn ? money(row.withdrawn) : '—', money(row.balance), row.bill
-        ];
-        columns.forEach((column, columnIndex) => {
-          const value = values[columnIndex];
-          const alignRight = ['paidIn', 'withdrawn', 'balance'].includes(column.key);
-          const font = (columnIndex === 1 ? '700 ' : '400 ') + (firstPage ? '6.7px' : '7.2px') + ' Arial';
-          const lines = wrapText(ctx, value, column.width - 8, font);
-          const maxLines = Math.max(1, Math.floor((rowH - 4) / (firstPage ? 7 : 7.5)));
-          const shownLines = lines.slice(0, maxLines);
-          shownLines.forEach((line, lineIndex) => drawText(ctx, line, alignRight ? x + column.width - 4 : x + 4, y + (firstPage ? 7.7 : 8.3) + lineIndex * (firstPage ? 7 : 7.5), { size: firstPage ? 6.7 : 7.2, weight: columnIndex === 1 ? '700' : '400', align: alignRight ? 'right' : 'left', maxWidth: column.width - 8 }));
-          x += column.width;
-        });
-        y += rowH;
-      });
-    }
-    ctx.strokeStyle = '#15924f'; ctx.beginPath(); ctx.moveTo(32, 579); ctx.lineTo(810, 579); ctx.stroke();
-    drawText(ctx, 'SAMPLE DATA · NOT AN OFFICIAL M-PESA STATEMENT', 32, 590, { size: 7, color: '#647366' });
-    drawText(ctx, 'Page ' + (pageIndex + 1) + ' of ' + pageCount, 810, 590, { size: 7, align: 'right', color: '#647366' });
-    return canvas;
+    ctx.strokeStyle = '#e0e0e0'; ctx.strokeRect(RIGHT - 96, 36, 96, 96);
+    if (ready(PDF_IMAGES.qr)) ctx.drawImage(PDF_IMAGES.qr, RIGHT - 95, 37, 94, 94);
+    drawText(ctx, 'SCAN TO VERIFY', RIGHT - 48, 148, { size: 9, weight: '700', align: 'center', color: INK });
+    hr(ctx, 262);
+    ctx.strokeStyle = RED; ctx.lineWidth = 2; ctx.strokeRect(LEFT, 280, RIGHT - LEFT, 42);
+    drawText(ctx, 'M-PESA TRANSACTION STATEMENT', PAGE_W / 2, 307, { size: 16, weight: '700', align: 'center', color: RED });
+    return 344;
+  }
+
+  function drawContinuedHeader(ctx, report) {
+    drawFittedLogo(ctx, LEFT, 32, 40);
+    ctx.strokeStyle = RED; ctx.lineWidth = 2; ctx.strokeRect(LEFT, 90, RIGHT - LEFT, 36);
+    drawText(ctx, 'M-PESA TRANSACTION STATEMENT · CONTINUED', PAGE_W / 2, 113, { size: 13, weight: '700', align: 'center', color: RED });
+    drawText(ctx, report.holder + '  ·  ' + report.reference, RIGHT, 60, { size: 10, align: 'right', color: MUTED });
+    return 142;
+  }
+
+  /* Holder details on the left, period and report details on the right. */
+  function drawDetails(ctx, y, report) {
+    const left = [['ACCOUNT HOLDER', report.holder], [report.idLabel.toUpperCase(), report.identifier]];
+    if (!report.partner) left.push(['CUSTOMER IDENTITY ID', report.identityId]);
+    left.push(['ACCOUNT', report.accountName], ['ACCOUNT TYPE', report.accountType]);
+    const right = [['FROM', report.from], ['TO', report.to], ['OPERATOR', report.operator], ['DATE OF REPORT', report.reportDate], ['STATEMENT REF.', report.reference]];
+    drawText(ctx, report.partner ? 'PARTNER DETAILS' : 'CUSTOMER DETAILS', LEFT, y, { size: 11, weight: '700', color: MUTED });
+    drawText(ctx, 'TIME PERIOD', 410, y, { size: 11, weight: '700', color: MUTED });
+    left.forEach((row, i) => {
+      drawText(ctx, row[0], LEFT, y + 26 + i * 23, { size: 11.5, color: INK });
+      drawText(ctx, row[1], LEFT + 150, y + 26 + i * 23, { size: 11.5, weight: '700', color: INK, maxWidth: 200 });
+    });
+    right.forEach((row, i) => {
+      drawText(ctx, row[0], 410, y + 26 + i * 23, { size: 11.5, color: INK });
+      drawText(ctx, row[1], 530, y + 26 + i * 23, { size: 11.5, weight: '700', color: INK, maxWidth: RIGHT - 530 });
+    });
+    return y + 26 + 5 * 23 + 8;
+  }
+
+  function drawTableHead(ctx, y) {
+    ctx.fillStyle = '#fafafa'; ctx.fillRect(LEFT, y, RIGHT - LEFT, HEAD_H);
+    ctx.strokeStyle = LINE; ctx.lineWidth = 1;
+    let x = LEFT;
+    COLUMNS.forEach((col) => {
+      ctx.strokeRect(x, y, col.width, HEAD_H);
+      const cx = col.center ? x + col.width / 2 : col.right ? x + col.width - 7 : x + 7;
+      col.label.forEach((line, li) => drawText(ctx, line, cx, y + (col.label.length === 1 ? 21 : 15 + li * 12), { size: 9.5, weight: '700', color: INK, align: col.center ? 'center' : col.right ? 'right' : 'left' }));
+      x += col.width;
+    });
+    return y + HEAD_H;
+  }
+
+  /* A row grows to two lines when the details wrap. */
+  function rowLines(ctx, row) { return wrapText(ctx, row.details, COLUMNS[3].width - 14, '400 10px Arial').slice(0, 2); }
+  function rowHeight(lines) { return lines.length > 1 ? 38 : 26; }
+
+  function drawRow(ctx, row, number, y, lines) {
+    const h = rowHeight(lines);
+    const time = new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false, timeZone: 'Africa/Addis_Ababa' }).format(row.date).replace(',', '');
+    const values = { no: String(number), receipt: row.receipt, time, status: row.status, paidIn: row.paidIn ? money(row.paidIn) : '-', withdrawn: row.withdrawn ? money(row.withdrawn) : '-', balance: money(row.balance) };
+    ctx.strokeStyle = LINE; ctx.lineWidth = 1;
+    let x = LEFT;
+    COLUMNS.forEach((col) => {
+      ctx.strokeRect(x, y, col.width, h);
+      if (col.key === 'details') lines.forEach((line, li) => drawText(ctx, line, x + 7, y + 17 + li * 13, { size: 10, color: INK, maxWidth: col.width - 12 }));
+      else drawText(ctx, values[col.key], col.center ? x + col.width / 2 : col.right ? x + col.width - 7 : x + 7, y + 17, { size: 10, weight: col.key === 'balance' ? '700' : '400', color: INK, align: col.center ? 'center' : col.right ? 'right' : 'left', maxWidth: col.width - 12 });
+      x += col.width;
+    });
+    return y + h;
+  }
+
+  /* Account summary (closing balance in the pink total row), stamp and notes. */
+  function drawClosing(ctx, y, report) {
+    y = greyBar(ctx, y, 'ACCOUNT SUMMARY');
+    const lines = [['OPENING BALANCE', report.opening], ['TOTAL PAID IN', report.paidIn], ['TOTAL WITHDRAWN', report.withdrawn]];
+    const top = y;
+    ctx.strokeStyle = LINE; ctx.lineWidth = 1;
+    lines.forEach((line) => {
+      ctx.strokeRect(LEFT, y, RIGHT - LEFT, 32);
+      drawText(ctx, line[0], LEFT + 10, y + 21, { size: 11.5, color: INK });
+      drawText(ctx, money(line[1]) + ' BIRR', RIGHT - 10, y + 21, { size: 11.5, weight: '700', align: 'right', color: INK });
+      y += 32;
+    });
+    ctx.fillStyle = '#fff1f2'; ctx.fillRect(LEFT, y, RIGHT - LEFT, 34); ctx.strokeRect(LEFT, y, RIGHT - LEFT, 34);
+    drawText(ctx, 'CLOSING BALANCE', LEFT + 10, y + 22, { size: 12.5, weight: '700', color: RED });
+    drawText(ctx, money(report.closing) + ' BIRR', RIGHT - 10, y + 22, { size: 12.5, weight: '700', align: 'right', color: RED });
+    y += 34;
+    if (ready(PDF_IMAGES.stamp)) { ctx.save(); ctx.translate(500, top + 40); ctx.rotate(-12 * Math.PI / 180); ctx.globalAlpha = 0.95; ctx.drawImage(PDF_IMAGES.stamp, -88, -88, 176, 176); ctx.restore(); }
+
+    y += 22; hr(ctx, y); y += 26;
+    drawText(ctx, 'IMPORTANT INFORMATION', LEFT, y, { size: 11, weight: '700', color: MUTED });
+    y += 22;
+    [
+      'This statement includes all completed M-PESA transactions within the selected period.',
+      'For any discrepancies, please contact Safaricom Customer Care on 700 or visit your nearest M-PESA agent.',
+      'This is a computer generated statement and does not require a signature.'
+    ].forEach((note) => {
+      drawText(ctx, '•', LEFT + 4, y, { size: 12, color: INK });
+      wrapText(ctx, note, RIGHT - LEFT - 30, '400 11.5px Arial').forEach((line, li) => drawText(ctx, line, LEFT + 20, y + li * 16, { size: 11.5, color: INK }));
+      y += 16 * wrapText(ctx, note, RIGHT - LEFT - 30, '400 11.5px Arial').length + 6;
+    });
+  }
+
+  function drawPageFooter(ctx, pageIndex, pageCount, last) {
+    hr(ctx, 1030);
+    if (last) drawText(ctx, 'THANK YOU FOR USING M-PESA', PAGE_W / 2, 1054, { size: 11.5, align: 'center', color: INK });
+    drawText(ctx, 'Page ' + (pageIndex + 1) + ' of ' + pageCount, RIGHT, 1054, { size: 9, align: 'right', color: MUTED });
+    drawText(ctx, 'Sample data · not official', LEFT, 1054, { size: 8, color: '#9aa3a8' });
+    ctx.fillStyle = RED; ctx.fillRect(0, PAGE_H - 48, PAGE_W, 48);
+    drawText(ctx, 'M-PESA ' + (state.category === 'partner' ? 'Partner' : 'Customer') + ' Statement', 24, PAGE_H - 19, { size: 11, weight: '700', color: '#fff' });
+    const white = PDF_IMAGES.white;
+    if (ready(white)) { const w = 30 * white.naturalWidth / white.naturalHeight; ctx.drawImage(white, PAGE_W - 24 - w, PAGE_H - 39, w, 30); }
+  }
+
+  /* Lay the rows out page by page; the summary goes after the last row,
+     on a page of its own when it doesn't fit underneath. */
+  function buildStatementPages(rows, report) {
+    const measure = makeCanvas(10, 10).context;
+    const laid = rows.map((row, i) => { const lines = rowLines(measure, row); return { row, number: i + 1, lines, h: rowHeight(lines) }; });
+    const firstTop = 344 + 26 + 5 * 23 + 8 + 14 + 40 + HEAD_H;
+    const nextTop = 142 + 40 + HEAD_H;
+    const pages = [];
+    let page = { first: true, items: [] }, y = firstTop;
+    laid.forEach((item) => {
+      if (y + item.h > TABLE_BOTTOM) { pages.push(page); page = { first: false, items: [] }; y = nextTop; }
+      page.items.push(item); y += item.h;
+    });
+    pages.push(page);
+    if (y + 24 + CLOSING_H > TABLE_BOTTOM + 10) pages.push({ first: false, items: null });
+
+    return pages.map((p, pageIndex) => {
+      const { canvas, context: ctx } = makeCanvas(PAGE_W, PAGE_H);
+      const last = pageIndex === pages.length - 1;
+      drawWatermark(ctx);
+      let top = p.first ? drawHeader(ctx) : drawContinuedHeader(ctx, report);
+      if (p.first) top = drawDetails(ctx, top + 10, report) + 14;
+      if (p.items) {
+        let ty = drawTableHead(ctx, greyBar(ctx, top, 'TRANSACTION DETAIL'));
+        if (!p.items.length) {
+          ctx.strokeStyle = LINE; ctx.strokeRect(LEFT, ty, RIGHT - LEFT, 32);
+          drawText(ctx, 'No transactions fall within this period.', PAGE_W / 2, ty + 21, { size: 11, align: 'center', color: MUTED });
+          ty += 32;
+        }
+        p.items.forEach((item) => { ty = drawRow(ctx, item.row, item.number, ty, item.lines); });
+        top = ty + 24;
+      }
+      if (last) drawClosing(ctx, top, report);
+      drawPageFooter(ctx, pageIndex, pages.length, last);
+      return canvas;
+    });
   }
 
   function pdfBlobFromCanvases(canvases, pageWidth, pageHeight) {
@@ -490,37 +594,45 @@
   }
 
   function downloadStatementPdf() {
-    if (!$('#statementPreview') || $('#statementPreview').classList.contains('hidden')) return;
-    const rows = state.rows;
-    const firstPageCapacity = 22;
-    const continuedCapacity = 23;
-    const pageCount = rows.length <= firstPageCapacity ? 1 : 1 + Math.ceil((rows.length - firstPageCapacity) / continuedCapacity);
-    const start = $('#startDate').value;
-    const end = $('#endDate').value;
-    const report = {
-      holder: $('#statementHolder').textContent,
-      idLabel: $('#statementIdLabel').textContent,
-      identifier: $('#statementMsisdn').textContent,
-      account: $('#statementAccount').textContent + ' · ' + $('#statementType').textContent,
-      period: $('#periodFrom').textContent + ' to ' + $('#periodTo').textContent,
-      reference: $('#statementRef').textContent,
-      reportDate: $('#reportDate').textContent,
-      opening: Number($('#openingBalance').textContent.replace(/,/g, '')) || 0,
-      paidIn: Number($('#totalPaidIn').textContent.replace(/,/g, '')) || 0,
-      withdrawn: Number($('#totalWithdrawn').textContent.replace(/,/g, '')) || 0,
-      closing: Number($('#closingBalance').textContent.replace(/,/g, '')) || 0
-    };
-    const pages = [];
-    let cursor = 0;
-    for (let page = 0; page < pageCount; page++) {
-      const capacity = page === 0 ? firstPageCapacity : continuedCapacity;
-      const pageRows = rows.slice(cursor, cursor + capacity);
-      pages.push(drawStatementPage(rows, page, pageCount, pageRows, report));
-      cursor += capacity;
-    }
-    const safeStart = start.replace(/[^0-9-]/g, '');
-    const safeEnd = end.replace(/[^0-9-]/g, '');
-    triggerDownload(pdfBlobFromCanvases(pages, '841.89', '595.28'), 'M-PESA-Statement-' + safeStart + '-to-' + safeEnd + '.pdf');
+    const report = state.report;
+    if (!report) return;
+    const pages = buildStatementPages(state.rows, report);
+    triggerDownload(pdfBlobFromCanvases(pages, '595.28', '841.89'), 'M-PESA-Statement-' + report.start + '-to-' + report.end + '.pdf');
+  }
+
+  function rowHtml(row) {
+    const index = state.rows.indexOf(row);
+    const time = new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false, timeZone: 'Africa/Addis_Ababa' }).format(row.date).replace(',', '');
+    return '<tr>' +
+      '<td>' + (index + 1) + '</td>' +
+      '<td><button type="button" class="rcpt" data-receipt-index="' + index + '" title="View receipt">' + html(row.receipt) + '</button></td>' +
+      '<td class="nowrap">' + html(time) + '</td>' +
+      '<td>' + html(row.details) + '</td>' +
+      '<td>' + html(row.status) + '</td>' +
+      '<td class="num">' + (row.paidIn ? money(row.paidIn) : '-') + '</td>' +
+      '<td class="num">' + (row.withdrawn ? money(row.withdrawn) : '-') + '</td>' +
+      '<td class="num">' + money(row.balance) + '</td>' +
+      '</tr>';
+  }
+
+  /* One page of the table at a time; printing shows every row. */
+  function renderRows(all) {
+    const total = state.rows.length;
+    const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+    state.page = Math.min(Math.max(1, state.page), pages);
+    const shown = all ? state.rows : state.rows.slice((state.page - 1) * PAGE_SIZE, state.page * PAGE_SIZE);
+    $('#transactionRows').innerHTML = total ? shown.map(rowHtml).join('')
+      : '<tr><td colspan="8"><div class="empty-state"><h3>No transactions</h3><p>No demonstration transactions fall within this period.</p></div></td></tr>';
+    const from = total ? (state.page - 1) * PAGE_SIZE + 1 : 0;
+    const to = Math.min(state.page * PAGE_SIZE, total);
+    $('#statementPagination').innerHTML = total <= PAGE_SIZE ? '' :
+      '<span class="pg-info">Showing ' + from + '–' + to + ' of ' + total + '</span>' +
+      '<div class="lp-pager">' +
+        '<button class="pg-btn" data-page="' + (state.page - 1) + '"' + (state.page <= 1 ? ' disabled' : '') + '><i data-lucide="chevron-left"></i> Prev</button>' +
+        '<span class="pg-info">Page ' + state.page + ' of ' + pages + '</span>' +
+        '<button class="pg-btn" data-page="' + (state.page + 1) + '"' + (state.page >= pages ? ' disabled' : '') + '>Next <i data-lucide="chevron-right"></i></button>' +
+      '</div>';
+    icons();
   }
 
   function renderStatement() {
@@ -530,7 +642,7 @@
     error.textContent = '';
     if (!start || !end) { error.textContent = 'Choose both a start date and an end date.'; return; }
     if (start > end) { error.textContent = 'The start date must be on or before the end date.'; return; }
-    const allRows = makeDemoRows(end);
+    const allRows = makeDemoRows(end, { name: state.holder, phone: state.identifier, partner: state.category === 'partner' });
     state.rows = allRows.filter((row) => {
       const day = dateInput(row.date);
       return day >= start && day <= end;
@@ -539,39 +651,37 @@
     const paidIn = state.rows.reduce((sum, row) => sum + row.paidIn, 0);
     const withdrawn = state.rows.reduce((sum, row) => sum + row.withdrawn, 0);
     const closing = opening + paidIn - withdrawn;
-    const account = state.selectedAccount || state.accounts[0] || { name: 'Main M-PESA Account', type: 'Main', suffix: '•••• 7184' };
-    const holder = $('#resultHeading').textContent || 'Demo Customer';
-    $('#statementRecordCount').textContent = 'STATEMENT PREVIEW · DEMO · ' + state.rows.length + ' TRANSACTIONS';
-    const refDate = dateInput(new Date());
-    const refToken = refDate.replaceAll('-', '');
-    $('#statementHolder').textContent = holder;
-    $('#statementAccount').textContent = account.name + ' ' + account.suffix;
-    $('#statementType').textContent = account.type + ' Account';
-    $('#periodFrom').textContent = displayDate(start);
-    $('#periodTo').textContent = displayDate(end);
-    $('#reportDate').textContent = dateTime(new Date());
-    $('#statementRef').textContent = 'DEMO-STMT-' + refToken + '-0001';
-    $('#openingBalance').textContent = money(opening);
-    $('#totalPaidIn').textContent = money(paidIn);
-    $('#totalWithdrawn').textContent = money(withdrawn);
-    $('#closingBalance').textContent = money(closing);
-    const rows = $('#transactionRows');
-    if (!state.rows.length) {
-      rows.innerHTML = '<tr><td class="empty-row" colspan="10">No demonstration transactions fall within this selected period.</td></tr>';
-    } else {
-      rows.innerHTML = state.rows.map((row, index) => '<tr>' +
-        '<td>' + (index + 1) + '</td>' +
-        '<td><strong>' + html(row.receipt) + '</strong></td>' +
-        '<td>' + html(new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false, timeZone: 'Africa/Addis_Ababa' }).format(row.date)) + '</td>' +
-        '<td>' + html(row.details) + '</td>' +
-        '<td>' + html(row.status) + '</td>' +
-        '<td>' + (row.paidIn ? money(row.paidIn) : '—') + '</td>' +
-        '<td>' + (row.withdrawn ? money(row.withdrawn) : '—') + '</td>' +
-        '<td>' + money(row.balance) + '</td>' +
-        '<td>' + html(row.bill) + '</td>' +
-        '<td><button type="button" class="table-receipt-button" data-receipt-index="' + index + '">View</button></td>' +
-        '</tr>').join('');
-    }
+    const account = state.accounts[Number($('#accountSelect').value)] || state.accounts[0];
+    const reference = 'DEMO-STMT-' + dateInput(new Date()).replaceAll('-', '') + '-0001';
+    state.report = {
+      partner: state.category === 'partner', holder: state.holder,
+      idLabel: state.category === 'partner' ? 'Short Code' : 'MSISDN',
+      identifier: state.idLabel === 'Customer Identity ID' ? '2517••••••' : state.identifier,
+      identityId: state.idLabel === 'Customer Identity ID' ? state.identifier : '••••••••',
+      accountName: account.name + ' ' + account.suffix, accountType: account.type + ' Account',
+      from: displayDate(start), to: displayDate(end), period: displayDate(start) + ' to ' + displayDate(end),
+      operator: 'Demo Operator', reference, reportDate: dateTime(new Date()),
+      opening, paidIn, withdrawn, closing, start, end
+    };
+    $('#statementMeta').textContent = state.holder + ' · ' + account.name + ' ' + account.suffix + ' · ' + state.report.period + ' · Ref ' + reference;
+    $('#statementRecordCount').textContent = state.rows.length + ' transactions';
+    const r = state.report;
+    const holderRows = [['Account Holder', r.holder], [r.idLabel, r.identifier]];
+    if (!r.partner) holderRows.push(['Customer Identity ID', r.identityId]);
+    holderRows.push(['Account', r.accountName], ['Account Type', r.accountType]);
+    $('#docDetailsTitle').textContent = r.partner ? 'PARTNER DETAILS' : 'CUSTOMER DETAILS';
+    $('#docHolder').innerHTML = holderRows.map((x) => '<dt>' + html(x[0].toUpperCase()) + '</dt><dd>' + html(x[1]) + '</dd>').join('');
+    $('#periodFrom').textContent = r.from;
+    $('#periodTo').textContent = r.to;
+    $('#reportDate').textContent = r.reportDate;
+    $('#statementRef').textContent = r.reference;
+    $('#docFooter').textContent = 'M-PESA ' + (r.partner ? 'Partner' : 'Customer') + ' Statement';
+    $('#openingBalance').textContent = money(opening) + ' BIRR';
+    $('#totalPaidIn').textContent = money(paidIn) + ' BIRR';
+    $('#totalWithdrawn').textContent = money(withdrawn) + ' BIRR';
+    $('#closingBalance').textContent = money(closing) + ' BIRR';
+    state.page = 1;
+    renderRows();
     $('#statementPreview').classList.remove('hidden');
     $('#statementPreview').scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
@@ -582,19 +692,122 @@
     $('#receiptDialog').showModal();
   }
 
-  $$('.category-grid .choice-card').forEach((button) => button.addEventListener('click', () => setCategory(button.dataset.category)));
-  $$('#methodChoices .method-card').forEach((button) => button.addEventListener('click', () => {
-    if (button.dataset.method === 'shortcode' && state.category !== 'partner') return;
-    if (button.dataset.method !== 'shortcode' && state.category === 'partner') return;
-    state.method = button.dataset.method;
-    updateSearchMethods();
-  }));
+  /* ── Statement period picker ──────────────────────────────
+     One field that opens quick ranges plus a range calendar. The chosen
+     dates live in the hidden #startDate / #endDate inputs (yyyy-mm-dd). */
+  const RP_MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  const fromIso = (v) => new Date(v + 'T00:00:00');
+  const prettyDate = (v) => new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }).format(fromIso(v));
+  const rp = { open: false, start: null, end: null, hover: null, view: null };
+
+  function rpPresets() {
+    const t = dateInput(today), d = new Date(today);
+    const monthStart = new Date(d.getFullYear(), d.getMonth(), 1);
+    const lastMonthStart = new Date(d.getFullYear(), d.getMonth() - 1, 1);
+    const lastMonthEnd = new Date(d.getFullYear(), d.getMonth(), 0);
+    return [
+      ['Today', t, t],
+      ['Yesterday', dateInput(addDays(today, -1)), dateInput(addDays(today, -1))],
+      ['Last 7 days', dateInput(addDays(today, -6)), t],
+      ['Last 30 days', dateInput(addDays(today, -29)), t],
+      ['This month', dateInput(monthStart), t],
+      ['Last month', dateInput(lastMonthStart), dateInput(lastMonthEnd)]
+    ];
+  }
+
+  function rpLabel() {
+    const s = $('#startDate').value, e = $('#endDate').value;
+    const preset = rpPresets().find((p) => p[1] === s && p[2] === e);
+    $('#periodText').textContent = s === e ? prettyDate(s) : prettyDate(s) + ' – ' + prettyDate(e);
+    $('#periodHint').textContent = preset ? preset[0] : '';
+  }
+
+  function rpRender() {
+    const t = dateInput(today);
+    const lo = rp.end ? rp.start : (rp.hover && rp.hover < rp.start ? rp.hover : rp.start);
+    const hi = rp.end ? rp.end : (rp.hover && rp.hover > rp.start ? rp.hover : rp.start);
+    $('#rpPresets').innerHTML = rpPresets().map((p) =>
+      '<button type="button" class="rp-preset' + (rp.end && p[1] === rp.start && p[2] === rp.end ? ' on' : '') + '" data-from="' + p[1] + '" data-to="' + p[2] + '">' + p[0] + '</button>').join('');
+
+    const y = rp.view.getFullYear(), m = rp.view.getMonth();
+    $('#rpMonth').textContent = RP_MONTHS[m] + ' ' + y;
+    $('#rpNext').disabled = y > today.getFullYear() || (y === today.getFullYear() && m >= today.getMonth());
+    const lead = (new Date(y, m, 1).getDay() + 6) % 7; /* weeks start on Monday */
+    const days = new Date(y, m + 1, 0).getDate();
+    let cells = '';
+    for (let i = 0; i < lead; i++) cells += '<span></span>';
+    for (let d = 1; d <= days; d++) {
+      const v = y + '-' + String(m + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+      const cls = ['rp-day'];
+      if (v === t) cls.push('today');
+      if (lo && hi && v > lo && v < hi) cls.push('in');
+      if (v === lo) cls.push('edge', 'start');
+      if (v === hi) cls.push('edge', 'end');
+      cells += '<button type="button" class="' + cls.join(' ') + '" data-day="' + v + '"' + (v > t ? ' disabled' : '') + '>' + d + '</button>';
+    }
+    $('#rpGrid').innerHTML = cells;
+    $('#rpSummary').textContent = !rp.end ? 'Select the end date' :
+      (rp.start === rp.end ? prettyDate(rp.start) : prettyDate(rp.start) + ' – ' + prettyDate(rp.end)) +
+      ' · ' + (Math.round((fromIso(rp.end) - fromIso(rp.start)) / 864e5) + 1) + ' days';
+    $('#rpApply').disabled = !rp.end;
+  }
+
+  function rpToggle(open) {
+    rp.open = open;
+    $('#periodPop').classList.toggle('hidden', !open);
+    $('#periodField').setAttribute('aria-expanded', String(open));
+    if (!open) return;
+    rp.start = $('#startDate').value;
+    rp.end = $('#endDate').value;
+    rp.hover = null;
+    const e = fromIso(rp.end);
+    rp.view = new Date(e.getFullYear(), e.getMonth(), 1);
+    rpRender();
+  }
+
+  $('#periodField').addEventListener('click', () => rpToggle(!rp.open));
+  $('#rpPrev').addEventListener('click', () => { rp.view.setMonth(rp.view.getMonth() - 1); rpRender(); });
+  $('#rpNext').addEventListener('click', () => { rp.view.setMonth(rp.view.getMonth() + 1); rpRender(); });
+  $('#rpPresets').addEventListener('click', (event) => {
+    const b = event.target.closest('[data-from]');
+    if (!b) return;
+    rp.start = b.dataset.from; rp.end = b.dataset.to;
+    const e = fromIso(rp.end); rp.view = new Date(e.getFullYear(), e.getMonth(), 1);
+    rpRender();
+  });
+  /* First click sets the start, second the end (either order). */
+  $('#rpGrid').addEventListener('click', (event) => {
+    const b = event.target.closest('[data-day]');
+    if (!b || b.disabled) return;
+    const v = b.dataset.day;
+    if (rp.end || !rp.start) { rp.start = v; rp.end = null; }
+    else if (v < rp.start) { rp.end = rp.start; rp.start = v; }
+    else rp.end = v;
+    rpRender();
+  });
+  $('#rpGrid').addEventListener('mouseover', (event) => {
+    const b = event.target.closest('[data-day]');
+    if (!b || rp.end || b.dataset.day === rp.hover) return;
+    rp.hover = b.dataset.day; rpRender();
+  });
+  $('#rpCancel').addEventListener('click', () => rpToggle(false));
+  $('#rpApply').addEventListener('click', () => {
+    $('#startDate').value = rp.start; $('#endDate').value = rp.end;
+    $('#dateError').textContent = '';
+    rpLabel(); rpToggle(false);
+  });
+  document.addEventListener('mousedown', (event) => {
+    if (rp.open && !event.target.closest('#periodPicker')) rpToggle(false);
+  });
+  document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && rp.open) rpToggle(false); });
+
+  $$('[data-category]').forEach((button) => button.addEventListener('click', () => setCategory(button.dataset.category)));
+  $('#searchMethod').addEventListener('change', updatePlaceholder);
   $('#accountSearchForm').addEventListener('submit', (event) => {
     event.preventDefault();
     const query = $('#accountSearchInput').value.trim();
-    const error = $('#searchError');
-    error.textContent = '';
-    if (!query) { error.textContent = 'Enter a search value to continue.'; $('#accountSearchInput').focus(); return; }
+    $('#searchError').textContent = '';
+    if (!query) { $('#searchError').textContent = 'Enter a search value to continue.'; $('#accountSearchInput').focus(); return; }
     revealAccountResult(query);
   });
   $('#changeSearch').addEventListener('click', () => {
@@ -605,19 +818,23 @@
   $('#generateStatement').addEventListener('click', renderStatement);
   $('#downloadStatementPdf').addEventListener('click', downloadStatementPdf);
   $('#downloadReceiptPdf').addEventListener('click', downloadReceiptPdf);
+  $('#statementPagination').addEventListener('click', (event) => {
+    const button = event.target.closest('[data-page]');
+    if (!button || button.disabled) return;
+    state.page = Number(button.dataset.page);
+    renderRows();
+  });
   $('#transactionRows').addEventListener('click', (event) => {
     const button = event.target.closest('[data-receipt-index]');
-    if (!button) return;
-    showReceipt(state.rows[Number(button.dataset.receiptIndex)]);
+    if (button) showReceipt(state.rows[Number(button.dataset.receiptIndex)]);
   });
-  $('#openReceipt').addEventListener('click', () => showReceipt(state.rows[0]));
   $('#closeReceipt').addEventListener('click', () => $('#receiptDialog').close());
   $('#receiptDialog').addEventListener('click', (event) => {
     if (event.target === $('#receiptDialog')) $('#receiptDialog').close();
   });
   $('#printStatement').addEventListener('click', () => {
     document.body.classList.add('print-statement');
-    $('#statementPreview').classList.add('print-target');
+    renderRows(true);
     window.print();
   });
   $('#printReceipt').addEventListener('click', () => {
@@ -625,12 +842,13 @@
     window.print();
   });
   window.addEventListener('afterprint', () => {
+    if (document.body.classList.contains('print-statement')) renderRows();
     document.body.classList.remove('print-receipt', 'print-statement');
-    $('#statementPreview').classList.remove('print-target');
   });
 
   $('#startDate').value = dateInput(addDays(today, -6));
   $('#endDate').value = dateInput(today);
-  $('#receiptDate').textContent = receiptDate(today);
-  updateSearchMethods();
+  rpLabel();
+  setCategory('customer');
+  icons();
 }());

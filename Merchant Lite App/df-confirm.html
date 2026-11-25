@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en" data-no-demo>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Distribute Float</title>
+<link rel="stylesheet" href="cm.css">
+<style>
+  .page{position:relative;z-index:0}
+  .pin-sub{text-align:center;font-size:12px;color:var(--muted);margin:-6px 0 16px}
+  .keypad button.bio svg{stroke:var(--green)}
+</style>
+</head>
+<body>
+<div class="phone-scroll">
+  <div class="header">
+    <button class="icon-btn" onclick="location.href='df-form.html'" aria-label="Close" id="closeBtn"></button>
+    <div class="header-title">DISTRIBUTE FLOAT</div>
+  </div>
+  <div class="page">
+    <div class="watermark"></div>
+    <div class="sum-card" id="summary"></div>
+  </div>
+</div>
+
+<div class="footer">
+  <button class="btn btn-primary" id="confirmBtn">Confirm</button>
+</div>
+<div class="gesture-bar"></div>
+
+<div class="sheet-backdrop" onclick="CM.closeSheet()"></div>
+<div class="sheet" id="pinSheet">
+  <div class="sheet-title">Enter PIN</div>
+  <div class="pin-sub">Confirm transaction by entering your PIN</div>
+  <div class="pin-dots" id="pinDots"><i></i><i></i><i></i><i></i></div>
+  <div class="pin-error" id="pinError"></div>
+  <div class="keypad" id="keypad"></div>
+</div>
+
+<script src="cm.js"></script>
+<script src="df.js"></script>
+<script>
+(function () {
+  var I = CM.ICON, d = DF.getDraft();
+  document.getElementById('closeBtn').innerHTML = I.close;
+  if (Object.keys(DF.problems(d)).length) { location.replace('df-form.html'); return; }
+  var s = DF.lookup(d.sender), r = DF.lookup(d.receiver);
+
+  function item(label, value, focus) {
+    return '<div class="sum-item"><div class="grow"><div class="k">' + label + '</div><div class="v">' + value + '</div></div>' +
+      (focus ? '<a class="edit-btn" href="df-form.html?focus=' + focus + '" aria-label="Edit ' + label + '">' + I.edit + '</a>' : '') + '</div>';
+  }
+  document.getElementById('summary').innerHTML =
+    '<div class="sum-av">' + DF.initials(s.name) + '</div>' +
+    item('Sender name', CM.esc(s.name)) +
+    item('Sender business number', DF.spaced(s.number), 'sender') +
+    item('Receiver name', CM.esc(r.name)) +
+    item('Business number', r.number, 'receiver') +
+    item('Amount', CM.money(+d.amount) + ' ETB', 'amount') +
+    item('Description', CM.esc((d.description || 'Distribute float').toUpperCase()));
+
+  /* ---- PIN (the fingerprint key stands in for biometric approval) ---- */
+  var FINGER = '<svg viewBox="0 0 24 24"><path d="M12 11v3a6 6 0 0 1-1.2 3.6M8.5 9.5A4 4 0 0 1 16 11v2M6.2 7.5A7 7 0 0 1 19 11v1.5M5 12.5V11a7 7 0 0 1 .4-2.3M9 20.3A9 9 0 0 0 12 14v-3M15.5 19.5c.3-.9.5-1.9.5-3"/></svg>';
+  var pin = '';
+  var keys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'bio', '0', 'del'];
+  document.getElementById('keypad').innerHTML = keys.map(function (k) {
+    var label = k === 'del' ? 'Delete' : k === 'bio' ? 'Use fingerprint' : k;
+    return '<button data-k="' + k + '"' + (k === 'bio' ? ' class="bio"' : '') + ' aria-label="' + label + '">' +
+      (k === 'del' ? I.del : k === 'bio' ? FINGER : k) + '</button>';
+  }).join('');
+  function dots() {
+    document.querySelectorAll('#pinDots i').forEach(function (el, i) { el.classList.toggle('fill', i < pin.length); });
+  }
+  function done() {
+    DF.complete(d);
+    setTimeout(function () { location.href = 'df-success.html'; }, 250);
+  }
+  document.querySelectorAll('[data-k]').forEach(function (b) {
+    b.onclick = function () {
+      document.getElementById('pinError').textContent = '';
+      if (b.dataset.k === 'bio') { pin = '1111'; dots(); done(); return; }
+      if (b.dataset.k === 'del') pin = pin.slice(0, -1);
+      else if (pin.length < 4) pin += b.dataset.k;
+      dots();
+      if (pin.length === 4) {
+        /* Prototype: any four digits except 0000 are accepted. */
+        if (pin === '0000') {
+          document.getElementById('pinError').textContent = 'Incorrect PIN. Try again.';
+          pin = ''; setTimeout(dots, 250);
+          return;
+        }
+        done();
+      }
+    };
+  });
+  document.getElementById('confirmBtn').onclick = function () { pin = ''; dots(); CM.openSheet('pinSheet'); };
+})();
+</script>
+</body>
+</html>

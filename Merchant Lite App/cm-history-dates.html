@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Select Date</title>
+<link rel="stylesheet" href="cm.css">
+<style>
+  .subtitle{text-align:center;font-size:14px;color:var(--muted);line-height:1.5;margin:-8px 0 30px}
+  /* Underlined fields with a green calendar, as on the draw-code date filter. */
+  .date-field{display:block;width:100%;margin-bottom:26px;padding:0;border:none;background:none;cursor:pointer;text-align:left;font-family:inherit}
+  .date-field .lbl{display:block;font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.4px;margin-bottom:6px}
+  .date-field .val{display:flex;align-items:center;justify-content:space-between;padding-bottom:6px;border-bottom:1.5px solid #d1d5db;font-size:15px;font-weight:700;color:var(--ink)}
+  .date-field .val svg{width:20px;height:20px;stroke:var(--green);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .date-field:active .val{border-color:var(--green)}
+  .clear{display:block;margin:4px auto 0;padding:8px 12px;border:none;background:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:700;color:var(--red)}
+  .field-error{min-height:18px;font-size:12px;font-weight:600;color:var(--red-d);text-align:center}
+</style>
+</head>
+<body>
+<div class="phone-scroll">
+  <div class="header">
+    <button class="icon-btn" onclick="location.replace('cm-history.html')" aria-label="Back" id="backBtn"></button>
+    <div class="header-title">SELECT DATE</div>
+  </div>
+  <div class="page">
+    <div class="subtitle">Choose a date range you want to<br>filter sweep history</div>
+    <button class="date-field" data-which="from"><span class="lbl">START DATE</span><span class="val"><span id="fromVal"></span><span data-ico></span></span></button>
+    <button class="date-field" data-which="to"><span class="lbl">END DATE</span><span class="val"><span id="toVal"></span><span data-ico></span></span></button>
+    <div class="field-error" id="err"></div>
+    <button class="clear" id="clearBtn" style="display:none">Show all time</button>
+  </div>
+</div>
+
+<div class="footer" style="box-shadow:none">
+  <button class="btn btn-primary" id="viewBtn">View Sweeps</button>
+</div>
+<div class="gesture-bar"></div>
+
+<div class="sheet-backdrop" onclick="CM.closeSheet()"></div>
+<div class="sheet" id="dateSheet">
+  <div class="sheet-title" id="sheetTitle">Start date</div>
+  <div class="wheels"><div class="wheel" id="wDay"></div><div class="wheel" id="wMon"></div><div class="wheel" id="wYear"></div></div>
+  <button class="btn btn-primary" id="selectBtn">Select</button>
+</div>
+
+<script src="cm.js"></script>
+<script>
+(function () {
+  var I = CM.ICON, S = CM.state;
+  document.getElementById('backBtn').innerHTML = I.back;
+  document.querySelectorAll('[data-ico]').forEach(function (el) { el.outerHTML = I.cal; });
+
+  function pad(n) { return String(n).padStart(2, '0'); }
+  function iso(dt) { return dt.getFullYear() + '-' + pad(dt.getMonth() + 1) + '-' + pad(dt.getDate()); }
+  function show(v) { var p = v.split('-'); return p[2] + '/' + p[1] + '/' + p[0]; }
+
+  /* Start from the saved range, else the span of the sweeps on record. */
+  var saved = CM.histRange();
+  var dates = S.history.map(function (b) { return CM.isoDate(b.date); }).sort();
+  var today = iso(new Date());
+  var range = saved || { from: dates[0] || today, to: dates[dates.length - 1] || today };
+  document.getElementById('clearBtn').style.display = saved ? '' : 'none';
+
+  function paint() {
+    document.getElementById('fromVal').textContent = show(range.from);
+    document.getElementById('toVal').textContent = show(range.to);
+    var bad = range.from > range.to;
+    document.getElementById('err').textContent = bad ? 'The start date must be on or before the end date.' : '';
+    document.getElementById('viewBtn').disabled = bad;
+  }
+
+  /* Day / month / year wheels, same picker as the sweep start date. */
+  var which, wd, wm, wy;
+  document.querySelectorAll('[data-which]').forEach(function (b) {
+    b.onclick = function () {
+      which = b.dataset.which;
+      document.getElementById('sheetTitle').textContent = which === 'from' ? 'Start date' : 'End date';
+      CM.openSheet('dateSheet');
+      var p = range[which].split('-').map(Number), now = new Date().getFullYear();
+      var days = [], mons = [], years = [];
+      for (var i = 1; i <= 31; i++) days.push({ label: pad(i), value: i });
+      CM.MONTHS.forEach(function (n, k) { mons.push({ label: n.toUpperCase(), value: k }); });
+      for (var y = now - 2; y <= now; y++) years.push({ label: String(y), value: y });
+      wd = CM.wheel(document.getElementById('wDay'), days, p[2]);
+      wm = CM.wheel(document.getElementById('wMon'), mons, p[1] - 1);
+      wy = CM.wheel(document.getElementById('wYear'), years, p[0]);
+    };
+  });
+  document.getElementById('selectBtn').onclick = function () {
+    var y = wy.get(), m = wm.get(), d = Math.min(wd.get(), new Date(y, m + 1, 0).getDate());
+    range[which] = y + '-' + pad(m + 1) + '-' + pad(d);
+    CM.closeSheet(); paint();
+  };
+
+  document.getElementById('viewBtn').onclick = function () { CM.histRange(range); location.replace('cm-history.html'); };
+  document.getElementById('clearBtn').onclick = function () { CM.histRange(null); location.replace('cm-history.html'); };
+  paint();
+})();
+</script>
+</body>
+</html>
