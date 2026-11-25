@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en" data-no-demo>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>M-PESA Receipt</title>
+<!-- Same layout as the M-PESA PDF receipts (Merchant PDF RECEIPT templates). -->
+<style>
+ @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap');
+
+ * { margin: 0; padding: 0; box-sizing: border-box; }
+ body { font-family: 'Inter', Arial, sans-serif; background: #E8E8E8; display: flex; justify-content: center; padding: 20px; color: #1C1C21; }
+ .page { width: 793.7px; min-height: 1122.5px; background: #FFF; position: relative; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.15); padding: 45.4px 52.9px; display: flex; flex-direction: column; padding-bottom: 75.6px; }
+ .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15.1px; padding-bottom: 15.1px; border-bottom: 1px solid #E0E0E0; }
+ .header-left { flex: 1; }
+ .mpesa-logo { height: 56.7px; width: auto; margin-bottom: 11.3px; }
+ .company-name { font-family: 'Poppins', sans-serif; font-size: 14.7px; font-weight: 700; color: #1C1C21; margin-bottom: 7.6px; }
+ .company-details { font-size: 13.3px; color: #1C1C21; line-height: 2.4; font-weight: 400; }
+ .company-details .label { font-weight: 400; color: #666; letter-spacing: 0.3px; }
+ .company-details .bold-val { font-weight: 700; color: #1C1C21; }
+ .qr-section { text-align: center; }
+ .qr-code { width: 94.5px; height: 94.5px; background: #FFF; border: 1px solid #E0E0E0; display: flex; align-items: center; justify-content: center; margin-bottom: 3.8px; }
+ .qr-code img { width: 100%; height: 100%; object-fit: contain; }
+ .qr-label { font-size: 9.3px; font-weight: 600; color: #1C1C21; letter-spacing: 0.5px; }
+ .title-box { border: 2px solid #FE353D; padding: 9.4px 0; text-align: center; margin: 15.1px 0 22.7px; }
+ .title-box h1 { font-family: 'Poppins', sans-serif; font-size: 16px; font-weight: 700; color: #FE353D; letter-spacing: 1.5px; text-transform: uppercase; }
+ .transaction-info { margin-bottom: 22.7px; }
+ .info-row { display: flex; padding: 5.7px 0; gap: 11.3px; font-size: 12px; }
+ .info-label { min-width: 272.1px; color: #1C1C21; font-weight: 500; text-transform: uppercase; letter-spacing: 0.3px; }
+ .amharic { font-weight: 400; color: #555; }
+ .info-value { flex: 1; color: #1C1C21; font-weight: 600; }
+ .detail-section { margin-bottom: 22.7px; }
+ .section-header { background: #F5F5F5; padding: 7.6px 11.3px; text-align: center; margin-bottom: 7.6px; }
+ .section-header h2 { font-family: 'Poppins', sans-serif; font-size: 13.3px; font-weight: 700; color: #1C1C21; letter-spacing: 1px; text-transform: uppercase; }
+ .detail-table { width: 100%; border-collapse: collapse; font-size: 11.3px; }
+ .detail-table th { background: #F5F5F5; padding: 7.6px 7.6px; text-align: left; font-weight: 600; color: #1C1C21; border: 1px solid #E0E0E0; }
+ .detail-table th:last-child { text-align: right; }
+ .detail-table td { padding: 7.6px 7.6px; border: 1px solid #E0E0E0; vertical-align: middle; }
+ .detail-table td:last-child { text-align: right; font-weight: 600; white-space: nowrap; }
+ .detail-table .amount-cell { font-family: 'Poppins', sans-serif; font-weight: 600; }
+ .detail-table .sum td:first-child { text-align: right; padding-right: 15.1px; }
+ .detail-table .failed { color: #FE353D; }
+ .total-row td { background: #FFF1F2; font-weight: 700; font-size: 12px; color: #FE353D; }
+ .additional-info { margin-bottom: 22.7px; padding-top: 15.1px; border-top: 1px solid #E0E0E0; }
+ .info-group { display: flex; padding: 5.7px 0; gap: 11.3px; font-size: 12px; }
+ .info-group .label { min-width: 272.1px; color: #1C1C21; font-weight: 500; text-transform: uppercase; letter-spacing: 0.3px; }
+ .info-group .value { flex: 1; color: #1C1C21; font-weight: 600; }
+ .amount-words { font-style: italic; }
+ /* Lower than on single-line receipts so it sits beside the summary, not over the amounts. */
+ .stamp-watermark { position: absolute; top: 770px; right: 68px; width: 249.4px; height: 249.4px; opacity: 0.95; pointer-events: none; z-index: 101; transform: rotate(-12deg); }
+ .stamp-watermark img { width: 100%; height: 100%; object-fit: contain; }
+ .footer { text-align: center; padding: 15.1px 0 11.3px; border-top: 1px solid #E0E0E0; font-size: 11.3px; color: #1C1C21; font-weight: 500; letter-spacing: 0.5px; margin-top: auto; }
+ .footer-bar { position: absolute; bottom: 0; left: 0; right: 0; background: #FE353D; padding: 11.3px 22.7px; display: flex; justify-content: flex-end; align-items: center; }
+ .footer-bar img { height: 30.2px; width: auto; }
+ .mpesa-watermark-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-25deg); font-family: 'Poppins', sans-serif; font-size: 140px; font-weight: 900; color: rgba(180, 180, 180, 0.2); letter-spacing: 12px; white-space: nowrap; pointer-events: none; z-index: 100; user-select: none; }
+ /* While the PDF is drawn the page sits flat, with no grey margin or shadow. */
+ body.pdf { background: #FFF; padding: 0; display: block; }
+ body.pdf .page { box-shadow: none; }
+ @media print { body { background: #FFF; padding: 0; } .page { box-shadow: none; width: 793.7px; min-height: 1122.5px; } }
+</style>
+</head>
+<body>
+<div class="page" id="page">
+  <div class="mpesa-watermark-text">M-PESA</div>
+  <div class="header">
+    <div class="header-left">
+      <img src="assets/receipt/M-PESA-red-logo.svg" alt="M-PESA" class="mpesa-logo">
+      <div class="company-name">Safaricom M-PESA Mobile Financial Services PLC</div>
+      <div class="company-details">
+        <span class="label">TIN NO:</span> <span class="bold-val">0084242753</span><br>
+        <span class="label">VAT REG NO:</span> <span class="bold-val">22371880003</span><br>
+        <span class="label">Address:</span> <span class="bold-val">Addis Ababa, Kirkos Woreda 1</span><br>
+        <span class="label">Tel:</span> <span class="bold-val">+251 756 765434</span>
+      </div>
+    </div>
+    <div class="qr-section">
+      <div class="qr-code"><img src="assets/receipt/qr-placeholder.svg" alt="QR Code"></div>
+      <div class="qr-label">SCAN TO VERIFY</div>
+    </div>
+  </div>
+  <div class="title-box"><h1>TRANSACTION INFORMATION</h1></div>
+  <div class="transaction-info" id="info"></div>
+  <div class="detail-section">
+    <div class="section-header"><h2>TRANSACTION DETAIL</h2></div>
+    <table class="detail-table" id="table"></table>
+  </div>
+  <div class="additional-info" id="extra"></div>
+
+  <div class="stamp-watermark"><img src="assets/receipt/M-PESA-official_stamp.png" alt="M-PESA Stamp"></div>
+  <div class="footer">M-PESAን ስለተጠቀሙ እናመሰግናለን / THANK YOU FOR USING M-PESA</div>
+  <div class="footer-bar"><img src="assets/receipt/M-PESA-white-logo.svg" alt="M-PESA"></div>
+</div>
+
+<script src="cm.js"></script>
+<script>
+(function () {
+  var S = CM.state, M = CM.MERCHANT;
+  var q = new URLSearchParams(location.search);
+  var b = CM.batch(q.get('ref')) || S.history[0];
+  if (!b) { document.body.textContent = 'Sweep not found.'; return; }
+  var t = CM.batchTotals(b);
+  var c = S.config;
+
+  function birr(n) { return CM.money(n) + ' BIRR'; }
+  function label(am, en) { return '<span class="amharic">' + am + ' /</span> ' + en; }
+  function row(am, en, v) { return '<div class="info-row"><span class="info-label">' + label(am, en) + '</span><span class="info-value">' + v + '</span></div>'; }
+  function group(am, en, v, cls) { return '<div class="info-group"><span class="label">' + label(am, en) + '</span><span class="value' + (cls ? ' ' + cls : '') + '">' + v + '</span></div>'; }
+
+  /* "26 Oct 2026" + "6:00 PM" -> "26-10-2026 18:00:00", as on the other receipts. */
+  function stampDate(d, tm) {
+    var p = d.split(' '), mon = ('0' + (CM.MONTHS.indexOf(p[1]) + 1)).slice(-2);
+    var m = /(\d+):(\d+)\s*(AM|PM)/i.exec(tm || '') || [0, 0, 0, 'AM'];
+    var h = (+m[1] % 12) + (/pm/i.test(m[3]) ? 12 : 0);
+    return ('0' + p[0]).slice(-2) + '-' + mon + '-' + p[2] + ' ' + ('0' + h).slice(-2) + ':' + m[2] + ':00';
+  }
+
+  /* Amount in words: "Thirty-One Thousand Four Hundred Twenty Birr Only". */
+  var ONES = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve',
+              'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+  var TENS = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+  function under1000(n) {
+    var out = [];
+    if (n >= 100) { out.push(ONES[Math.floor(n / 100)] + ' Hundred'); n %= 100; }
+    if (n >= 20) { out.push(TENS[Math.floor(n / 10)] + (n % 10 ? '-' + ONES[n % 10] : '')); }
+    else if (n) out.push(ONES[n]);
+    return out.join(' ');
+  }
+  function words(n) {
+    if (!n) return 'Zero';
+    var parts = [], units = [[1e9, 'Billion'], [1e6, 'Million'], [1e3, 'Thousand']];
+    units.forEach(function (u) { if (n >= u[0]) { parts.push(under1000(Math.floor(n / u[0])) + ' ' + u[1]); n %= u[0]; } });
+    if (n) parts.push(under1000(n));
+    return parts.join(' ');
+  }
+  function amountWords(v) {
+    var cents = Math.round(v * 100), whole = Math.floor(cents / 100), rest = cents % 100;
+    return words(whole) + ' Birr' + (rest ? ' and ' + words(rest) + ' Cents' : '') + ' Only';
+  }
+
+  document.title = 'M-PESA Cash Sweep Receipt ' + b.ref;
+
+  document.getElementById('info').innerHTML =
+    row('የላኪ ስም', 'SENDER NAME', CM.esc(M.name)) +
+    row('የላኪ አጭር ኮድ', 'SENDER SHORT CODE', M.shortCode) +
+    row('የግብይት መታወቂያ', 'SWEEP REFERENCE', b.ref) +
+    row('የግብይት ቀን', 'SWEEP DATE', stampDate(b.date, b.time)) +
+    row('ሁኔታ', 'STATUS', (CM.STATUS[b.status] || [b.status])[0]) +
+    row('ብቁ ቀሪ ሂሳብ', 'ELIGIBLE BALANCE', birr(b.eligible)) +
+    row('የግብይት ዝርዝር', 'TRANSACTION DETAIL', 'Automated Cash Sweep to Bank');
+
+  /* One line per bank transfer, then what failed and the total that moved. */
+  var body = b.transfers.length ? b.transfers.map(function (x) {
+    var bk = CM.bank(x.bank) || { bank: x.bank, acct: '' };
+    var ok = x.status === 'successful';
+    return '<tr><td>' + CM.esc(bk.bank) + '</td><td>**** **** ' + String(bk.acct).slice(-4) + '</td><td>' + (x.ref || '—') + '</td>' +
+      '<td' + (ok ? '' : ' class="failed"') + '>' + (CM.STATUS[x.status] || [x.status])[0] + '</td>' +
+      '<td class="amount-cell">' + birr(x.amount) + '</td></tr>';
+  }).join('') : '<tr><td colspan="5" style="text-align:center">' + CM.esc(b.note || 'No transfers were made.') + '</td></tr>';
+  document.getElementById('table').innerHTML =
+    '<thead><tr><th style="width:24%">' + label('ተቀባይ ባንክ', 'RECEIVING BANK') + '</th><th style="width:20%">' + label('የሂሳብ ቁጥር', 'ACCOUNT NO') + '</th>' +
+      '<th style="width:20%">' + label('የግብይት መታወቂያ', 'TRANSFER REF') + '</th><th style="width:14%">' + label('ሁኔታ', 'STATUS') + '</th>' +
+      '<th style="width:22%">' + label('መጠን', 'AMOUNT') + '</th></tr></thead><tbody>' + body +
+    (t.bad ? '<tr class="sum"><td colspan="4">ያልተሳካ / FAILED AMOUNT</td><td class="amount-cell">' + birr(t.bad) + '</td></tr>' : '') +
+    '<tr class="total-row sum"><td colspan="4">ጠቅላላ የተላለፈ / TOTAL TRANSFERRED</td><td class="amount-cell">' + birr(t.ok) + '</td></tr></tbody>';
+
+  document.getElementById('extra').innerHTML =
+    group('ጠቅላላ መጠን በቃላት', 'TOTAL AMOUNT IN WORD', amountWords(t.ok), 'amount-words') +
+    group('የተቀናሽ ሂሳብ', 'DEBIT ACCOUNT', 'M-PESA Merchant Account ' + M.shortCode) +
+    group('የክፍፍል ዘዴ', 'ALLOCATION METHOD', c ? (c.type === 'fixed' ? 'Fixed amount' : 'Percentage') : '—') +
+    group('የግብይት ዓይነት', 'TRANSACTION TYPE', 'Cash Sweep - Automated') +
+    group('የግብይት መነሻ', 'USED CHANNEL', 'M-PESA Merchant App') +
+    group('የግብይት ምክንያት', 'TRANSACTION REASON', 'Scheduled Cash Sweep');
+
+  /* ?dl=1: draw the page to an A4 PDF and save it, then tell the opener. */
+  if (q.get('dl') !== '1') return;
+  function done(ok) { try { parent.postMessage({ cmReceipt: ok ? 'saved' : 'failed' }, location.origin); } catch (e) {} }
+  var s = document.createElement('script');
+  s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+  s.onerror = function () { done(false); };
+  s.onload = function () {
+    document.body.classList.add('pdf');
+    (document.fonts ? document.fonts.ready : Promise.resolve()).then(function () {
+      /* One page: A4, or taller when a sweep has many transfers. */
+      var page = document.getElementById('page'), h = Math.max(1123, Math.ceil(page.offsetHeight));
+      return html2pdf().set({
+        margin: 0,
+        filename: 'M-PESA_Cash_Sweep_' + b.ref + '.pdf',
+        image: { type: 'jpeg', quality: 0.96 },
+        html2canvas: { scale: 2, useCORS: true, width: 794, height: h, windowWidth: 794 },
+        jsPDF: { unit: 'px', format: [794, h], orientation: 'portrait', hotfixes: ['px_scaling'] }
+      }).from(page).save();
+    }).then(function () { done(true); }, function () { done(false); });
+  };
+  document.head.appendChild(s);
+})();
+</script>
+</body>
+</html>

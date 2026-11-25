@@ -411,6 +411,8 @@ var CM = (function () {
   }
   function demoPanel() {
     if (document.getElementById('demoPanel')) return;
+    /* Pages outside the phone frame (the PDF receipt) opt out. */
+    if (document.documentElement.hasAttribute('data-no-demo')) return;
     var cur = !activeBanks().length ? 'nobank' : state.config ? 'active' : 'first';
     var el = document.createElement('aside');
     el.id = 'demoPanel';
