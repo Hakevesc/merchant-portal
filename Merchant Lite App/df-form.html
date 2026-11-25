@@ -41,7 +41,7 @@
     flex-shrink:0;display:flex;align-items:center;gap:5px;height:40px;padding:0 10px;border-radius:10px;
     background:#fff;border:1.5px solid var(--green);cursor:text;
   }
-  .flow-amt input{width:92px;border:none;outline:none;background:none;text-align:right;font-family:inherit;font-size:15px;font-weight:700;color:var(--ink)}
+  .flow-amt input{width:96px;border:none;outline:none;background:none;text-align:right;font-family:inherit;font-size:15px;font-weight:700;color:var(--ink)}
   .flow-amt input::placeholder{color:var(--faint);font-weight:600}
   .flow-amt span{font-size:11px;font-weight:700;color:var(--muted)}
   .flow-amt.error{border-color:var(--red);background:#fff7f7}
@@ -166,6 +166,7 @@
     var v = this.value.replace(/[^\d.]/g, '').replace(/\.(?=.*\.)/g, '').replace(/(\.\d{2})\d+$/, '$1');
     if (v !== this.value) this.value = v;
     $(this.id === 'amount' ? 'flowAmount' : 'amount').value = v;
+    d.amountIsBalance = false;
     render();
   }
   $('amount').addEventListener('input', amountInput);
@@ -182,7 +183,14 @@
   }
   function renderFlow() {
     var r = DF.lookup(d.receiver);
-    $('fromPick').innerHTML = flowName(DF.lookup(d.sender), true);
+    var from = DF.lookup(d.sender);
+    $('fromPick').innerHTML = flowName(from, false);
+    /* The box starts at the full balance and can be edited; it follows the
+       From account until the merchant types their own amount. */
+    if (!d.amount || d.amountIsBalance) {
+      d.amount = from.balance.toFixed(2); d.amountIsBalance = true;
+      $('flowAmount').value = d.amount; $('amount').value = d.amount;
+    }
     $('toPick').innerHTML = flowName(r, false);
     $('toBal').textContent = CM.money(r.balance) + ' BIRR';
   }
