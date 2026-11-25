@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#078b47" />
+  <title>M-PESA Statement Generation | Support Portal</title>
+  <link rel="stylesheet" href="statement-portal.css" />
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="index.html" aria-label="M-PESA portals home">
+      <img src="M-Pesa-Logo.png" alt="M-PESA" />
+      <span class="brand-divider"></span>
+      <span class="brand-title">Customer Support Portal</span>
+    </a>
+    <div class="operator"><span class="operator-dot">D</span><span>Demo Operator</span><span class="chevron">⌄</span></div>
+  </header>
+
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Portal navigation">
+      <a class="side-link" href="index.html"><span class="nav-icon">⌂</span>Home</a>
+      <div class="side-group">Customer Support <span>⌄</span></div>
+      <a class="side-link" href="#searchArea"><span class="nav-icon">◷</span>Service Requests</a>
+      <a class="side-link active" href="#searchArea" aria-current="page"><span class="nav-icon">▤</span>Statement Generation</a>
+      <a class="side-link" href="#statementPreview"><span class="nav-icon">⌕</span>Transaction Enquiries</a>
+      <a class="side-link muted-link" href="#searchArea"><span class="nav-icon">▣</span>Case Management</a>
+      <a class="side-link muted-link" href="#keyInformation"><span class="nav-icon">▥</span>Knowledge Base</a>
+      <a class="side-link muted-link" href="#statementPreview"><span class="nav-icon">▮</span>Reports &amp; Analytics</a>
+      <a class="side-link muted-link" href="#keyInformation"><span class="nav-icon">⚙</span>Settings</a>
+      <div class="help-card">
+        <div class="help-icon">?</div>
+        <div><strong>Need Help?</strong><span>Contact Support</span></div>
+        <a href="#keyInformation">Help guide <span>›</span></a>
+      </div>
+      <p class="sidebar-note">Standalone UI prototype<br />Sample data only</p>
+    </aside>
+
+    <main class="main-content">
+      <section class="hero">
+        <div class="hero-copy">
+          <span class="eyebrow">CUSTOMER SUPPORT</span>
+          <h1>M-PESA<br />Statement Generation</h1>
+          <p>Find a customer or partner account and prepare a clear transaction statement.</p>
+        </div>
+        <div class="hero-art" aria-hidden="true">
+          <div class="hero-ring ring-one"></div><div class="hero-ring ring-two"></div>
+          <div class="hero-doc"><span></span><span></span><span></span><i>ETB</i></div>
+          <div class="hero-check">✓</div>
+          <div class="hero-tagline">Simple. Secure. Reliable.</div>
+        </div>
+      </section>
+
+      <div class="prototype-notice" role="note"><span class="notice-icon">i</span><span><strong>Prototype preview:</strong> account search, transaction retrieval, verification QR codes and exports use demonstration data. Connect approved account and transaction services before operational use.</span></div>
+
+      <section class="workflow-card" id="searchArea" aria-labelledby="searchHeading">
+        <div class="step-heading"><span class="step-number">1</span><h2 id="searchHeading">Select account category</h2></div>
+        <div class="choice-grid category-grid" role="group" aria-label="Account category">
+          <button class="choice-card selected" type="button" data-category="customer" aria-pressed="true">
+            <span class="choice-symbol person-symbol">●</span><span class="choice-copy"><strong>Customer Account</strong><small>Generate a statement for an M-PESA customer</small></span><span class="choice-check">✓</span>
+          </button>
+          <button class="choice-card" type="button" data-category="partner" aria-pressed="false">
+            <span class="choice-symbol building-symbol">▥</span><span class="choice-copy"><strong>Partner Account</strong><small>Generate a statement for a partner or organization</small></span><span class="choice-check">✓</span>
+          </button>
+        </div>
+
+        <div class="step-heading second-step"><span class="step-number">2</span><h2>Choose search method</h2></div>
+        <div class="choice-grid method-grid" role="group" aria-label="Search method" id="methodChoices">
+          <button class="method-card selected" type="button" data-method="msisdn" aria-pressed="true"><span class="radio-dot"></span><span><strong>Search by MSISDN</strong><small>Enter the customer's mobile number</small></span></button>
+          <button class="method-card" type="button" data-method="identity" aria-pressed="false"><span class="radio-dot"></span><span><strong>Search by Customer Identity ID</strong><small>Enter the customer's registered ID</small></span></button>
+          <button class="method-card hidden" type="button" data-method="shortcode" aria-pressed="false"><span class="radio-dot"></span><span><strong>Search by Partner Short Code</strong><small>Enter the partner's registered short code</small></span></button>
+        </div>
+
+        <div class="step-heading third-step"><span class="step-number">3</span><h2>Enter search information</h2></div>
+        <form class="search-form" id="accountSearchForm">
+          <label class="visually-hidden" id="searchLabel" for="accountSearchInput">Customer mobile number</label>
+          <div class="search-input-wrap"><span class="input-icon" id="searchInputIcon">☎</span><input id="accountSearchInput" name="accountSearchInput" autocomplete="off" placeholder="e.g. 2517XXXXXXX or 12345678" /><button type="submit" class="primary-button"><span>⌕</span> Find Account</button></div>
+          <div class="field-hint" id="searchHint"><span class="hint-info">i</span>Enter the customer's mobile number. Use a registered number for account lookup.</div>
+          <p class="field-error" id="searchError" aria-live="polite"></p>
+        </form>
+
+        <div class="key-info" id="keyInformation">
+          <div class="key-info-title"><span class="info-round">i</span><strong>Key Information</strong></div>
+          <div class="key-info-list"><span>✓</span><span>Retrieve recent and historical transactions</span><span>✓</span><span>Preview and download a statement</span><span>✓</span><span>Share a statement via approved channels</span></div>
+          <div class="key-info-security"><span class="shield">♢</span><span>Access and disclosure should follow Safaricom data protection and authorization policies.</span></div>
+        </div>
+      </section>
+
+      <section class="result-card hidden" id="accountResult" aria-labelledby="resultHeading">
+        <div class="result-topline"><div><span class="eyebrow green-eyebrow">ACCOUNT FOUND · DEMO</span><h2 id="resultHeading">Demo Customer</h2><p id="resultIdentifier">MSISDN: 2517•••••••</p></div><button class="text-button" type="button" id="changeSearch">Change search</button></div>
+        <div class="step-heading account-step"><span class="step-number">4</span><h2>Select account</h2></div>
+        <div class="account-options" id="accountOptions" role="group" aria-label="Available accounts"></div>
+        <div class="date-generation">
+          <div class="step-heading compact-step"><span class="step-number">5</span><h2>Select transaction period</h2></div>
+          <div class="date-grid">
+            <label>Start date<input type="date" id="startDate" /></label>
+            <label>End date<input type="date" id="endDate" /></label>
+            <button class="primary-button generate-button" id="generateStatement" type="button"><span>▤</span> Generate Statement</button>
+          </div>
+          <p class="field-error" id="dateError" aria-live="polite"></p>
+        </div>
+      </section>
+
+      <section class="statement-card hidden" id="statementPreview" aria-labelledby="statementHeading">
+        <div class="preview-toolbar"><div><span class="eyebrow green-eyebrow" id="statementRecordCount">STATEMENT PREVIEW · DEMO</span><h2 id="statementHeading">M-PESA Transaction Statement</h2></div><div class="toolbar-actions"><button class="secondary-button" type="button" id="openReceipt"><span>▧</span> Receipt format</button><button class="secondary-button" type="button" id="printStatement">Print</button><button class="primary-button" type="button" id="downloadStatementPdf"><span>⤓</span> Download PDF</button></div></div>
+        <div class="statement-banner">M-PESA TRANSACTION STATEMENT</div>
+        <div class="statement-meta">
+          <div class="meta-block"><h3 id="statementDetailsHeading">Customer Details</h3><dl><dt>Account Holder</dt><dd id="statementHolder">Demo Customer</dd><dt id="statementIdLabel">MSISDN</dt><dd id="statementMsisdn">2517•••••••</dd><dt id="statementIdentityLabel">Customer Identity ID</dt><dd id="statementIdentityValue">••••••••</dd><dt>Account</dt><dd id="statementAccount">Main Account</dd><dt>Account Type</dt><dd id="statementType">Main Account</dd></dl></div>
+          <div class="meta-block period-block"><h3>Time Period</h3><dl><dt>From</dt><dd id="periodFrom">—</dd><dt>To</dt><dd id="periodTo">—</dd><dt>Operator</dt><dd>Demo Operator</dd><dt>Date of Report</dt><dd id="reportDate">—</dd><dt>Statement Ref.</dt><dd id="statementRef">—</dd></dl></div>
+        </div>
+        <div class="table-wrap"><table class="transactions-table"><thead><tr><th>No.</th><th>Receipt No.</th><th>Completion Time<br />(EAT)</th><th>Details</th><th>Transaction Status</th><th>Paid In<br />(ETB)</th><th>Withdrawn<br />(ETB)</th><th>Balance<br />(ETB)</th><th>Bill reference</th><th class="receipt-column">Receipt</th></tr></thead><tbody id="transactionRows"></tbody></table></div>
+        <div class="statement-footer-grid">
+          <section class="summary-box"><h3>Account Summary</h3><dl><dt>Opening Balance</dt><dd id="openingBalance">—</dd><dt>Total Paid In</dt><dd id="totalPaidIn">—</dd><dt>Total Withdrawn</dt><dd id="totalWithdrawn">—</dd><dt class="closing-label">Closing Balance</dt><dd class="closing-value" id="closingBalance">—</dd></dl></section>
+          <section class="important-box"><h3><span class="info-round">i</span> Important Information</h3><p>Sample transactions shown here are for layout demonstration only.</p><p>For an official statement, retrieve the source data through approved M-PESA systems.</p><p>This preview is computer generated and is not an official account statement.</p></section>
+        </div>
+        <div class="statement-thanks">Thank you for choosing M-PESA <span class="stamp-small">DEMO<br />PREVIEW</span></div>
+        <div class="statement-bottomline">Safaricom Ethiopia PLC <span>|</span> M-PESA Customer Statement <span class="page-demo">Prototype • Not Official</span></div>
+      </section>
+      <footer class="page-footer">Safaricom Ethiopia PLC <span>•</span> Internal prototype for review</footer>
+    </main>
+  </div>
+
+  <dialog class="receipt-dialog" id="receiptDialog" aria-labelledby="receiptDialogHeading">
+    <div class="dialog-toolbar"><div><strong id="receiptDialogHeading">Receipt format preview</strong><span>Based on your latest receipt PDF</span></div><div><button type="button" class="primary-button" id="downloadReceiptPdf">Download PDF</button><button type="button" class="secondary-button" id="printReceipt">Print receipt</button><button type="button" class="close-dialog" id="closeReceipt" aria-label="Close receipt preview">×</button></div></div>
+    <article class="receipt-page" id="receiptPage">
+      <div class="receipt-watermark">SAMPLE PREVIEW</div>
+      <div class="receipt-head">
+        <div class="receipt-company"><img src="M-Pesa-Logo.png" alt="M-PESA" /><strong>Safaricom M-PESA Mobile Financial Services PLC</strong><p><span>TIN NO:</span> <b>0084242753</b></p><p><span>VAT REG NO:</span> <b>22371880003</b></p><p><span>Address:</span> <b>Addis Ababa, Kirkos Woreda 1</b></p><p><span>Tel:</span> <b>+251 756 765434</b></p></div>
+        <div class="qr-placeholder" aria-label="QR verification placeholder; not scannable"><div class="qr-grid"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><span>DEMO QR<br />NOT SCANNABLE</span></div>
+      </div>
+      <div class="receipt-section-title">TRANSACTION INFORMATION</div>
+      <dl class="receipt-fields">
+        <dt>NAME</dt><dd id="receiptName">Demo Customer</dd>
+        <dt>PHONE NUMBER</dt><dd id="receiptPhone">09••••••15</dd>
+        <dt>PARTNER BANK</dt><dd id="receiptBank">Cooperative Bank of Oromia</dd>
+        <dt>SAVING ACCOUNT NUMBER</dt><dd id="receiptSavingNumber">IS••••2501</dd>
+        <dt>SAVING A/C NAME</dt><dd id="receiptSavingName">Rainy Day</dd>
+        <dt>AMOUNT</dt><dd id="receiptAmount">300.00 ETB</dd>
+        <dt>INTEREST</dt><dd id="receiptInterest">7% Interest</dd>
+        <dt>TRANSACTION TYPE</dt><dd id="receiptType">Deposit to Savings account</dd>
+        <dt>TRANSACTION ID</dt><dd id="receiptId">DEMO-RECEIPT-001</dd>
+      </dl>
+      <div class="receipt-detail-title">TRANSACTION DETAIL</div>
+      <table class="receipt-detail-table"><thead><tr><th>RECEIPT NO</th><th>TRANSACTION DATE AND TIME</th><th>AMOUNT</th></tr></thead><tbody><tr><td id="receiptNo">DEMO-RECEIPT-001</td><td id="receiptDate">25/11/2026 at 02:14 PM</td><td id="receiptDetailAmount">300.00 BIRR</td></tr><tr class="receipt-total"><td colspan="2">TOTAL AMOUNT</td><td id="receiptTotal">300.00 BIRR</td></tr></tbody></table>
+      <dl class="receipt-extra"><dt>TOTAL AMOUNT IN WORD</dt><dd id="receiptWords">Three Hundred Birr Only</dd><dt>USED CHANNEL</dt><dd>M-PESA App</dd><dt>TRANSACTION REASON</dt><dd>M-PESA Savings · Money Deposited</dd></dl>
+      <div class="receipt-stamp">M-PESA<br /><span>DEMO RECEIPT</span></div>
+      <div class="receipt-thanks">THANK YOU FOR USING M-PESA</div>
+      <div class="receipt-red-footer"><span>m<span class="mini-phone">▰</span>pesa</span><small>Safaricom Ethiopia</small></div>
+      <div class="receipt-disclaimer">Sample layout only. This is not an official receipt and cannot be used to verify a transaction.</div>
+    </article>
+  </dialog>
+  <script src="statement-portal.js"></script>
+</body>
+</html>
