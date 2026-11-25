@@ -14,6 +14,11 @@
   }
   .filters button.on{background:var(--red);color:#fff;font-weight:700}
   .group{font-size:11px;font-weight:700;color:var(--faint);letter-spacing:.5px;margin:14px 2px 8px}
+  /* Search above the status tabs, in the same soft-field style. */
+  .search{margin-bottom:12px;display:flex;align-items:center;gap:12px;height:50px;padding:0 20px;border-radius:25px;background:var(--field)}
+  .search svg{width:18px;height:18px;flex-shrink:0;stroke:var(--faint);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .search input{flex:1;min-width:0;border:none;outline:none;background:transparent;font-family:inherit;font-size:14px;color:var(--ink);caret-color:var(--green)}
+  .search input::placeholder{color:var(--faint)}
   .empty-list{text-align:center;padding:28px 10px;color:var(--muted);font-size:12.5px}
 </style>
 </head>
@@ -24,6 +29,10 @@
     <h1>Sweep History</h1>
   </div>
   <div class="page-simple" style="padding-bottom:40px">
+    <label class="search">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></svg>
+      <input id="q" type="search" placeholder="Search date, amount or reference" autocomplete="off">
+    </label>
     <div class="filters" id="filters"></div>
     <div id="list"></div>
   </div>
@@ -47,14 +56,23 @@
 
   function render() {
     document.querySelectorAll('[data-f]').forEach(function (b) { b.classList.toggle('on', b.dataset.f === active); });
-    var rows = S.history.filter(function (b) { return active === 'all' || b.status === active; });
+    var q = document.getElementById('q').value.trim().toLowerCase().replace(/,/g, '');
+    var rows = S.history.filter(function (b) {
+      if (active !== 'all' && b.status !== active) return false;
+      if (!q) return true;
+      /* Match what the row shows (date, time, amount, status) plus the reference. */
+      var text = (b.ref + ' ' + CM.sweepRow(b).replace(/<[^>]+>/g, ' ')).toLowerCase().replace(/,/g, '');
+      return text.indexOf(q) !== -1;
+    });
     document.getElementById('list').innerHTML = rows.length
       ? '<div class="group">OCTOBER 2026</div><div class="hist">' + rows.map(function (b) {
           return '<a class="tile" href="cm-sweep.html?ref=' + b.ref + '">' + CM.sweepRow(b) + '</a>';
         }).join('') + '</div>'
-      : (S.history.length ? '<div class="hist" style="margin-top:14px">' + CM.emptySweeps('No sweeps here', 'There are no sweeps with this status.') + '</div>'
+      : (S.history.length ? '<div class="hist" style="margin-top:14px">' + (q ? CM.emptySweeps('No results', 'No sweeps match your search.')
+                                                                               : CM.emptySweeps('No sweeps here', 'There are no sweeps with this status.')) + '</div>'
                           : '<div class="hist" style="margin-top:14px">' + CM.emptySweeps() + '</div>');
   }
+  document.getElementById('q').addEventListener('input', render);
   render();
 })();
 </script>

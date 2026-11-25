@@ -16,6 +16,11 @@
   .sheet .kv span{color:var(--muted)}
   .sheet .kv b{font-weight:700;text-align:right}
 </style>
+<style>
+  .no-banks .phone-scroll{display:flex;flex-direction:column}
+  .no-banks .page-simple{display:flex;flex-direction:column;flex:1 0 auto;padding-bottom:90px !important}
+  .no-banks #list{flex:1 0 auto;display:flex;align-items:center;justify-content:center;background:none;box-shadow:none;border:none}
+</style>
 </head>
 <body>
 <div class="phone-scroll">
@@ -57,7 +62,11 @@
     return '<a class="tile" href="#" data-id="' + b.id + '">' + CM.bankAv(b) +
       '<div class="tile-main"><div class="tile-title">' + CM.esc(b.bank) + '</div>' +
       '<div class="tile-sub">' + CM.mask(b.acct) + ' • ' + roleOf(b) + '</div></div>' + I.chev + '</a>';
-  }).join('') : '<div class="tile"><div class="tile-sub">No bank accounts linked yet.</div></div>';
+  }).join('') : '<div class="empty-state"><span class="es-ico">' + I.bank + '</span>' +
+      '<div class="es-title">No Bank A/C has been Linked</div>' +
+      '<div class="es-text">Your bank accounts will appear here once the M-PESA Onboarding team links them.</div></div>';
+  /* With nothing linked the empty state fills the screen. */
+  document.body.classList.toggle('no-banks', !banks.length);
   document.querySelectorAll('#list .tile[data-id]').forEach(function (el) {
     el.onclick = function (e) { e.preventDefault(); detail(el.dataset.id); };
   });

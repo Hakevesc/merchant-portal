@@ -8,6 +8,8 @@
 <style>
   /* Home-only: balance hide toggle and the wallet drawing. */
   .eye{background:none;border:none;padding:0;cursor:pointer;display:flex}
+  .view-ico{display:flex;flex-shrink:0}
+  .view-ico svg{width:20px;height:20px;stroke:var(--muted);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
   .eye svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;opacity:.9}
   /* With no sweeps yet, the empty history card stretches to the bottom of
      the screen, its message centred inside. */
@@ -100,10 +102,9 @@
       '<span class="setup-btn">Set Up Cash Sweep</span>';
   } else {
     st.innerHTML = '<span class="tile-ico' + (on ? '' : ' idle') + '">' + I.bolt + '</span>' +
-      '<div class="tile-main"><div class="tile-title">Cash Sweep</div>' +
-        (on ? '<div class="tile-sub">Next sweep: <b style="color:var(--ink)">' + CM.runLabel(CM.nextRun(c)) + '</b></div>'
-            : '<div class="tile-sub">Paused</div>') +
-      '</div>' + CM.pill(on ? 'active' : 'paused') + I.chev;
+      '<div class="tile-main"><div class="tile-title">Cash Sweep</div></div>' +
+      /* Active: an eye to view the running sweep; paused keeps the arrow. */
+      CM.pill(on ? 'active' : 'paused') + (on ? '<span class="view-ico">' + EYE + '</span>' : I.chev);
   }
 
   /* ---- Bank accounts, on the foot of the red card ---- */

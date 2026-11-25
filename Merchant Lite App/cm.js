@@ -397,26 +397,28 @@ var CM = (function () {
 
   /* ---------- Prototype flows ----------
      A panel beside the phone (desktop only) switches the demo between the
-     two journeys: a merchant setting up Cash Sweep for the first time, and
-     one whose sweep is already active. */
+     journeys: a merchant with no bank account linked yet, one setting up
+     Cash Sweep for the first time, and one whose sweep is already active. */
   var SCENARIOS = {
+    nobank: function () { return { banks: [], config: null, history: [] }; },
     first: function () { return { banks: clone(SEED_BANKS), config: null, history: [] }; },
     active: function () { return { banks: clone(SEED_BANKS), config: clone(SEED_CONFIG), history: clone(SEED_HISTORY) }; }
   };
   function scenario(name) {
     try { sessionStorage.setItem(KEY, JSON.stringify(SCENARIOS[name]())); } catch (e) {}
     clearDraft();
-    location.href = 'cm-home.html';
+    location.href = name === 'nobank' ? 'cm-banks.html' : 'cm-home.html';
   }
   function demoPanel() {
     if (document.getElementById('demoPanel')) return;
-    var cur = state.config ? 'active' : 'first';
+    var cur = !activeBanks().length ? 'nobank' : state.config ? 'active' : 'first';
     var el = document.createElement('aside');
     el.id = 'demoPanel';
     el.className = 'demo-panel';
     el.innerHTML = '<div class="dp-title">Prototype flows</div>' +
-      [['first', '1', 'First time', 'No cash sweep set up yet'],
-       ['active', '2', 'Active sweep', 'Sweep running, with history']].map(function (f) {
+      [['nobank', '1', 'No bank linked', 'No bank account linked yet'],
+       ['first', '2', 'First time', 'No cash sweep set up yet'],
+       ['active', '3', 'Active sweep', 'Sweep running, with history']].map(function (f) {
         return '<button class="dp-flow' + (cur === f[0] ? ' on' : '') + '" data-flow="' + f[0] + '">' +
           '<span class="dp-num">' + f[1] + '</span><span><b>' + f[2] + '</b><small>' + f[3] + '</small></span></button>';
       }).join('') +
