@@ -44,7 +44,7 @@
 
     <div class="field-label">Business number</div>
     <div class="field" id="receiverField">
-      <input id="receiver" inputmode="numeric" autocomplete="off" placeholder="Enter Float Business Number">
+      <input id="receiver" readonly aria-readonly="true" tabindex="-1">
     </div>
     <div id="receiverInfo"></div>
 
@@ -74,7 +74,9 @@
   /* The sender starts as the merchant's own business. */
   if (!d.sender) d.sender = DF.HOME;
   $('sender').value = DF.spaced(d.sender);
-  $('receiver').value = d.receiver || '';
+  /* The receiving business is fixed, not chosen. */
+  d.receiver = DF.RECEIVER;
+  $('receiver').value = d.receiver;
   $('amount').value = d.amount || '';
   $('description').value = d.description || '';
 
@@ -122,7 +124,6 @@
   $('sender').addEventListener('input', function () { this.value = DF.spaced(DF.digits(this.value).slice(0, 9)); render(); });
   $('sender').addEventListener('blur', settle);
   $('sender').addEventListener('keydown', function (e) { if (e.key === 'Enter') this.blur(); });
-  $('receiver').addEventListener('input', function () { this.value = DF.digits(this.value).slice(0, 9); render(); });
   /* mousedown would blur the field first and flip the button before the click lands. */
   $('senderEdit').addEventListener('mousedown', function (e) { e.preventDefault(); });
   $('senderEdit').onclick = function () {

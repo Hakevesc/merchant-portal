@@ -55,7 +55,7 @@
     item('Sender name', CM.esc(s.name)) +
     item('Sender business number', DF.spaced(s.number), 'sender') +
     item('Receiver name', CM.esc(r.name)) +
-    item('Business number', r.number, 'receiver') +
+    item('Business number', r.number) +
     item('Amount', CM.money(+d.amount) + ' ETB', 'amount') +
     item('Description', CM.esc((d.description || 'Distribute float').toUpperCase()));
 
