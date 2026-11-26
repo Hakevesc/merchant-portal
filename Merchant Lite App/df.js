@@ -10,7 +10,10 @@ window.DF = (function () {
     '701457843': { name: 'BETTY SHOP', balance: 42678.23 },
     '125216612': { name: 'BETTY SHOP 2', balance: 18240.5 },
     '125216634': { name: 'BETTY SHOP BOLE', balance: 9310 },
-    '125216658': { name: 'BETTY SHOP PIASSA', balance: 27455.75 }
+    '125216658': { name: 'BETTY SHOP PIASSA', balance: 27455.75 },
+    /* Easy numbers for testing. */
+    '123456789': { name: 'TEST SHOP ONE', balance: 50000 },
+    '987654321': { name: 'TEST SHOP TWO', balance: 25000 }
   };
 
   function digits(v) { return String(v || '').replace(/\D/g, ''); }
