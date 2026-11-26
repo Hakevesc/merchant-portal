@@ -17,7 +17,6 @@
   }
   .field .edit-in svg{width:15px;height:15px;stroke:var(--green-d);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
   .field.editing{background:#fff;border-color:var(--green)}
-  .field.editing .edit-in{display:none}
   /* The business behind a number, shown once it's recognised. */
   .acct-card{
     margin-top:12px;padding:14px 16px;border-radius:14px;background:#f3f6fb;
@@ -27,14 +26,6 @@
   .acct-card div{display:flex;justify-content:space-between;gap:10px;font-size:10.5px}
   .acct-card span{font-weight:700;letter-spacing:.3px}
   .acct-card em{font-style:normal;color:var(--muted)}
-  /* Swap sender and receiver, so float can go either way. */
-  .swap-row{display:flex;justify-content:center;margin:14px 0 -6px}
-  .swap-btn{
-    width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:#fff;cursor:pointer;
-    display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.08);transition:transform .25s;
-  }
-  .swap-btn.turn{transform:rotate(180deg)}
-  .swap-btn svg{width:16px;height:16px;stroke:var(--ink-2);fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
 </style>
 </head>
 <body>
@@ -47,16 +38,13 @@
     <div class="field-label" style="margin-top:4px">Sender business number</div>
     <div class="field" id="senderField">
       <input id="sender" inputmode="numeric" autocomplete="off" placeholder="Enter Sender Business Number">
-      <button type="button" class="edit-in" data-edit="sender" aria-label="Edit sender business number"></button>
+      <button type="button" class="edit-in" id="senderEdit" aria-label="Edit sender business number"></button>
     </div>
     <div id="senderInfo"></div>
-
-    <div class="swap-row"><button type="button" class="swap-btn" id="swapBtn" aria-label="Swap sender and receiver"><svg viewBox="0 0 24 24"><path d="M7 4v16M3 16l4 4 4-4M17 20V4M13 8l4-4 4 4"/></svg></button></div>
 
     <div class="field-label">Business number</div>
     <div class="field" id="receiverField">
       <input id="receiver" inputmode="numeric" autocomplete="off" placeholder="Enter Float Business Number">
-      <button type="button" class="edit-in" data-edit="receiver" aria-label="Edit business number"></button>
     </div>
     <div id="receiverInfo"></div>
 
@@ -81,7 +69,7 @@
   var I = CM.ICON, d = DF.getDraft();
   document.getElementById('closeBtn').innerHTML = I.close;
   var $ = function (id) { return document.getElementById(id); };
-  document.querySelectorAll('.edit-in').forEach(function (b) { b.innerHTML = I.edit + 'Edit'; });
+  var RESET = '<svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.3-5.6M4 4v4h4"/></svg>';
 
   /* The sender starts as the merchant's own business. */
   if (!d.sender) d.sender = DF.HOME;
@@ -95,16 +83,19 @@
   }
   function note(msg) { return '<div class="field-note error">' + msg + '</div>'; }
 
-  /* A recognised number locks as text; an empty or unknown one stays open. */
-  function setEditing(which, on) {
-    $(which).readOnly = !on;
-    $(which + 'Field').classList.toggle('editing', on);
-    if (on) { $(which).focus(); var v = $(which).value; $(which).setSelectionRange(v.length, v.length); }
+  /* The sender reads as text with Edit. Editing swaps the button to Reset,
+     which puts back the number from before editing started. */
+  var before = DF.lookup(d.sender) ? d.sender : DF.HOME;
+  function setEditing(on) {
+    $('sender').readOnly = !on;
+    $('senderField').classList.toggle('editing', on);
+    $('senderEdit').innerHTML = on ? RESET + 'Reset' : I.edit + 'Edit';
+    $('senderEdit').setAttribute('aria-label', on ? 'Reset sender business number' : 'Edit sender business number');
+    if (on) { $('sender').focus(); var v = $('sender').value; $('sender').setSelectionRange(v.length, v.length); }
   }
-  function settle(which) {
-    var known = !!DF.lookup($(which).value);
-    $(which).readOnly = known;
-    $(which + 'Field').classList.toggle('editing', !known);
+  /* Leaving the field: a recognised number locks again, anything else stays open. */
+  function settle() {
+    if (DF.lookup($('sender').value)) { before = DF.digits($('sender').value); setEditing(false); }
   }
 
   /* Show the business behind each number as soon as it's complete, and
@@ -128,23 +119,16 @@
     $('confirmBtn').disabled = Object.keys(p).length > 0;
   }
 
-  ['sender', 'receiver'].forEach(function (which) {
-    $(which).addEventListener('input', function () {
-      var v = DF.digits(this.value).slice(0, 9);
-      this.value = which === 'sender' ? DF.spaced(v) : v;
-      render();
-    });
-    $(which).addEventListener('blur', function () { settle(which); });
-    $(which).addEventListener('keydown', function (e) { if (e.key === 'Enter') this.blur(); });
-  });
-  document.querySelectorAll('[data-edit]').forEach(function (b) {
-    b.onclick = function () { setEditing(b.dataset.edit, true); };
-  });
-  $('swapBtn').onclick = function () {
-    var s = d.sender, r = d.receiver;
-    $('sender').value = DF.spaced(r); $('receiver').value = s;
-    this.classList.toggle('turn');
-    render(); settle('sender'); settle('receiver');
+  $('sender').addEventListener('input', function () { this.value = DF.spaced(DF.digits(this.value).slice(0, 9)); render(); });
+  $('sender').addEventListener('blur', settle);
+  $('sender').addEventListener('keydown', function (e) { if (e.key === 'Enter') this.blur(); });
+  $('receiver').addEventListener('input', function () { this.value = DF.digits(this.value).slice(0, 9); render(); });
+  /* mousedown would blur the field first and flip the button before the click lands. */
+  $('senderEdit').addEventListener('mousedown', function (e) { e.preventDefault(); });
+  $('senderEdit').onclick = function () {
+    if ($('sender').readOnly) { setEditing(true); return; }
+    $('sender').value = DF.spaced(before);
+    render(); setEditing(false);
   };
   $('amount').addEventListener('input', function () {
     var v = this.value.replace(/[^\d.]/g, '').replace(/\.(?=.*\.)/g, '').replace(/(\.\d{2})\d+$/, '$1');
@@ -155,11 +139,11 @@
   $('confirmBtn').onclick = function () { location.href = 'df-confirm.html'; };
 
   render();
-  settle('sender'); settle('receiver');
+  setEditing(!DF.lookup(d.sender));
 
   /* Coming back from the confirm screen to change one value. */
   var focus = new URLSearchParams(location.search).get('focus');
-  if (focus === 'sender' || focus === 'receiver') setTimeout(function () { setEditing(focus, true); }, 150);
+  if (focus === 'sender') setTimeout(function () { setEditing(true); }, 150);
   else if (focus && $(focus)) setTimeout(function () { $(focus).focus(); }, 150);
 })();
 </script>
