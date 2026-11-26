@@ -8,6 +8,16 @@
 <style>
   .field-label{margin-top:18px}
   .field input::placeholder{color:var(--faint);font-weight:500}
+  /* A set number reads as text with a pencil; the pencil makes it editable. */
+  .field input[readonly]{cursor:default}
+  .field .edit-in{
+    flex-shrink:0;padding:0 14px;border:none;border-left:1px solid var(--field-line);background:none;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;gap:6px;
+    font-family:inherit;font-size:12.5px;font-weight:700;color:var(--green-d);
+  }
+  .field .edit-in svg{width:15px;height:15px;stroke:var(--green-d);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .field.editing{background:#fff;border-color:var(--green)}
+  .field.editing .edit-in{display:none}
   /* The business behind a number, shown once it's recognised. */
   .acct-card{
     margin-top:12px;padding:14px 16px;border-radius:14px;background:#f3f6fb;
@@ -17,45 +27,14 @@
   .acct-card div{display:flex;justify-content:space-between;gap:10px;font-size:10.5px}
   .acct-card span{font-weight:700;letter-spacing:.3px}
   .acct-card em{font-style:normal;color:var(--muted)}
-
-  /* Two ways in: type business numbers, or pick from the organisation's accounts. */
-  .view-seg{display:flex;padding:4px;border-radius:999px;background:var(--field);border:1px solid var(--line);margin:0 0 6px}
-  .view-seg button{
-    flex:1;height:40px;border:none;border-radius:999px;background:transparent;cursor:pointer;
-    font-family:inherit;font-size:13px;font-weight:700;color:var(--muted);
+  /* Swap sender and receiver, so float can go either way. */
+  .swap-row{display:flex;justify-content:center;margin:14px 0 -6px}
+  .swap-btn{
+    width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:#fff;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.08);transition:transform .25s;
   }
-  .view-seg button:focus-visible{outline:2px solid var(--green-d);outline-offset:1px}
-  .view-seg button:focus{outline:none}
-  .view-seg button.on{background:var(--green);color:#fff;box-shadow:0 3px 10px rgba(31,168,86,.25)}
-
-  /* From / To account picker with a swap arrow between the two cards. */
-  .flow{position:relative;display:grid;gap:10px;margin-top:8px}
-  .flow-lbl{font-size:10.5px;font-weight:700;color:var(--muted);letter-spacing:.5px;margin:0 0 6px 2px}
-  .flow-card{
-    width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px 10px 14px;border-radius:14px;min-height:62px;
-    background:var(--field);border:1px solid var(--field-line);
-  }
-  /* Name side opens the account picker; the From card's right side is the amount to send. */
-  .flow-pick{flex:1;min-width:0;display:flex;align-items:center;gap:12px;padding:0;border:none;background:none;cursor:pointer;font-family:inherit;text-align:left}
-  .flow-amt{
-    flex-shrink:0;display:flex;align-items:center;gap:5px;height:40px;padding:0 10px;border-radius:10px;
-    background:#fff;border:1.5px solid var(--green);cursor:text;
-  }
-  .flow-amt input{width:96px;border:none;outline:none;background:none;text-align:right;font-family:inherit;font-size:15px;font-weight:700;color:var(--ink)}
-  .flow-amt input::placeholder{color:var(--faint);font-weight:600}
-  .flow-amt span{font-size:11px;font-weight:700;color:var(--muted)}
-  .flow-amt.error{border-color:var(--red);background:#fff7f7}
-  .flow-card .av{width:30px;height:30px;border-radius:50%;flex-shrink:0;background:#2f80ed;color:#fff;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center}
-  .flow-card .nm{flex:1;min-width:0;font-size:13px;font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .flow-card .nm small{display:block;font-size:10.5px;font-weight:600;color:var(--muted);margin-top:2px}
-  .flow-card .fbal{font-size:12px;font-weight:600;color:var(--ink-2);white-space:nowrap}
-  .flow-swap{
-    position:absolute;left:50%;top:50%;transform:translate(-50%,-6px);z-index:2;width:30px;height:30px;border-radius:50%;
-    border:1px solid var(--line);background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;
-    box-shadow:0 2px 8px rgba(0,0,0,.08);transition:transform .25s;
-  }
-  .flow-swap.turn{transform:translate(-50%,-6px) rotate(180deg)}
-  .flow-swap svg{width:15px;height:15px;stroke:var(--ink-2);fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+  .swap-btn.turn{transform:rotate(180deg)}
+  .swap-btn svg{width:16px;height:16px;stroke:var(--ink-2);fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
 </style>
 </head>
 <body>
@@ -65,38 +44,25 @@
     <div class="header-title">DISTRIBUTE FLOAT</div>
   </div>
   <div class="page">
-    <div class="view-seg" role="group" aria-label="How to choose the accounts">
-      <button type="button" data-view="number">Business number</button>
-      <button type="button" data-view="accounts">My accounts</button>
+    <div class="field-label" style="margin-top:4px">Sender business number</div>
+    <div class="field" id="senderField">
+      <input id="sender" inputmode="numeric" autocomplete="off" placeholder="Enter Sender Business Number">
+      <button type="button" class="edit-in" data-edit="sender" aria-label="Edit sender business number"></button>
     </div>
-
-    <div id="viewAccounts">
-      <div class="flow">
-        <div><div class="flow-lbl">FROM · AMOUNT TO SEND</div>
-          <div class="flow-card"><button type="button" class="flow-pick" data-pick="sender" id="fromPick"></button>
-            <label class="flow-amt" id="flowAmtBox"><input id="flowAmount" inputmode="decimal" autocomplete="off" placeholder="0.00" aria-label="Amount to send"><span>BIRR</span></label></div></div>
-        <div><div class="flow-lbl">TO</div>
-          <div class="flow-card"><button type="button" class="flow-pick" data-pick="receiver" id="toPick"></button><span class="fbal" id="toBal"></span></div></div>
-        <button type="button" class="flow-swap" id="swapBtn" aria-label="Swap direction"><svg viewBox="0 0 24 24"><path d="M12 5v14M6 13l6 6 6-6"/></svg></button>
-      </div>
-      <div id="flowNote"></div>
-    </div>
-
-    <div id="viewNumber">
-    <div class="field-label">Sender business number</div>
-    <div class="field" id="senderField"><input id="sender" inputmode="numeric" autocomplete="off" placeholder="Enter Sender Business Number"></div>
     <div id="senderInfo"></div>
 
-    <div class="field-label">Business number</div>
-    <div class="field" id="receiverField"><input id="receiver" inputmode="numeric" autocomplete="off" placeholder="Enter Float Business Number"></div>
-    <div id="receiverInfo"></div>
-    </div>
+    <div class="swap-row"><button type="button" class="swap-btn" id="swapBtn" aria-label="Swap sender and receiver"><svg viewBox="0 0 24 24"><path d="M7 4v16M3 16l4 4 4-4M17 20V4M13 8l4-4 4 4"/></svg></button></div>
 
-    <div id="amountBlock">
+    <div class="field-label">Business number</div>
+    <div class="field" id="receiverField">
+      <input id="receiver" inputmode="numeric" autocomplete="off" placeholder="Enter Float Business Number">
+      <button type="button" class="edit-in" data-edit="receiver" aria-label="Edit business number"></button>
+    </div>
+    <div id="receiverInfo"></div>
+
     <div class="field-label">Amount</div>
     <div class="field" id="amountField"><input id="amount" inputmode="decimal" autocomplete="off" placeholder="Enter Amount"><span class="suffix">ETB</span></div>
     <div id="amountInfo"></div>
-    </div>
 
     <div class="field-label">Description</div>
     <div class="field"><input id="description" autocomplete="off" maxlength="60" placeholder="Enter description"></div>
@@ -108,12 +74,6 @@
 </div>
 <div class="gesture-bar"></div>
 
-<div class="sheet-backdrop" onclick="CM.closeSheet()"></div>
-<div class="sheet" id="pickSheet">
-  <div class="sheet-title" id="pickTitle">From account</div>
-  <div class="sheet-list" id="pickList"></div>
-</div>
-
 <script src="cm.js"></script>
 <script src="df.js"></script>
 <script>
@@ -121,8 +81,11 @@
   var I = CM.ICON, d = DF.getDraft();
   document.getElementById('closeBtn').innerHTML = I.close;
   var $ = function (id) { return document.getElementById(id); };
+  document.querySelectorAll('.edit-in').forEach(function (b) { b.innerHTML = I.edit + 'Edit'; });
 
-  $('sender').value = d.sender ? DF.spaced(d.sender) : '';
+  /* The sender starts as the merchant's own business. */
+  if (!d.sender) d.sender = DF.HOME;
+  $('sender').value = DF.spaced(d.sender);
   $('receiver').value = d.receiver || '';
   $('amount').value = d.amount || '';
   $('description').value = d.description || '';
@@ -131,6 +94,18 @@
     return '<div class="acct-card"><b>' + CM.esc(acct.name) + '</b><div><span>WORKING ACCOUNT BALANCE</span><em>' + CM.money(acct.balance) + ' ETB</em></div></div>';
   }
   function note(msg) { return '<div class="field-note error">' + msg + '</div>'; }
+
+  /* A recognised number locks as text; an empty or unknown one stays open. */
+  function setEditing(which, on) {
+    $(which).readOnly = !on;
+    $(which + 'Field').classList.toggle('editing', on);
+    if (on) { $(which).focus(); var v = $(which).value; $(which).setSelectionRange(v.length, v.length); }
+  }
+  function settle(which) {
+    var known = !!DF.lookup($(which).value);
+    $(which).readOnly = known;
+    $(which + 'Field').classList.toggle('editing', !known);
+  }
 
   /* Show the business behind each number as soon as it's complete, and
      only name a problem once the merchant has typed enough to judge it. */
@@ -150,99 +125,42 @@
     $('senderField').classList.toggle('error', !!showS);
     $('receiverField').classList.toggle('error', !!showR);
     $('amountField').classList.toggle('error', !!showA);
-    $('flowAmtBox').classList.toggle('error', !!showA);
-    $('flowNote').innerHTML = showA ? note(p.amount) : '';
     $('confirmBtn').disabled = Object.keys(p).length > 0;
   }
 
-  $('sender').addEventListener('input', function () {
-    var v = DF.digits(this.value).slice(0, 9);
-    this.value = DF.spaced(v);
-    render();
+  ['sender', 'receiver'].forEach(function (which) {
+    $(which).addEventListener('input', function () {
+      var v = DF.digits(this.value).slice(0, 9);
+      this.value = which === 'sender' ? DF.spaced(v) : v;
+      render();
+    });
+    $(which).addEventListener('blur', function () { settle(which); });
+    $(which).addEventListener('keydown', function (e) { if (e.key === 'Enter') this.blur(); });
   });
-  $('receiver').addEventListener('input', function () { this.value = DF.digits(this.value).slice(0, 9); render(); });
-  /* Both amount inputs (form field and From card) hold the same value. */
-  function amountInput() {
+  document.querySelectorAll('[data-edit]').forEach(function (b) {
+    b.onclick = function () { setEditing(b.dataset.edit, true); };
+  });
+  $('swapBtn').onclick = function () {
+    var s = d.sender, r = d.receiver;
+    $('sender').value = DF.spaced(r); $('receiver').value = s;
+    this.classList.toggle('turn');
+    render(); settle('sender'); settle('receiver');
+  };
+  $('amount').addEventListener('input', function () {
     var v = this.value.replace(/[^\d.]/g, '').replace(/\.(?=.*\.)/g, '').replace(/(\.\d{2})\d+$/, '$1');
     if (v !== this.value) this.value = v;
-    $(this.id === 'amount' ? 'flowAmount' : 'amount').value = v;
-    d.amountIsBalance = false;
     render();
-  }
-  $('amount').addEventListener('input', amountInput);
-  $('flowAmount').addEventListener('input', amountInput);
-  $('flowAmount').value = d.amount || '';
+  });
   $('description').addEventListener('input', render);
   $('confirmBtn').onclick = function () { location.href = 'df-confirm.html'; };
 
-  /* ---- My accounts view ---- */
-  var numbers = Object.keys(DF.ORG);
-  function flowName(acct, withBalance) {
-    return '<span class="av">' + acct.name[0] + '</span><span class="nm">' + CM.esc(acct.name) +
-      '<small>' + DF.spaced(acct.number) + (withBalance ? ' · Bal ' + CM.money(acct.balance) : '') + '</small></span>';
-  }
-  function renderFlow() {
-    var r = DF.lookup(d.receiver);
-    var from = DF.lookup(d.sender);
-    $('fromPick').innerHTML = flowName(from, false);
-    /* The box starts at the full balance and can be edited; it follows the
-       From account until the merchant types their own amount. */
-    if (!d.amount || d.amountIsBalance) {
-      d.amount = from.balance.toFixed(2); d.amountIsBalance = true;
-      $('flowAmount').value = d.amount; $('amount').value = d.amount;
-    }
-    $('toPick').innerHTML = flowName(r, false);
-    $('toBal').textContent = CM.money(r.balance) + ' BIRR';
-  }
-  /* Picking from the list needs two different known accounts to start from. */
-  function ensurePair() {
-    if (!DF.lookup(d.sender)) d.sender = numbers.find(function (n) { return n !== d.receiver; });
-    if (!DF.lookup(d.receiver) || d.receiver === d.sender) d.receiver = numbers.find(function (n) { return n !== d.sender; });
-  }
-  function setView(view) {
-    d.view = view;
-    document.querySelectorAll('[data-view]').forEach(function (b) { b.classList.toggle('on', b.dataset.view === view); });
-    $('viewAccounts').style.display = view === 'accounts' ? '' : 'none';
-    $('viewNumber').style.display = view === 'accounts' ? 'none' : '';
-    $('amountBlock').style.display = view === 'accounts' ? 'none' : '';
-    if (view === 'accounts') { ensurePair(); renderFlow(); }
-    $('sender').value = DF.spaced(d.sender);
-    $('receiver').value = d.receiver;
-    render();
-  }
-  document.querySelectorAll('[data-view]').forEach(function (b) { b.onclick = function () { setView(b.dataset.view); }; });
-  $('swapBtn').onclick = function () {
-    var t = d.sender; d.sender = d.receiver; d.receiver = t;
-    this.classList.toggle('turn');
-    $('sender').value = DF.spaced(d.sender); $('receiver').value = d.receiver;
-    renderFlow(); render();
-  };
-  document.querySelectorAll('[data-pick]').forEach(function (card) {
-    card.onclick = function () {
-      var which = card.dataset.pick, other = which === 'sender' ? d.receiver : d.sender;
-      $('pickTitle').textContent = which === 'sender' ? 'From account' : 'To account';
-      $('pickList').innerHTML = numbers.filter(function (n) { return n !== other; }).map(function (n) {
-        var a = DF.lookup(n);
-        return '<button class="opt' + (d[which] === n ? ' on' : '') + '" data-num="' + n + '"><span class="opt-ico" style="background:#2f80ed;font-weight:800;color:#fff;font-size:13px">' + a.name[0] + '</span>' +
-          '<span style="flex:1;min-width:0"><span class="opt-title" style="display:block;font-size:13.5px">' + CM.esc(a.name) + '</span>' +
-          '<span class="opt-sub" style="display:block">' + DF.spaced(n) + ' · ' + CM.money(a.balance) + ' BIRR</span></span><span class="radio"></span></button>';
-      }).join('');
-      document.querySelectorAll('[data-num]').forEach(function (o) {
-        o.onclick = function () {
-          d[which] = o.dataset.num;
-          $('sender').value = DF.spaced(d.sender); $('receiver').value = d.receiver;
-          CM.closeSheet(); renderFlow(); render();
-        };
-      });
-      CM.openSheet('pickSheet');
-    };
-  });
+  render();
+  settle('sender'); settle('receiver');
 
   /* Coming back from the confirm screen to change one value. */
   var focus = new URLSearchParams(location.search).get('focus');
-  if (focus === 'amount' && d.view === 'accounts') focus = 'flowAmount';
-  if (focus && $(focus)) setTimeout(function () { $(focus).focus(); }, 150);
-  setView(d.view === 'accounts' ? 'accounts' : 'number');
+  if (focus === 'sender' || focus === 'receiver') setTimeout(function () { setEditing(focus, true); }, 150);
+  else if (focus && $(focus)) setTimeout(function () { $(focus).focus(); }, 150);
 })();
 </script>
 </body>

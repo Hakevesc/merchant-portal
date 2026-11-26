@@ -59,6 +59,9 @@ window.DF = (function () {
   }
   function last() { return read(LAST_KEY); }
 
-  return { ORG: ORG, digits: digits, lookup: lookup, spaced: spaced, initials: initials,
+  /* The merchant's own business, the default sender. */
+  var HOME = '701457843';
+
+  return { ORG: ORG, HOME: HOME, digits: digits, lookup: lookup, spaced: spaced, initials: initials,
     getDraft: getDraft, saveDraft: saveDraft, problems: problems, complete: complete, last: last };
 })();
