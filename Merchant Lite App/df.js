@@ -59,10 +59,9 @@ window.DF = (function () {
   }
   function last() { return read(LAST_KEY); }
 
-  /* The merchant's own business (default sender) and the business that
-     receives the float, which is fixed. */
-  var HOME = '701457843', RECEIVER = '125216612';
+  /* The merchant's own business, the default sender. */
+  var HOME = '701457843';
 
-  return { ORG: ORG, HOME: HOME, RECEIVER: RECEIVER, digits: digits, lookup: lookup, spaced: spaced, initials: initials,
+  return { ORG: ORG, HOME: HOME, digits: digits, lookup: lookup, spaced: spaced, initials: initials,
     getDraft: getDraft, saveDraft: saveDraft, problems: problems, complete: complete, last: last };
 })();
